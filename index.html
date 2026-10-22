@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html class="dark" lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "tertiary-container": "#a0b4bd", "on-primary": "#432c00", "primary-container": "#dda74a", "on-tertiary-fixed-variant": "#374a51", "surface-bright": "#36393f", "secondary-fixed": "#ffdeab", "on-surface": "#e1e2e9", "outline-variant": "#4f4537", "on-tertiary": "#20333a", "background": "#101418", "surface-container": "#1d2025", "on-background": "#e1e2e9", "on-secondary-container": "#ddb269", "inverse-on-surface": "#2e3036", "on-secondary": "#422c00", "inverse-primary": "#7f5700", "on-tertiary-fixed": "#0a1e25", "on-secondary-fixed": "#271900", "error-container": "#93000a", "surface-container-low": "#191c21", "surface-container-highest": "#32353a", "secondary-container": "#624302", "inverse-surface": "#e1e2e9", "surface-dim": "#101418", "surface-container-high": "#272a2f", "primary-fixed-dim": "#f6bd5e", "surface-variant": "#32353a", "outline": "#9c8f7d", "on-primary-fixed": "#281900", "primary-fixed": "#ffdead", "on-secondary-fixed-variant": "#5f4100", "tertiary": "#bbcfd9", "on-tertiary-container": "#33464e", "secondary-fixed-dim": "#ecc076", "on-error": "#690005", "secondary": "#ecc076", "surface-container-lowest": "#0b0e13", "tertiary-fixed-dim": "#b5cad3", "on-error-container": "#ffdad6", "surface": "#101418", "primary": "#fbc262", "on-surface-variant": "#d3c4b1", "error": "#ffb4ab", "tertiary-fixed": "#d1e6ef", "on-primary-fixed-variant": "#604100", "on-primary-container": "#5b3d00", "surface-tint": "#f6bd5e" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "space-lg": "1.5rem", "space-md": "1rem", "space-xl": "2.5rem", "space-xs": "0.25rem", "gutter-mobile": "1rem", "gutter": "1.5rem", "margin": "2rem", "margin-mobile": "1rem", "space-sm": "0.5rem" }, "fontFamily": { "headline-lg": [ "Newsreader" ], "headline-sm": [ "Newsreader" ], "label-sm": [ "JetBrains Mono" ], "display-lg": [ "Newsreader" ], "headline-lg-mobile": [ "Newsreader" ], "display-lg-mobile": [ "Newsreader" ], "body-md": [ "Inter" ], "label-md": [ "JetBrains Mono" ], "scripture-quote": [ "Newsreader" ], "body-sm": [ "Inter" ], "headline-md": [ "Newsreader" ], "body-lg": [ "Inter" ] }, "fontSize": { "headline-lg": [ "2.5rem", { "lineHeight": "3rem", "letterSpacing": "-0.015em", "fontWeight": "500" } ], "headline-sm": [ "1.375rem", { "lineHeight": "1.75rem", "fontWeight": "600" } ], "label-sm": [ "0.6875rem", { "lineHeight": "0.875rem", "letterSpacing": "0.05em", "fontWeight": "500" } ], "display-lg": [ "3.5rem", { "lineHeight": "4.25rem", "letterSpacing": "-0.02em", "fontWeight": "400" } ], "headline-lg-mobile": [ "1.75rem", { "lineHeight": "2.25rem", "fontWeight": "500" } ], "display-lg-mobile": [ "2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.01em", "fontWeight": "400" } ], "body-md": [ "0.9375rem", { "lineHeight": "1.5rem", "fontWeight": "400" } ], "label-md": [ "0.8125rem", { "lineHeight": "1rem", "letterSpacing": "0.04em", "fontWeight": "500" } ], "scripture-quote": [ "1.25rem", { "lineHeight": "2rem", "letterSpacing": "0.01em", "fontWeight": "400" } ], "body-sm": [ "0.8125rem", { "lineHeight": "1.25rem", "fontWeight": "400" } ], "headline-md": [ "1.875rem", { "lineHeight": "2.375rem", "fontWeight": "500" } ], "body-lg": [ "1.125rem", { "lineHeight": "1.875rem", "fontWeight": "400" } ] } } } };</script></head><body class="bg-background text-on-surface font-body-md text-body-md min-h-screen antialiased selection:bg-primary-container selection:text-on-primary-container"><aside class="fixed left-0 top-0 h-full w-72 bg-surface-container-lowest z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.3)]"><div class="flex flex-col"><div class="h-16 flex items-center px-gutter gap-space-sm bg-surface-container-low/40"><span class="material-symbols-outlined text-primary text-[24px]">menu_book</span><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-primary tracking-tight">Kerygma</span><span class="font-label-sm text-label-sm text-tertiary tracking-wider uppercase">Ministerio &amp; Pulpit</span></div></div><div class="px-space-md py-space-sm"><div class="font-label-sm text-label-sm text-outline px-space-sm mb-space-xs uppercase tracking-wider">Navegación Pastoral</div><nav class="flex flex-col gap-space-xs" data-active-classes="bg-surface-container-high text-primary font-medium"><a class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="cronograma-y-predicaciones" href="#"><span class="material-symbols-outlined text-[20px]">event_available</span><span>Cronograma &amp; Predicaciones</span></a><a class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="editor-de-bosquejos-y-discursos" href="#"><span class="material-symbols-outlined text-[20px]">history_edu</span><span>Editor de Bosquejos / Discursos</span></a><a class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="banco-biblico-y-notas" href="#"><span class="material-symbols-outlined text-[20px]">auto_stories</span><span>Banco Bíblico &amp; Notas</span></a><a class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="revisitas-y-territorio" href="#"><span class="material-symbols-outlined text-[20px]">pin_drop</span><span>Revisitas &amp; Territorio</span></a><a class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="cronometro-de-ensayos" href="#"><span class="material-symbols-outlined text-[20px]">timer</span><span>Cronómetro de Ensayos</span></a></nav></div></div><div class="p-space-md bg-surface-container-low/30 flex flex-col gap-space-xs"><nav class="flex flex-col" data-active-classes="bg-surface-container-high text-primary font-medium"><a class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="configuracion-y-dokploy" href="#"><span class="material-symbols-outlined text-[20px]">tune</span><span>Configuración / Dokploy</span></a></nav><div class="flex items-center justify-between px-space-sm pt-space-xs"><span class="font-label-sm text-label-sm text-outline">PWA v2.4.0</span><span class="flex items-center gap-1 font-label-sm text-label-sm text-tertiary"><span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>Dokploy OK</span></div></div></aside><div class="pl-72"><header class="fixed top-0 left-72 right-0 h-16 bg-surface/85 backdrop-blur-xl z-40 shadow-[0_1px_8px_rgba(0,0,0,0.15)] flex items-center justify-between px-gutter"><div class="flex items-center gap-gutter"><div class="flex items-center gap-space-sm bg-surface-container-low px-space-md py-space-xs rounded-lg"><span class="material-symbols-outlined text-secondary text-[18px]">church</span><div class="flex flex-col text-left"><span class="font-label-sm text-label-sm text-outline leading-none">Congregación / Perfil</span><span class="font-body-sm text-body-sm text-on-surface font-medium leading-tight">Bethel Central • Discursante</span></div><span class="material-symbols-outlined text-outline text-[16px]">expand_more</span></div><button class="flex items-center gap-space-sm bg-surface-container px-space-md py-space-xs rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[18px]">search</span><span class="font-body-sm text-body-sm">Buscar escrituras, bosquejos...</span><kbd class="font-label-sm text-label-sm bg-surface-container-highest px-space-xs py-0.5 rounded text-secondary">Cmd + K</kbd></button></div><div class="flex items-center gap-gutter"><div class="flex items-center gap-space-sm bg-surface-container-low px-space-md py-space-xs rounded-lg"><div class="relative flex items-center justify-center"><span class="w-2 h-2 rounded-full bg-secondary"></span><span class="absolute w-2 h-2 rounded-full bg-secondary animate-ping opacity-75"></span></div><div class="flex flex-col"><span class="font-label-sm text-label-sm text-on-surface leading-none">PocketBase Sincronizado</span><span class="font-label-sm text-label-sm text-outline leading-none mt-0.5">Offline Ready (Local Cache)</span></div><span class="material-symbols-outlined text-tertiary text-[18px]">cloud_done</span></div><div class="flex items-center gap-space-sm"><button class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"><span class="material-symbols-outlined text-[20px]">podium</span></button><button class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"><span class="material-symbols-outlined text-[20px]">notifications</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="relative w-full pt-16 bg-background px-gutter min-h-screen"><div class="flex flex-col w-full pb-16">
+<!-- Top Operational Banner & Quick Stats -->
+<section class="w-full mb-space-xl">
+<div class="flex flex-col xl:flex-row xl:items-end justify-between gap-space-lg mb-space-lg">
+<div class="flex flex-col max-w-2xl">
+<div class="flex items-center gap-space-sm mb-space-xs">
+<span class="w-2 h-2 rounded-full bg-primary-container shadow-[0_0_8px_rgba(221,167,74,0.8)]"></span>
+<span class="font-label-sm text-label-sm text-primary tracking-widest uppercase">Agenda Homilética y Ministerio Activo</span>
+<span class="text-outline text-body-sm">•</span>
+<span class="font-label-sm text-label-sm text-tertiary">Ciclo Mensual: Octubre 2024</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Cronograma &amp; Predicaciones</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">
+          Planificación teológica, asignaciones de plataforma y registro unificado de discursos con persistencia offline PocketBase.
+        </p>
+</div>
+<!-- Action bar with Quick Trigger -->
+<div class="flex flex-wrap items-center gap-space-sm">
+<div class="flex items-center bg-surface-container-low px-space-md py-space-sm rounded-lg shadow-sm gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[18px]">cloud_sync</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface leading-none">Dokploy pb_data: OK</span>
+<span class="font-label-sm text-label-sm text-outline leading-none mt-1">PWA IndexedDB Activa</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+</div>
+<button class="flex items-center gap-space-sm bg-primary hover:bg-primary-container text-on-primary font-body-md text-body-md font-semibold px-space-lg py-space-sm rounded-lg transition-all shadow-md hover:shadow-lg" id="btnOpenModal">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+<span>Nueva Predicación / Bosquejo</span>
+</button>
+</div>
+</div>
+<!-- Metricas Clave Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Metric 1: Horas de Servicio / Predicación -->
+<div class="bg-surface-container-low rounded-xl p-space-lg relative overflow-hidden shadow-sm flex flex-col justify-between">
+<div class="absolute -right-4 -bottom-4 w-28 h-28 rounded-full bg-primary/5 blur-2xl pointer-events-none"></div>
+<div class="flex items-center justify-between mb-space-sm">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Meta Mensual Servicio</span>
+<span class="material-symbols-outlined text-primary text-[20px]">pace</span>
+</div>
+<div class="flex items-baseline gap-space-sm">
+<span class="font-headline-lg text-headline-lg text-on-surface">38.5</span>
+<span class="font-label-md text-label-md text-outline">/ 50.0 hrs</span>
+</div>
+<div class="mt-space-md">
+<div class="w-full bg-surface-container-highest h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full transition-all duration-700" style="width: 77%;"></div>
+</div>
+<div class="flex justify-between items-center mt-space-xs font-label-sm text-label-sm">
+<span class="text-tertiary">77% completado</span>
+<span class="text-outline">Resta: 11h 30m</span>
+</div>
+</div>
+</div>
+<!-- Metric 2: Discursos Asignados & Ensayos -->
+<div class="bg-surface-container-low rounded-xl p-space-lg relative overflow-hidden shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between mb-space-sm">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Discursos Asignados</span>
+<span class="material-symbols-outlined text-secondary text-[20px]">mic</span>
+</div>
+<div class="flex items-baseline gap-space-sm">
+<span class="font-headline-lg text-headline-lg text-on-surface">4</span>
+<span class="font-label-md text-label-md text-primary">2 Ensayados</span>
+</div>
+<div class="flex items-center gap-space-sm mt-space-md font-body-sm text-body-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-tertiary text-[16px]">hourglass_bottom</span>
+<span>Próximo: Dom 27 Oct (30 min)</span>
+</div>
+</div>
+<!-- Metric 3: Revisitas & Cursos Bíblicos -->
+<div class="bg-surface-container-low rounded-xl p-space-lg relative overflow-hidden shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between mb-space-sm">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Estudios &amp; Revisitas</span>
+<span class="material-symbols-outlined text-tertiary text-[20px]">contacts_product</span>
+</div>
+<div class="flex items-baseline gap-space-sm">
+<span class="font-headline-lg text-headline-lg text-on-surface">12</span>
+<span class="font-label-md text-label-md text-tertiary-fixed">+3 esta semana</span>
+</div>
+<div class="flex items-center gap-space-sm mt-space-md font-body-sm text-body-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-[16px]">menu_book</span>
+<span>3 activos con «Disfrute la Vida»</span>
+</div>
+</div>
+<!-- Metric 4: Precisión Homilética / Tiempo Pulpit -->
+<div class="bg-surface-container-low rounded-xl p-space-lg relative overflow-hidden shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between mb-space-sm">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Eficiencia de Tiempo</span>
+<span class="material-symbols-outlined text-primary text-[20px]">timer_10</span>
+</div>
+<div class="flex items-baseline gap-space-sm">
+<span class="font-headline-lg text-headline-lg text-on-surface">29<span class="text-headline-sm text-outline font-normal">m</span> 15<span class="text-headline-sm text-outline font-normal">s</span></span>
+</div>
+<div class="flex items-center justify-between mt-space-md font-label-sm text-label-sm text-tertiary">
+<span class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+            Desviación: -45 seg
+          </span>
+<span class="text-outline">Rango Óptimo</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Interactive Calendar Strip & Filter Controls -->
+<section class="w-full bg-surface-container-low rounded-xl p-space-lg mb-space-xl shadow-sm">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md pb-space-md mb-space-md">
+<div class="flex items-center gap-space-md">
+<div class="flex items-center bg-surface-container px-space-sm py-space-xs rounded-lg">
+<button class="p-1 hover:bg-surface-container-highest rounded text-on-surface-variant hover:text-on-surface transition-colors" title="Mes Anterior">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<span class="font-headline-sm text-headline-sm px-space-md text-on-surface">Octubre 2024</span>
+<button class="p-1 hover:bg-surface-container-highest rounded text-on-surface-variant hover:text-on-surface transition-colors" title="Mes Siguiente">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-widest hidden sm:inline-block">Semana 43 de 52</span>
+</div>
+<!-- Filters Combos -->
+<div class="flex flex-wrap items-center gap-space-sm">
+<div class="relative">
+<select class="bg-surface-container text-on-surface font-body-sm text-body-sm pl-space-md pr-8 py-2 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary shadow-sm" id="filterCategory">
+<option value="all">Todas las Categorías</option>
+<option value="discurso">Discurso Público (30 min)</option>
+<option value="reunion">Vida y Ministerio (5-10 min)</option>
+<option value="predicacion">Servicio del Campo</option>
+<option value="revisita">Revisita / Estudio Bíblico</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-2.5 text-outline pointer-events-none text-[16px]">unfold_more</span>
+</div>
+<div class="relative">
+<select class="bg-surface-container text-on-surface font-body-sm text-body-sm pl-space-md pr-8 py-2 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary shadow-sm" id="filterTheme">
+<option value="all">Todos los Temas</option>
+<option value="esperanza">La Esperanza del Reino</option>
+<option value="consuelo">Consuelo en la Aflicción</option>
+<option value="creacion">Creación y Ciencia</option>
+<option value="amor">Amor Cristiano</option>
+<option value="familia">Vida Familiar</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-2.5 text-outline pointer-events-none text-[16px]">category</span>
+</div>
+<div class="flex bg-surface-container rounded-lg p-0.5">
+<button class="px-space-md py-1.5 rounded-lg bg-surface-container-high text-primary font-label-sm text-label-sm flex items-center gap-1 font-semibold">
+<span class="material-symbols-outlined text-[16px]">view_week</span>
+<span>Semana</span>
+</button>
+<button class="px-space-md py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">calendar_view_month</span>
+<span>Mes</span>
+</button>
+</div>
+</div>
+</div>
+<!-- 7-Day Interactive Horizontal Planner Grid -->
+<div class="grid grid-cols-1 md:grid-cols-7 gap-space-sm pt-space-xs">
+<!-- Lunes 21 -->
+<div class="bg-surface-container rounded-lg p-space-sm flex flex-col justify-between min-h-[160px] opacity-70 hover:opacity-100 transition-opacity">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase">Lun 21</span>
+<span class="font-headline-sm text-headline-sm text-outline">21</span>
+</div>
+<div class="my-auto py-space-xs">
+<span class="font-label-sm text-label-sm text-outline italic">Sin asignaciones</span>
+</div>
+<div class="text-right">
+<span class="font-label-sm text-label-sm text-outline">0h</span>
+</div>
+</div>
+<!-- Martes 22 -->
+<div class="bg-surface-container rounded-lg p-space-sm flex flex-col justify-between min-h-[160px] shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase">Mar 22</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">22</span>
+</div>
+<div class="bg-surface-container-high p-space-xs rounded my-space-xs">
+<div class="flex items-center gap-1 mb-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="font-label-sm text-label-sm text-secondary truncate">Revisita #3</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface truncate">Flia. Martínez</p>
+<span class="font-label-sm text-label-sm text-outline">Sal. 37:10, 11</span>
+</div>
+<div class="flex justify-between items-center pt-space-xs">
+<span class="material-symbols-outlined text-secondary text-[14px]">check_circle</span>
+<span class="font-label-sm text-label-sm text-secondary">1h 30m</span>
+</div>
+</div>
+<!-- Miercoles 23 (Reunión entre semana) -->
+<div class="bg-surface-container-high rounded-lg p-space-sm flex flex-col justify-between min-h-[160px] shadow-md relative overflow-hidden">
+<div class="absolute top-0 right-0 w-12 h-12 bg-primary/10 rounded-bl-full pointer-events-none"></div>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-primary font-semibold uppercase">Mié 23</span>
+<span class="font-headline-sm text-headline-sm text-primary">23</span>
+</div>
+<div class="bg-surface-container-highest p-space-xs rounded my-space-xs">
+<span class="font-label-sm text-label-sm text-primary block truncate">Vida y Ministerio</span>
+<p class="font-body-sm text-body-sm text-on-surface font-medium truncate">«Consuelo en la tribulación»</p>
+<span class="font-label-sm text-label-sm text-tertiary">2 Cor. 1:3-4 (10m)</span>
+</div>
+<div class="flex justify-between items-center pt-space-xs">
+<span class="font-label-sm text-label-sm bg-primary-container text-on-primary-container px-1 rounded font-mono font-medium">ENSAYADO</span>
+<span class="font-label-sm text-label-sm text-primary">9m 40s</span>
+</div>
+</div>
+<!-- Jueves 24 -->
+<div class="bg-surface-container rounded-lg p-space-sm flex flex-col justify-between min-h-[160px] shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase">Jue 24</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">24</span>
+</div>
+<div class="bg-surface-container-high p-space-xs rounded my-space-xs">
+<span class="font-label-sm text-label-sm text-tertiary block truncate">Estudio Bíblico</span>
+<p class="font-body-sm text-body-sm text-on-surface truncate">Carlos V. • Cap. 4</p>
+<span class="font-label-sm text-label-sm text-outline">Génesis 1:1</span>
+</div>
+<div class="flex justify-between items-center pt-space-xs">
+<span class="material-symbols-outlined text-outline text-[14px]">schedule</span>
+<span class="font-label-sm text-label-sm text-outline">19:00 hs</span>
+</div>
+</div>
+<!-- Viernes 25 -->
+<div class="bg-surface-container rounded-lg p-space-sm flex flex-col justify-between min-h-[160px] opacity-70 hover:opacity-100 transition-opacity">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase">Vie 25</span>
+<span class="font-headline-sm text-headline-sm text-outline">25</span>
+</div>
+<div class="my-auto py-space-xs">
+<span class="font-label-sm text-label-sm text-outline italic">Preparación personal</span>
+</div>
+<div class="text-right">
+<span class="font-label-sm text-label-sm text-outline">Lectura</span>
+</div>
+</div>
+<!-- Sabado 26 (Servicio) -->
+<div class="bg-surface-container rounded-lg p-space-sm flex flex-col justify-between min-h-[160px] shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase">Sáb 26</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">26</span>
+</div>
+<div class="bg-surface-container-high p-space-xs rounded my-space-xs">
+<span class="font-label-sm text-label-sm text-secondary block truncate">Servicio del Campo</span>
+<p class="font-body-sm text-body-sm text-on-surface truncate">Grupo 3 • Territorio 14</p>
+<span class="font-label-sm text-label-sm text-outline">Mat. 24:14</span>
+</div>
+<div class="flex justify-between items-center pt-space-xs">
+<span class="font-label-sm text-label-sm text-tertiary">09:30 AM</span>
+<span class="font-label-sm text-label-sm text-primary font-medium">3h plan</span>
+</div>
+</div>
+<!-- Domingo 27 (Discurso Público Principal) -->
+<div class="bg-surface-container-high rounded-lg p-space-sm flex flex-col justify-between min-h-[160px] shadow-md border-t-2 border-primary">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-primary font-bold uppercase">Dom 27</span>
+<span class="font-headline-sm text-headline-sm text-primary font-bold">27</span>
+</div>
+<div class="bg-surface-container-highest p-space-xs rounded my-space-xs">
+<span class="font-label-sm text-label-sm text-primary font-semibold block truncate">Discurso Público #142</span>
+<p class="font-body-sm text-body-sm text-on-surface font-medium truncate">«¿Por qué refugiarse en Dios?»</p>
+<span class="font-label-sm text-label-sm text-outline">Sof. 2:3 • Sal. 91</span>
+</div>
+<div class="flex justify-between items-center pt-space-xs">
+<span class="font-label-sm text-label-sm bg-primary/20 text-primary px-1 rounded font-mono">30 MIN</span>
+<span class="material-symbols-outlined text-primary text-[16px]">podium</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Main Content Split: Asignaciones & Registro Homilético + Previews -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl">
+<!-- Left Column: Master Table / Card Deck of Predicaciones -->
+<div class="lg:col-span-8 flex flex-col gap-space-lg">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[22px]">format_list_bulleted</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Registros Homiléticos Programados</h2>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="font-label-sm text-label-sm text-outline">Mostrando 4 registros</span>
+</div>
+</div>
+<!-- Card 1: Discurso Principal (Featured) -->
+<div class="bg-surface-container-low rounded-xl p-space-lg shadow-sm hover:shadow-md transition-shadow">
+<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-space-md mb-space-md">
+<div class="flex flex-col">
+<div class="flex flex-wrap items-center gap-space-xs mb-space-xs">
+<span class="font-label-sm text-label-sm bg-surface-container-highest text-primary px-space-xs py-0.5 rounded font-mono">DOMINGO 27 OCT • 10:00 AM</span>
+<span class="font-label-sm text-label-sm bg-surface-container text-tertiary px-space-xs py-0.5 rounded">Discurso Público (30 min)</span>
+<span class="font-label-sm text-label-sm bg-primary-container text-on-primary-container px-space-xs py-0.5 rounded font-semibold">Listo para Presentar</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">¿Por qué refugiarse en el Reino de Dios hoy?</h3>
+<span class="font-label-md text-label-md text-outline mt-0.5">Bosquejo Núm. 142 • Congregación Bethel Central</span>
+</div>
+<div class="flex items-center gap-space-xs self-start">
+<button class="p-2 bg-surface-container hover:bg-surface-container-high text-primary rounded-lg transition-colors flex items-center justify-center" title="Ensayo de Tiempo">
+<span class="material-symbols-outlined text-[18px]">timer</span>
+</button>
+<button class="p-2 bg-surface-container hover:bg-surface-container-high text-on-surface rounded-lg transition-colors flex items-center justify-center" title="Abrir en Editor">
+<span class="material-symbols-outlined text-[18px]">history_edu</span>
+</button>
+<button class="p-2 bg-surface-container hover:bg-surface-container-high text-on-surface-variant rounded-lg transition-colors flex items-center justify-center" title="Exportar PDF">
+<span class="material-symbols-outlined text-[18px]">download</span>
+</button>
+</div>
+</div>
+<blockquote class="bg-surface-container-high/60 pl-space-md pr-space-md py-space-sm rounded-lg mb-space-md">
+<p class="font-scripture-quote text-scripture-quote text-on-surface italic">
+            «Busquen a Jehová, todos ustedes los mansos de la tierra [...] Busquen la justicia, busquen la mansedumbre. Probablemente se les oculte en el día de la furia de Jehová.»
+          </p>
+<cite class="block font-label-sm text-label-sm text-primary uppercase tracking-widest mt-space-xs not-italic">
+            Sofonías 2:3 • Traducción del Nuevo Mundo (TNM)
+          </cite>
+</blockquote>
+<div class="flex flex-wrap items-center justify-between gap-space-md pt-space-xs">
+<div class="flex flex-wrap gap-1.5">
+<span class="font-label-sm text-label-sm bg-surface-container text-secondary px-2 py-1 rounded">Sofonías 2:3</span>
+<span class="font-label-sm text-label-sm bg-surface-container text-secondary px-2 py-1 rounded">Salmo 91:1-4</span>
+<span class="font-label-sm text-label-sm bg-surface-container text-secondary px-2 py-1 rounded">Mateo 6:33</span>
+<span class="font-label-sm text-label-sm bg-surface-container text-outline px-2 py-1 rounded">Ref: Libro Disfrute la Vida Lecc. 58</span>
+</div>
+<div class="flex items-center gap-space-sm font-label-sm text-label-sm text-outline">
+<span class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[16px]">check</span> Ensayo: 29m 10s
+            </span>
+<span>• Meta: 30m 00s</span>
+</div>
+</div>
+</div>
+<!-- Additional cards omitted for brevity -->
+</div></div></main></body></html>
