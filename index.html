@@ -5,6 +5,7 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <meta content="web_dashboard" name="shell-type" />
   <title>TestimonioBox - Kerygma</title>
+  <link rel="icon" href="https://img.icons8.com/color/48/holy-bible.png" type="image/png" />
   <link href="https://fonts.googleapis.com" rel="preconnect" />
   <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&amp;display=swap" rel="stylesheet" />
@@ -204,6 +205,17 @@
           <button type="submit" class="bg-primary text-on-primary font-medium px-space-md py-space-sm rounded-lg shadow hover:bg-primary-container transition-colors">Entrar</button>
         </div>
       </form>
+      
+      <div class="relative flex items-center py-space-md">
+        <div class="flex-grow border-t border-surface-container-highest"></div>
+        <span class="flex-shrink-0 mx-4 text-outline font-label-sm">O</span>
+        <div class="flex-grow border-t border-surface-container-highest"></div>
+      </div>
+      
+      <button id="googleLoginBtn" type="button" class="w-full flex items-center justify-center gap-3 bg-surface-container hover:bg-surface-container-high text-on-surface font-medium px-space-md py-space-sm rounded-lg transition-colors border border-surface-container-highest shadow-sm">
+        <img src="https://img.icons8.com/color/48/google-logo.png" alt="Google" class="w-5 h-5" />
+        Continuar con Google
+      </button>
     </div>
   </div>
 
@@ -363,6 +375,22 @@
         showToast('Credenciales incorrectas', true);
       }
     });
+
+    // Handle Google Login
+    const googleLoginBtn = document.getElementById('googleLoginBtn');
+    if(googleLoginBtn) {
+      googleLoginBtn.addEventListener('click', async () => {
+        try {
+          const authData = await pb.collection('users').authWithOAuth2({ provider: 'google' });
+          showToast('Login exitoso con Google');
+          loginModal.classList.add('hidden');
+          updateAuthState();
+        } catch (err) {
+          console.error(err);
+          showToast('Error al autenticar con Google. Revisa la configuración de Auth Providers en PocketBase.', true);
+        }
+      });
+    }
 
     // Create Modal Listeners
     btnOpenCreate.addEventListener('click', () => createModal.classList.remove('hidden'));
