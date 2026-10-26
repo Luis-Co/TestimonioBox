@@ -29,72 +29,96 @@
 </head>
 <body class="bg-background text-on-surface font-body-md text-body-md min-h-screen antialiased">
 
-  <aside class="fixed left-0 top-0 h-full w-72 bg-[#0b0e13] z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.3)]">
-    <div class="flex flex-col">
-      <div class="h-16 flex items-center px-6 gap-2 bg-surface-container-low/40">
-        <span class="material-symbols-outlined text-primary text-[24px]">menu_book</span>
-        <div class="flex flex-col">
-          <span class="font-headline-sm text-[1.375rem] text-primary tracking-tight">Kerygma</span>
-          <span class="font-label-sm text-[0.6875rem] text-tertiary tracking-wider uppercase">Ministerio & Pulpit</span>
-        </div>
-      </div>
-      <div class="px-4 py-2 mt-4">
-        <div class="font-label-sm text-[0.6875rem] text-outline px-2 mb-1 uppercase tracking-wider">Navegación Pastoral</div>
-        <nav class="flex flex-col gap-1">
-          <a class="flex items-center gap-2 px-2 py-2 rounded-lg bg-surface-container-high text-primary font-medium" href="#"><span class="material-symbols-outlined text-[20px]">event_available</span><span>Cronograma & Predicaciones</span></a>
-          <a class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">history_edu</span><span>Editor de Bosquejos</span></a>
-        </nav>
-      </div>
+  <!-- ================= VISTA DE LOGIN ================= -->
+  <div id="loginView" class="min-h-screen flex flex-col items-center justify-center p-6 bg-background relative overflow-hidden">
+    <!-- Decoración de fondo suave -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
+    
+    <div class="bg-surface-container-low p-10 rounded-2xl shadow-2xl flex flex-col items-center max-w-sm w-full border border-outline/10 relative z-10">
+      <span class="material-symbols-outlined text-primary text-[56px] mb-4 drop-shadow-md">menu_book</span>
+      <h1 class="font-headline-lg text-4xl text-on-surface mb-1">Kerygma</h1>
+      <p class="text-tertiary mb-2 text-center uppercase tracking-widest text-xs font-bold">Ministerio & Pulpit</p>
+      <p class="text-outline text-sm text-center mb-8">Inicia sesión para gestionar tus asignaciones homiléticas de forma segura.</p>
+      
+      <button id="btnLoginGoogle" class="w-full flex items-center justify-center gap-3 bg-surface-container-high hover:bg-surface-container-highest text-on-surface px-6 py-3.5 rounded-xl transition-colors border border-outline/20 shadow-sm font-medium">
+        <img src="https://img.icons8.com/color/24/google-logo.png" alt="Google" />
+        <span>Continuar con Google</span>
+      </button>
     </div>
-  </aside>
+  </div>
 
-  <div class="pl-72">
-    <header class="fixed top-0 left-72 right-0 h-16 bg-[#101418]/85 backdrop-blur-xl z-40 shadow-[0_1px_8px_rgba(0,0,0,0.15)] flex items-center justify-between px-6">
-      <div class="flex items-center gap-6">
-        <div class="flex items-center gap-2 bg-surface-container-low px-4 py-1.5 rounded-lg">
-          <span class="material-symbols-outlined text-secondary text-[18px]">church</span>
-          <div class="flex flex-col text-left">
-            <span class="font-label-sm text-[0.6875rem] text-outline leading-none" id="userEmailDisplay">Invitado</span>
-            <span class="font-body-sm text-[0.8125rem] text-on-surface font-medium leading-tight" id="userRoleDisplay">Inicia sesión para continuar</span>
+  <!-- ================= VISTA DE LA APLICACIÓN ================= -->
+  <div id="appView" class="hidden">
+    <aside class="fixed left-0 top-0 h-full w-72 bg-[#0b0e13] z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.3)]">
+      <div class="flex flex-col">
+        <div class="h-16 flex items-center px-6 gap-2 bg-surface-container-low/40">
+          <span class="material-symbols-outlined text-primary text-[24px]">menu_book</span>
+          <div class="flex flex-col">
+            <span class="font-headline-sm text-[1.375rem] text-primary tracking-tight">Kerygma</span>
+            <span class="font-label-sm text-[0.6875rem] text-tertiary tracking-wider uppercase">Ministerio & Pulpit</span>
           </div>
         </div>
+        <div class="px-4 py-2 mt-4">
+          <div class="font-label-sm text-[0.6875rem] text-outline px-2 mb-1 uppercase tracking-wider">Navegación Pastoral</div>
+          <nav class="flex flex-col gap-1">
+            <a class="flex items-center gap-2 px-2 py-2 rounded-lg bg-surface-container-high text-primary font-medium" href="#"><span class="material-symbols-outlined text-[20px]">event_available</span><span>Cronograma & Predicaciones</span></a>
+            <a class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">history_edu</span><span>Editor de Bosquejos</span></a>
+          </nav>
+        </div>
       </div>
-      <div class="flex items-center gap-4">
-        <button id="authBtn" class="flex items-center gap-2 bg-surface-container-high hover:bg-surface-container-highest text-on-surface px-4 py-2 rounded-lg transition-colors border border-outline/30">
-          <img src="https://img.icons8.com/color/18/google-logo.png" alt="Google" />
-          <span id="authBtnText" class="font-medium text-sm">Ingresar con Google</span>
-        </button>
-      </div>
-    </header>
+    </aside>
 
-    <main class="relative w-full pt-24 bg-background px-6 min-h-screen">
-      <div class="flex flex-col w-full pb-16">
-        <section class="w-full mb-8 flex justify-between items-end">
-          <div class="flex flex-col">
-            <h1 class="font-headline-lg text-[2.5rem] text-on-surface tracking-tight leading-none mb-2">Cronograma & Predicaciones</h1>
-            <p class="text-on-surface-variant">Gestor homilético sincronizado con PocketBase.</p>
-          </div>
-          <button id="btnOpenModal" class="hidden items-center gap-2 bg-primary hover:bg-primary-container text-[#432c00] font-semibold px-6 py-2.5 rounded-lg transition-all shadow-md">
-            <span class="material-symbols-outlined text-[20px]">add_circle</span>
-            <span>Nueva Ficha</span>
-          </button>
-        </section>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <div class="lg:col-span-8 flex flex-col gap-6" id="recordsContainer">
-            <div id="loadingState" class="text-center py-12 text-outline">
-              Inicia sesión para ver tus predicaciones.
+    <div class="pl-72">
+      <header class="fixed top-0 left-72 right-0 h-16 bg-[#101418]/85 backdrop-blur-xl z-40 shadow-[0_1px_8px_rgba(0,0,0,0.15)] flex items-center justify-between px-6">
+        <div class="flex items-center gap-6">
+          <div class="flex items-center gap-2 bg-surface-container-low px-4 py-1.5 rounded-lg border border-outline/5">
+            <span class="material-symbols-outlined text-secondary text-[18px]">church</span>
+            <div class="flex flex-col text-left">
+              <span class="font-label-sm text-[0.6875rem] text-outline leading-none" id="userEmailDisplay">Cargando...</span>
+              <span class="font-body-sm text-[0.8125rem] text-on-surface font-medium leading-tight">Ministro / Publicador</span>
             </div>
           </div>
         </div>
-      </div>
-    </main>
+        <div class="flex items-center gap-4">
+          <button id="btnLogout" class="flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors px-3 py-2 rounded-lg hover:bg-surface-container">
+            <span class="material-symbols-outlined text-[20px]">logout</span>
+            <span class="font-medium text-sm">Salir</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="relative w-full pt-24 bg-background px-6 min-h-screen">
+        <div class="flex flex-col w-full pb-16">
+          <section class="w-full mb-8 flex justify-between items-end">
+            <div class="flex flex-col">
+              <h1 class="font-headline-lg text-[2.5rem] text-on-surface tracking-tight leading-none mb-2">Cronograma & Predicaciones</h1>
+              <p class="text-on-surface-variant">Gestor homilético sincronizado con PocketBase.</p>
+            </div>
+            <button id="btnOpenModal" class="flex items-center gap-2 bg-primary hover:bg-primary-container text-[#432c00] font-semibold px-6 py-2.5 rounded-lg transition-all shadow-md">
+              <span class="material-symbols-outlined text-[20px]">add_circle</span>
+              <span>Nueva Ficha</span>
+            </button>
+          </section>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-8 flex flex-col gap-6" id="recordsContainer">
+              <div id="loadingState" class="text-center py-12 text-outline">
+                Cargando registros...
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
   </div>
 
+  <!-- ================= MODAL NUEVA FICHA ================= -->
   <div id="recordModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300">
     <div class="bg-surface-container-low w-full max-w-lg rounded-xl shadow-2xl p-6 transform scale-95 transition-transform duration-300" id="modalContent">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-headline-sm text-primary">Nueva Asignación</h2>
+        <h2 class="text-xl font-headline-sm text-primary flex items-center gap-2">
+          <span class="material-symbols-outlined">post_add</span> Nueva Asignación
+        </h2>
         <button id="btnCloseModal" class="text-outline hover:text-on-surface"><span class="material-symbols-outlined">close</span></button>
       </div>
       
@@ -123,7 +147,7 @@
         <div class="bg-surface-container/50 p-4 rounded-lg border border-outline/10">
           <label class="block text-xs font-label-sm text-outline mb-2 uppercase">Asignación de Textos Bíblicos</label>
           <div class="flex gap-2 mb-3">
-            <select id="bibleBook" class="flex-1 bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2 text-on-surface focus:border-primary">
+            <select id="bibleBook" class="flex-1 bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2 text-on-surface focus:outline-none focus:border-primary">
               <option value="Génesis">Génesis</option>
               <option value="Salmos">Salmos</option>
               <option value="Proverbios">Proverbios</option>
@@ -153,8 +177,8 @@
         </div>
 
         <div class="mt-4 flex justify-end gap-3">
-          <button type="button" id="btnCancelModal" class="px-4 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high">Cancelar</button>
-          <button type="submit" class="px-6 py-2 bg-primary hover:bg-primary-container text-[#432c00] font-semibold rounded-lg shadow-md">Guardar Ficha</button>
+          <button type="button" id="btnCancelModal" class="px-4 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors">Cancelar</button>
+          <button type="submit" class="px-6 py-2 bg-primary hover:bg-primary-container text-[#432c00] font-semibold rounded-lg shadow-md transition-colors">Guardar Ficha</button>
         </div>
       </form>
     </div>
@@ -162,15 +186,19 @@
 
   <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3"></div>
 
+  <!-- PocketBase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/pocketbase@0.21.1/dist/pocketbase.umd.js"></script>
   
   <script>
     const pb = new PocketBase('https://pb-testimonio.webticocr.com');
     
-    const authBtn = document.getElementById('authBtn');
-    const authBtnText = document.getElementById('authBtnText');
+    // Referencias DOM
+    const loginView = document.getElementById('loginView');
+    const appView = document.getElementById('appView');
+    const btnLoginGoogle = document.getElementById('btnLoginGoogle');
+    const btnLogout = document.getElementById('btnLogout');
+    
     const userEmailDisplay = document.getElementById('userEmailDisplay');
-    const userRoleDisplay = document.getElementById('userRoleDisplay');
     const btnOpenModal = document.getElementById('btnOpenModal');
     const recordsContainer = document.getElementById('recordsContainer');
     const loadingState = document.getElementById('loadingState');
@@ -180,6 +208,7 @@
 
     let currentScriptures = [];
 
+    // Sistema de Notificaciones
     function showToast(message, type = 'success') {
       const toast = document.createElement('div');
       const bgColor = type === 'success' ? 'bg-[#191c21] border-l-4 border-primary' : 'bg-[#93000a] text-white';
@@ -193,43 +222,40 @@
       }, 3000);
     }
 
+    // Lógica de Autenticación y Vistas
     function updateUIAuth() {
       if (pb.authStore.isValid) {
-        authBtnText.textContent = "Cerrar Sesión";
+        // Mostrar App, Ocultar Login
+        loginView.classList.add('hidden');
+        appView.classList.remove('hidden');
+        
         userEmailDisplay.textContent = pb.authStore.model.email;
-        userRoleDisplay.textContent = "Ministro / Publicador";
-        btnOpenModal.classList.remove('hidden');
-        btnOpenModal.classList.add('flex');
         fetchPredicaciones();
       } else {
-        authBtnText.textContent = "Ingresar con Google";
-        userEmailDisplay.textContent = "Invitado";
-        userRoleDisplay.textContent = "Inicia sesión para continuar";
-        btnOpenModal.classList.add('hidden');
-        btnOpenModal.classList.remove('flex');
-        recordsContainer.innerHTML = '';
-        recordsContainer.appendChild(loadingState);
-        loadingState.textContent = "Inicia sesión para ver tus predicaciones.";
+        // Mostrar Login, Ocultar App
+        loginView.classList.remove('hidden');
+        appView.classList.add('hidden');
       }
     }
 
-    authBtn.addEventListener('click', async () => {
-      if (pb.authStore.isValid) {
-        pb.authStore.clear();
+    btnLoginGoogle.addEventListener('click', async () => {
+      try {
+        await pb.collection('users').authWithOAuth2({ provider: 'google' });
         updateUIAuth();
-        showToast('Sesión cerrada');
-      } else {
-        try {
-          await pb.collection('users').authWithOAuth2({ provider: 'google' });
-          updateUIAuth();
-          showToast('Sesión iniciada correctamente');
-        } catch (error) {
-          console.error(error);
-          showToast('Error al iniciar sesión', 'error');
-        }
+        showToast('Sesión iniciada correctamente');
+      } catch (error) {
+        console.error(error);
+        showToast('Error al iniciar sesión', 'error');
       }
     });
 
+    btnLogout.addEventListener('click', () => {
+      pb.authStore.clear();
+      updateUIAuth();
+      showToast('Sesión cerrada');
+    });
+
+    // Lógica de Textos Bíblicos
     document.getElementById('btnAddScripture').addEventListener('click', () => {
       const book = document.getElementById('bibleBook').value;
       const chapter = document.getElementById('bibleChapter').value;
@@ -270,6 +296,7 @@
       updateScriptureTags();
     };
 
+    // Control del Modal
     const openModal = () => {
       recordModal.classList.remove('hidden');
       setTimeout(() => {
@@ -293,6 +320,7 @@
     document.getElementById('btnCloseModal').addEventListener('click', closeModal);
     document.getElementById('btnCancelModal').addEventListener('click', closeModal);
 
+    // Guardar Ficha
     recordForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       
@@ -318,9 +346,10 @@
       }
     });
 
+    // Obtener y Renderizar Fichas
     async function fetchPredicaciones() {
       try {
-        loadingState.textContent = "Cargando registros...";
+        recordsContainer.innerHTML = `<div class="text-center py-12 text-outline">Cargando registros...</div>`;
         const records = await pb.collection('predicaciones').getFullList({ sort: '-date' });
         
         recordsContainer.innerHTML = '';
@@ -364,7 +393,7 @@
                 </div>
                 <h3 class="font-headline-md text-2xl text-on-surface mt-1">${record.title}</h3>
               </div>
-              <button onclick="deleteRecord('${record.id}')" class="text-outline hover:text-error transition-colors p-2"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+              <button onclick="deleteRecord('${record.id}')" class="text-outline hover:text-error transition-colors p-2" title="Eliminar Ficha"><span class="material-symbols-outlined text-[18px]">delete</span></button>
             </div>
             
             ${scripturesBlockHtml}
@@ -394,6 +423,7 @@
       }
     };
 
+    // Revisar estado de autenticación al cargar
     updateUIAuth();
   </script>
 </body>
