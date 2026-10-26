@@ -1,183 +1,89 @@
 <!DOCTYPE html>
 <html class="dark" lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-  <meta content="web_dashboard" name="shell-type" />
-  <title>TestimonioBox - Kerygma</title>
-  <link rel="icon" href="https://img.icons8.com/color/48/holy-bible.png" type="image/png" />
-  <link href="https://fonts.googleapis.com" rel="preconnect" />
-  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&amp;display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="web_dashboard" name="shell-type"/>
+  <title>Kerygma - Ministerio & Pulpit</title>
+  
+  <link rel="icon" type="image/png" href="https://img.icons8.com/fluency/48/open-book.png">
+  
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  
   <style>
-    @layer base {
-      html, body { margin: 0; padding: 0; }
-      body { overscroll-behavior: none; }
-      main > :first-child { margin-top: 0 !important; }
-      main > :last-child { margin-bottom: 0 !important; }
-    }
-    ::-webkit-scrollbar { display: none; }
-    
-    /* Toast Animation */
-    @keyframes slideUp {
-      from { transform: translateY(100%); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    .toast-enter { animation: slideUp 0.3s ease-out forwards; }
+    @layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}
+    ::-webkit-scrollbar{display:none;}
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+    .toast-enter { animation: slideIn 0.3s ease-out forwards; }
+    .toast-exit { animation: fadeOut 0.3s ease-out forwards; }
   </style>
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <script id="tailwind-config">
-    tailwind.config = { 
-      darkMode: "class", 
-      theme: { 
-        extend: { 
-          colors: { 
-            "tertiary-container": "#a0b4bd", "on-primary": "#432c00", "primary-container": "#dda74a", 
-            "on-tertiary-fixed-variant": "#374a51", "surface-bright": "#36393f", "secondary-fixed": "#ffdeab", 
-            "on-surface": "#e1e2e9", "outline-variant": "#4f4537", "on-tertiary": "#20333a", 
-            "background": "#101418", "surface-container": "#1d2025", "on-background": "#e1e2e9", 
-            "on-secondary-container": "#ddb269", "inverse-on-surface": "#2e3036", "on-secondary": "#422c00", 
-            "inverse-primary": "#7f5700", "on-tertiary-fixed": "#0a1e25", "on-secondary-fixed": "#271900", 
-            "error-container": "#93000a", "surface-container-low": "#191c21", "surface-container-highest": "#32353a", 
-            "secondary-container": "#624302", "inverse-surface": "#e1e2e9", "surface-dim": "#101418", 
-            "surface-container-high": "#272a2f", "primary-fixed-dim": "#f6bd5e", "surface-variant": "#32353a", 
-            "outline": "#9c8f7d", "on-primary-fixed": "#281900", "primary-fixed": "#ffdead", 
-            "on-secondary-fixed-variant": "#5f4100", "tertiary": "#bbcfd9", "on-tertiary-container": "#33464e", 
-            "secondary-fixed-dim": "#ecc076", "on-error": "#690005", "secondary": "#ecc076", 
-            "surface-container-lowest": "#0b0e13", "tertiary-fixed-dim": "#b5cad3", "on-error-container": "#ffdad6", 
-            "surface": "#101418", "primary": "#fbc262", "on-surface-variant": "#d3c4b1", "error": "#ffb4ab", 
-            "tertiary-fixed": "#d1e6ef", "on-primary-fixed-variant": "#604100", "on-primary-container": "#5b3d00", 
-            "surface-tint": "#f6bd5e" 
-          }, 
-          borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, 
-          spacing: { "space-lg": "1.5rem", "space-md": "1rem", "space-xl": "2.5rem", "space-xs": "0.25rem", "gutter-mobile": "1rem", "gutter": "1.5rem", "margin": "2rem", "margin-mobile": "1rem", "space-sm": "0.5rem" }, 
-          fontFamily: { 
-            "headline-lg": [ "Newsreader" ], "headline-sm": [ "Newsreader" ], "label-sm": [ "JetBrains Mono" ], 
-            "display-lg": [ "Newsreader" ], "headline-lg-mobile": [ "Newsreader" ], "display-lg-mobile": [ "Newsreader" ], 
-            "body-md": [ "Inter" ], "label-md": [ "JetBrains Mono" ], "scripture-quote": [ "Newsreader" ], 
-            "body-sm": [ "Inter" ], "headline-md": [ "Newsreader" ], "body-lg": [ "Inter" ] 
-          }, 
-          fontSize: { 
-            "headline-lg": [ "2.5rem", { "lineHeight": "3rem", "letterSpacing": "-0.015em", "fontWeight": "500" } ], 
-            "headline-sm": [ "1.375rem", { "lineHeight": "1.75rem", "fontWeight": "600" } ], 
-            "label-sm": [ "0.6875rem", { "lineHeight": "0.875rem", "letterSpacing": "0.05em", "fontWeight": "500" } ], 
-            "display-lg": [ "3.5rem", { "lineHeight": "4.25rem", "letterSpacing": "-0.02em", "fontWeight": "400" } ], 
-            "headline-lg-mobile": [ "1.75rem", { "lineHeight": "2.25rem", "fontWeight": "500" } ], 
-            "display-lg-mobile": [ "2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.01em", "fontWeight": "400" } ], 
-            "body-md": [ "0.9375rem", { "lineHeight": "1.5rem", "fontWeight": "400" } ], 
-            "label-md": [ "0.8125rem", { "lineHeight": "1rem", "letterSpacing": "0.04em", "fontWeight": "500" } ], 
-            "scripture-quote": [ "1.25rem", { "lineHeight": "2rem", "letterSpacing": "0.01em", "fontWeight": "400" } ], 
-            "body-sm": [ "0.8125rem", { "lineHeight": "1.25rem", "fontWeight": "400" } ], 
-            "headline-md": [ "1.875rem", { "lineHeight": "2.375rem", "fontWeight": "500" } ], 
-            "body-lg": [ "1.125rem", { "lineHeight": "1.875rem", "fontWeight": "400" } ] 
-          } 
-        } 
-      } 
-    };
+    tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "primary-container": "#dda74a", "surface-bright": "#36393f", "on-surface": "#e1e2e9", "background": "#101418", "surface-container": "#1d2025", "surface-container-low": "#191c21", "surface-container-highest": "#32353a", "surface-container-high": "#272a2f", "outline": "#9c8f7d", "primary": "#fbc262", "on-surface-variant": "#d3c4b1", "secondary": "#ecc076", "tertiary": "#bbcfd9", "error": "#ffb4ab", "error-container": "#93000a" }, "fontFamily": { "headline-lg": ["Newsreader"], "headline-sm": ["Newsreader"], "label-sm": ["JetBrains Mono"], "body-md": ["Inter"], "scripture-quote": ["Newsreader"], "body-sm": ["Inter"], "headline-md": ["Newsreader"] } } } };
   </script>
 </head>
-<body class="bg-background text-on-surface font-body-md text-body-md min-h-screen antialiased selection:bg-primary-container selection:text-on-primary-container">
-  
-  <aside class="fixed left-0 top-0 h-full w-72 bg-surface-container-lowest z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.3)]">
+<body class="bg-background text-on-surface font-body-md text-body-md min-h-screen antialiased">
+
+  <aside class="fixed left-0 top-0 h-full w-72 bg-[#0b0e13] z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.3)]">
     <div class="flex flex-col">
-      <div class="h-16 flex items-center px-gutter gap-space-sm bg-surface-container-low/40">
+      <div class="h-16 flex items-center px-6 gap-2 bg-surface-container-low/40">
         <span class="material-symbols-outlined text-primary text-[24px]">menu_book</span>
         <div class="flex flex-col">
-          <span class="font-headline-sm text-headline-sm text-primary tracking-tight">Kerygma</span>
-          <span class="font-label-sm text-label-sm text-tertiary tracking-wider uppercase">Ministerio &amp; Pulpit</span>
+          <span class="font-headline-sm text-[1.375rem] text-primary tracking-tight">Kerygma</span>
+          <span class="font-label-sm text-[0.6875rem] text-tertiary tracking-wider uppercase">Ministerio & Pulpit</span>
         </div>
       </div>
-      <div class="px-space-md py-space-sm">
-        <div class="font-label-sm text-label-sm text-outline px-space-sm mb-space-xs uppercase tracking-wider">Navegación Pastoral</div>
-        <nav class="flex flex-col gap-space-xs">
-          <a class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg bg-surface-container-high text-primary font-medium transition-colors" href="#">
-            <span class="material-symbols-outlined text-[20px]">event_available</span>
-            <span>Cronograma &amp; Predicaciones</span>
-          </a>
-          <a class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" href="#">
-            <span class="material-symbols-outlined text-[20px]">history_edu</span>
-            <span>Editor de Bosquejos / Discursos</span>
-          </a>
-          <a class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" href="#">
-            <span class="material-symbols-outlined text-[20px]">auto_stories</span>
-            <span>Banco Bíblico &amp; Notas</span>
-          </a>
+      <div class="px-4 py-2 mt-4">
+        <div class="font-label-sm text-[0.6875rem] text-outline px-2 mb-1 uppercase tracking-wider">Navegación Pastoral</div>
+        <nav class="flex flex-col gap-1">
+          <a class="flex items-center gap-2 px-2 py-2 rounded-lg bg-surface-container-high text-primary font-medium" href="#"><span class="material-symbols-outlined text-[20px]">event_available</span><span>Cronograma & Predicaciones</span></a>
+          <a class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">history_edu</span><span>Editor de Bosquejos</span></a>
         </nav>
-      </div>
-    </div>
-    <div class="p-space-md bg-surface-container-low/30 flex flex-col gap-space-xs">
-      <div class="flex items-center justify-between px-space-sm pt-space-xs">
-        <span class="font-label-sm text-label-sm text-outline">PWA v2.4.0</span>
-        <span class="flex items-center gap-1 font-label-sm text-label-sm text-tertiary" id="dbStatus">
-          <span class="w-1.5 h-1.5 rounded-full bg-error" id="dbStatusDot"></span>Desconectado
-        </span>
       </div>
     </div>
   </aside>
 
   <div class="pl-72">
-    <header class="fixed top-0 left-72 right-0 h-16 bg-surface/85 backdrop-blur-xl z-40 shadow-[0_1px_8px_rgba(0,0,0,0.15)] flex items-center justify-between px-gutter">
-      <div class="flex items-center gap-gutter">
-        <div class="flex items-center gap-space-sm bg-surface-container-low px-space-md py-space-xs rounded-lg">
+    <header class="fixed top-0 left-72 right-0 h-16 bg-[#101418]/85 backdrop-blur-xl z-40 shadow-[0_1px_8px_rgba(0,0,0,0.15)] flex items-center justify-between px-6">
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2 bg-surface-container-low px-4 py-1.5 rounded-lg">
           <span class="material-symbols-outlined text-secondary text-[18px]">church</span>
           <div class="flex flex-col text-left">
-            <span class="font-label-sm text-label-sm text-outline leading-none">Congregación / Perfil</span>
-            <span class="font-body-sm text-body-sm text-on-surface font-medium leading-tight">TestimonioBox User</span>
+            <span class="font-label-sm text-[0.6875rem] text-outline leading-none" id="userEmailDisplay">Invitado</span>
+            <span class="font-body-sm text-[0.8125rem] text-on-surface font-medium leading-tight" id="userRoleDisplay">Inicia sesión para continuar</span>
           </div>
         </div>
       </div>
-      <div class="flex items-center gap-gutter">
-        <div class="flex items-center gap-space-sm bg-surface-container-low px-space-md py-space-xs rounded-lg">
-          <div class="flex flex-col text-right">
-            <span class="font-label-sm text-label-sm text-on-surface leading-none" id="authStatusText">No Autenticado</span>
-            <span class="font-label-sm text-label-sm text-outline leading-none mt-0.5">PocketBase</span>
-          </div>
-          <span class="material-symbols-outlined text-tertiary text-[18px]">cloud</span>
-        </div>
-        <div class="flex items-center gap-space-sm">
-          <button id="authBtn" class="flex items-center gap-space-sm bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm px-space-md py-space-xs rounded-lg transition-colors">
-            <span class="material-symbols-outlined text-[18px]">login</span>
-            <span id="authBtnText">Entrar</span>
-          </button>
-        </div>
+      <div class="flex items-center gap-4">
+        <button id="authBtn" class="flex items-center gap-2 bg-surface-container-high hover:bg-surface-container-highest text-on-surface px-4 py-2 rounded-lg transition-colors border border-outline/30">
+          <img src="https://img.icons8.com/color/18/google-logo.png" alt="Google" />
+          <span id="authBtnText" class="font-medium text-sm">Ingresar con Google</span>
+        </button>
       </div>
     </header>
 
-    <main class="relative w-full pt-20 bg-background px-gutter min-h-screen">
+    <main class="relative w-full pt-24 bg-background px-6 min-h-screen">
       <div class="flex flex-col w-full pb-16">
-        
-        <!-- Top Banner -->
-        <section class="w-full mb-space-xl">
-          <div class="flex flex-col xl:flex-row xl:items-end justify-between gap-space-lg mb-space-lg">
-            <div class="flex flex-col max-w-2xl">
-              <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Cronograma &amp; Predicaciones</h1>
-              <p class="font-body-md text-body-md text-on-surface-variant mt-1">
-                Planificación teológica, asignaciones de plataforma y registro unificado de discursos con persistencia PocketBase.
-              </p>
-            </div>
-            <div class="flex flex-wrap items-center gap-space-sm">
-              <button id="btnOpenCreate" class="flex items-center gap-space-sm bg-primary hover:bg-primary-container text-on-primary font-body-md font-semibold px-space-lg py-space-sm rounded-lg transition-all shadow-md hidden">
-                <span class="material-symbols-outlined text-[20px]">add_circle</span>
-                <span>Nueva Ficha</span>
-              </button>
-            </div>
+        <section class="w-full mb-8 flex justify-between items-end">
+          <div class="flex flex-col">
+            <h1 class="font-headline-lg text-[2.5rem] text-on-surface tracking-tight leading-none mb-2">Cronograma & Predicaciones</h1>
+            <p class="text-on-surface-variant">Gestor homilético sincronizado con PocketBase.</p>
           </div>
+          <button id="btnOpenModal" class="hidden items-center gap-2 bg-primary hover:bg-primary-container text-[#432c00] font-semibold px-6 py-2.5 rounded-lg transition-all shadow-md">
+            <span class="material-symbols-outlined text-[20px]">add_circle</span>
+            <span>Nueva Ficha</span>
+          </button>
         </section>
 
-        <!-- Main Content: Registros Homiléticos -->
-        <div class="flex flex-col gap-space-lg">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-space-sm">
-              <span class="material-symbols-outlined text-primary text-[22px]">format_list_bulleted</span>
-              <h2 class="font-headline-sm text-headline-sm text-on-surface">Registros Homiléticos Programados</h2>
-            </div>
-          </div>
-
-          <!-- Contenedor Dinámico para las Fichas -->
-          <div id="recordsContainer" class="flex flex-col gap-space-md">
-            <div class="bg-surface-container-low rounded-xl p-space-lg text-center border border-dashed border-outline-variant">
-              <p class="text-on-surface-variant">Inicia sesión para ver y crear registros de predicación.</p>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div class="lg:col-span-8 flex flex-col gap-6" id="recordsContainer">
+            <div id="loadingState" class="text-center py-12 text-outline">
+              Inicia sesión para ver tus predicaciones.
             </div>
           </div>
         </div>
@@ -185,332 +91,310 @@
     </main>
   </div>
 
-  <!-- Modal Iniciar Sesión -->
-  <div id="loginModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 transition-opacity">
-    <div class="bg-surface-container-low rounded-xl p-space-lg w-full max-w-sm shadow-2xl border border-surface-container-highest">
-      <h2 class="font-headline-sm text-headline-sm text-on-surface mb-space-md flex items-center gap-2">
-        <span class="material-symbols-outlined text-primary">lock</span> Autenticación
-      </h2>
-      <form id="loginForm" class="flex flex-col gap-space-md">
-        <div class="flex flex-col gap-1">
-          <label class="font-label-sm text-outline">Correo Electrónico</label>
-          <input type="email" id="loginEmail" class="bg-surface-container-high text-on-surface p-space-sm rounded-lg border border-transparent focus:border-primary focus:outline-none transition-colors" required />
-        </div>
-        <div class="flex flex-col gap-1">
-          <label class="font-label-sm text-outline">Contraseña</label>
-          <input type="password" id="loginPassword" class="bg-surface-container-high text-on-surface p-space-sm rounded-lg border border-transparent focus:border-primary focus:outline-none transition-colors" required />
-        </div>
-        <div class="flex justify-end gap-space-sm mt-space-sm">
-          <button type="button" id="closeLoginModal" class="px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">Cancelar</button>
-          <button type="submit" class="bg-primary text-on-primary font-medium px-space-md py-space-sm rounded-lg shadow hover:bg-primary-container transition-colors">Entrar</button>
-        </div>
-      </form>
-      
-      <div class="relative flex items-center py-space-md">
-        <div class="flex-grow border-t border-surface-container-highest"></div>
-        <span class="flex-shrink-0 mx-4 text-outline font-label-sm">O</span>
-        <div class="flex-grow border-t border-surface-container-highest"></div>
+  <div id="recordModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-surface-container-low w-full max-w-lg rounded-xl shadow-2xl p-6 transform scale-95 transition-transform duration-300" id="modalContent">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-headline-sm text-primary">Nueva Asignación</h2>
+        <button id="btnCloseModal" class="text-outline hover:text-on-surface"><span class="material-symbols-outlined">close</span></button>
       </div>
       
-      <button id="googleLoginBtn" type="button" class="w-full flex items-center justify-center gap-3 bg-surface-container hover:bg-surface-container-high text-on-surface font-medium px-space-md py-space-sm rounded-lg transition-colors border border-surface-container-highest shadow-sm">
-        <img src="https://img.icons8.com/color/48/google-logo.png" alt="Google" class="w-5 h-5" />
-        Continuar con Google
-      </button>
-    </div>
-  </div>
-
-  <!-- Modal Crear/Editar Ficha -->
-  <div id="createModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 transition-opacity">
-    <div class="bg-surface-container-low rounded-xl p-space-lg w-full max-w-2xl shadow-2xl border border-surface-container-highest max-h-[90vh] overflow-y-auto">
-      <h2 class="font-headline-sm text-headline-sm text-on-surface mb-space-md flex items-center gap-2">
-        <span class="material-symbols-outlined text-primary">edit_document</span> Nueva Ficha Homilética
-      </h2>
-      <form id="createForm" class="flex flex-col gap-space-md">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
-          <div class="flex flex-col gap-1">
-            <label class="font-label-sm text-outline">Título / Tema</label>
-            <input type="text" id="fichaTitle" placeholder="Ej: La Esperanza del Reino" class="bg-surface-container-high text-on-surface p-space-sm rounded-lg border border-transparent focus:border-primary focus:outline-none" required />
+      <form id="recordForm" class="flex flex-col gap-4">
+        <div>
+          <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Tema / Título del Discurso</label>
+          <input type="text" id="fieldTitle" required class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2 text-on-surface focus:outline-none focus:border-primary">
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Fecha</label>
+            <input type="date" id="fieldDate" required class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2 text-on-surface focus:outline-none focus:border-primary [color-scheme:dark]">
           </div>
-          <div class="flex flex-col gap-1">
-            <label class="font-label-sm text-outline">Categoría</label>
-            <select id="fichaCategory" class="bg-surface-container-high text-on-surface p-space-sm rounded-lg border border-transparent focus:border-primary focus:outline-none" required>
-              <option value="Predicacion">Servicio del Campo / Predicación</option>
-              <option value="Discurso">Discurso Público</option>
-              <option value="Reunion">Vida y Ministerio (Reunión)</option>
-              <option value="Revisita">Revisita / Estudio</option>
+          <div>
+            <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Categoría</label>
+            <select id="fieldCategory" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2 text-on-surface focus:outline-none focus:border-primary">
+              <option value="Discurso Público">Discurso Público</option>
+              <option value="Reunión Vida y Ministerio">Reunión Vida y Ministerio</option>
+              <option value="Revisita">Revisita</option>
+              <option value="Servicio">Servicio del Campo</option>
             </select>
           </div>
         </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
-          <div class="flex flex-col gap-1">
-            <label class="font-label-sm text-outline">Fecha Asignada</label>
-            <input type="datetime-local" id="fichaDate" class="bg-surface-container-high text-on-surface p-space-sm rounded-lg border border-transparent focus:border-primary focus:outline-none" required />
+
+        <div class="bg-surface-container/50 p-4 rounded-lg border border-outline/10">
+          <label class="block text-xs font-label-sm text-outline mb-2 uppercase">Asignación de Textos Bíblicos</label>
+          <div class="flex gap-2 mb-3">
+            <select id="bibleBook" class="flex-1 bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2 text-on-surface focus:border-primary">
+              <option value="Génesis">Génesis</option>
+              <option value="Salmos">Salmos</option>
+              <option value="Proverbios">Proverbios</option>
+              <option value="Isaías">Isaías</option>
+              <option value="Mateo">Mateo</option>
+              <option value="Marcos">Marcos</option>
+              <option value="Lucas">Lucas</option>
+              <option value="Juan">Juan</option>
+              <option value="Hechos">Hechos</option>
+              <option value="Romanos">Romanos</option>
+              <option value="1 Corintios">1 Corintios</option>
+              <option value="Hebreos">Hebreos</option>
+              <option value="Apocalipsis">Apocalipsis</option>
+            </select>
+            <input type="number" id="bibleChapter" placeholder="Cap" min="1" class="w-20 bg-surface-container-high border border-outline/20 rounded-lg px-2 py-2 text-center text-on-surface focus:outline-none focus:border-primary">
+            <input type="text" id="bibleVerse" placeholder="Vers" class="w-20 bg-surface-container-high border border-outline/20 rounded-lg px-2 py-2 text-center text-on-surface focus:outline-none focus:border-primary">
+            <button type="button" id="btnAddScripture" class="bg-secondary text-[#271900] px-4 py-2 rounded-lg font-bold hover:bg-secondary-fixed-dim transition-colors">+</button>
           </div>
-          <div class="flex flex-col gap-1">
-            <label class="font-label-sm text-outline">Textos Bíblicos (Separados por coma)</label>
-            <input type="text" id="fichaScriptures" placeholder="Ej: Juan 3:16, Salmo 37:10" class="bg-surface-container-high text-on-surface p-space-sm rounded-lg border border-transparent focus:border-primary focus:outline-none" />
-          </div>
+          
+          <div id="scriptureTagsContainer" class="flex flex-wrap gap-2 empty:hidden"></div>
+          <input type="hidden" id="fieldScripturesArray" value="[]">
         </div>
 
-        <div class="flex flex-col gap-1">
-          <label class="font-label-sm text-outline">Bosquejo / Notas (Opcional)</label>
-          <textarea id="fichaNotes" rows="4" placeholder="Ideas principales o cita destacada..." class="bg-surface-container-high text-on-surface p-space-sm rounded-lg border border-transparent focus:border-primary focus:outline-none resize-none"></textarea>
+        <div>
+          <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Bosquejo / Notas</label>
+          <textarea id="fieldNotes" rows="4" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2 text-on-surface focus:outline-none focus:border-primary resize-none"></textarea>
         </div>
 
-        <div class="flex justify-end gap-space-sm mt-space-sm pt-space-md border-t border-surface-container-highest">
-          <button type="button" id="closeCreateModal" class="px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">Cancelar</button>
-          <button type="submit" class="bg-primary text-on-primary font-medium px-space-md py-space-sm rounded-lg shadow hover:bg-primary-container transition-colors flex items-center gap-2">
-            <span class="material-symbols-outlined text-[18px]">save</span> Guardar Ficha
-          </button>
+        <div class="mt-4 flex justify-end gap-3">
+          <button type="button" id="btnCancelModal" class="px-4 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high">Cancelar</button>
+          <button type="submit" class="px-6 py-2 bg-primary hover:bg-primary-container text-[#432c00] font-semibold rounded-lg shadow-md">Guardar Ficha</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Custom Toast Notification -->
-  <div id="toast" class="fixed bottom-6 right-6 bg-surface-container-highest text-on-surface px-space-md py-space-sm rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.5)] flex items-center gap-3 border-l-4 border-primary hidden z-[60]">
-    <span id="toastIcon" class="material-symbols-outlined text-primary">info</span>
-    <span id="toastMsg" class="font-body-sm">Mensaje</span>
-  </div>
+  <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3"></div>
 
-  <!-- PocketBase SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/pocketbase@0.18.0/dist/pocketbase.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pocketbase@0.21.1/dist/pocketbase.umd.js"></script>
   
   <script>
-    // 1. Inicialización de PocketBase
     const pb = new PocketBase('https://pb-testimonio.webticocr.com');
     
-    // UI Elements
     const authBtn = document.getElementById('authBtn');
     const authBtnText = document.getElementById('authBtnText');
-    const authStatusText = document.getElementById('authStatusText');
-    const dbStatus = document.getElementById('dbStatus');
-    const dbStatusDot = document.getElementById('dbStatusDot');
-    
-    const loginModal = document.getElementById('loginModal');
-    const closeLoginModal = document.getElementById('closeLoginModal');
-    const loginForm = document.getElementById('loginForm');
-    
-    const btnOpenCreate = document.getElementById('btnOpenCreate');
-    const createModal = document.getElementById('createModal');
-    const closeCreateModal = document.getElementById('closeCreateModal');
-    const createForm = document.getElementById('createForm');
+    const userEmailDisplay = document.getElementById('userEmailDisplay');
+    const userRoleDisplay = document.getElementById('userRoleDisplay');
+    const btnOpenModal = document.getElementById('btnOpenModal');
     const recordsContainer = document.getElementById('recordsContainer');
+    const loadingState = document.getElementById('loadingState');
+    const recordModal = document.getElementById('recordModal');
+    const modalContent = document.getElementById('modalContent');
+    const recordForm = document.getElementById('recordForm');
 
-    // Toast Logic
-    function showToast(message, isError = false) {
-      const toast = document.getElementById('toast');
-      document.getElementById('toastMsg').innerText = message;
+    let currentScriptures = [];
+
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      const bgColor = type === 'success' ? 'bg-[#191c21] border-l-4 border-primary' : 'bg-[#93000a] text-white';
+      toast.className = `toast-enter flex items-center px-4 py-3 rounded shadow-lg ${bgColor}`;
+      toast.innerHTML = `<span class="text-sm font-medium">${message}</span>`;
       
-      const icon = document.getElementById('toastIcon');
-      if(isError) {
-        toast.classList.replace('border-primary', 'border-error');
-        icon.classList.replace('text-primary', 'text-error');
-        icon.innerText = 'error';
-      } else {
-        toast.classList.replace('border-error', 'border-primary');
-        icon.classList.replace('text-error', 'text-primary');
-        icon.innerText = 'check_circle';
-      }
-      
-      toast.classList.remove('hidden');
-      toast.classList.add('toast-enter');
-      
+      document.getElementById('toastContainer').appendChild(toast);
       setTimeout(() => {
-        toast.classList.add('hidden');
-        toast.classList.remove('toast-enter');
-      }, 3500);
+        toast.classList.replace('toast-enter', 'toast-exit');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
     }
 
-    // UI State Management
-    function updateAuthState() {
+    function updateUIAuth() {
       if (pb.authStore.isValid) {
-        authStatusText.innerText = pb.authStore.model.email;
-        authBtnText.innerText = "Salir";
-        authBtn.querySelector('span').innerText = "logout";
-        dbStatusDot.classList.replace('bg-error', 'bg-primary-container');
-        dbStatus.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-primary-container shadow-[0_0_5px_rgba(221,167,74,0.8)]"></span> Dokploy OK`;
-        btnOpenCreate.classList.remove('hidden');
-        loadRecords();
+        authBtnText.textContent = "Cerrar Sesión";
+        userEmailDisplay.textContent = pb.authStore.model.email;
+        userRoleDisplay.textContent = "Ministro / Publicador";
+        btnOpenModal.classList.remove('hidden');
+        btnOpenModal.classList.add('flex');
+        fetchPredicaciones();
       } else {
-        authStatusText.innerText = "No Autenticado";
-        authBtnText.innerText = "Entrar";
-        authBtn.querySelector('span').innerText = "login";
-        dbStatusDot.classList.replace('bg-primary-container', 'bg-error');
-        dbStatus.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-error"></span> Desconectado`;
-        btnOpenCreate.classList.add('hidden');
-        recordsContainer.innerHTML = `
-          <div class="bg-surface-container-low rounded-xl p-space-lg text-center border border-dashed border-outline-variant">
-            <p class="text-on-surface-variant">Inicia sesión para ver y crear registros de predicación.</p>
-          </div>`;
+        authBtnText.textContent = "Ingresar con Google";
+        userEmailDisplay.textContent = "Invitado";
+        userRoleDisplay.textContent = "Inicia sesión para continuar";
+        btnOpenModal.classList.add('hidden');
+        btnOpenModal.classList.remove('flex');
+        recordsContainer.innerHTML = '';
+        recordsContainer.appendChild(loadingState);
+        loadingState.textContent = "Inicia sesión para ver tus predicaciones.";
       }
     }
 
-    // Login Modal Listeners
-    authBtn.addEventListener('click', () => {
+    authBtn.addEventListener('click', async () => {
       if (pb.authStore.isValid) {
         pb.authStore.clear();
-        updateAuthState();
-        showToast("Sesión cerrada correctamente");
+        updateUIAuth();
+        showToast('Sesión cerrada');
       } else {
-        loginModal.classList.remove('hidden');
-      }
-    });
-    closeLoginModal.addEventListener('click', () => loginModal.classList.add('hidden'));
-
-    // Handle Login
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      
-      try {
-        await pb.collection('users').authWithPassword(email, password);
-        showToast('Login exitoso');
-        loginModal.classList.add('hidden');
-        loginForm.reset();
-        updateAuthState();
-      } catch (err) {
-        showToast('Credenciales incorrectas', true);
-      }
-    });
-
-    // Handle Google Login
-    const googleLoginBtn = document.getElementById('googleLoginBtn');
-    if(googleLoginBtn) {
-      googleLoginBtn.addEventListener('click', async () => {
         try {
-          const authData = await pb.collection('users').authWithOAuth2({ provider: 'google' });
-          showToast('Login exitoso con Google');
-          loginModal.classList.add('hidden');
-          updateAuthState();
-        } catch (err) {
-          console.error(err);
-          showToast('Error al autenticar con Google. Revisa la configuración de Auth Providers en PocketBase.', true);
+          await pb.collection('users').authWithOAuth2({ provider: 'google' });
+          updateUIAuth();
+          showToast('Sesión iniciada correctamente');
+        } catch (error) {
+          console.error(error);
+          showToast('Error al iniciar sesión', 'error');
         }
+      }
+    });
+
+    document.getElementById('btnAddScripture').addEventListener('click', () => {
+      const book = document.getElementById('bibleBook').value;
+      const chapter = document.getElementById('bibleChapter').value;
+      const verse = document.getElementById('bibleVerse').value;
+      
+      if (book && chapter && verse) {
+        const formattedScripture = `${book} capítulo ${chapter}, versículo ${verse}`;
+        currentScriptures.push(formattedScripture);
+        updateScriptureTags();
+        
+        document.getElementById('bibleChapter').value = '';
+        document.getElementById('bibleVerse').value = '';
+      }
+    });
+
+    function updateScriptureTags() {
+      const container = document.getElementById('scriptureTagsContainer');
+      container.innerHTML = '';
+      
+      currentScriptures.forEach((scripture, index) => {
+        const tag = document.createElement('div');
+        tag.className = 'flex items-center gap-2 bg-surface-container-highest text-secondary px-3 py-1.5 rounded-md text-sm border border-outline/20';
+        tag.innerHTML = `
+          <span class="material-symbols-outlined text-[16px]">menu_book</span>
+          <span>${scripture}</span>
+          <button type="button" onclick="removeScripture(${index})" class="text-error hover:text-error-container ml-2 cursor-pointer">
+            <span class="material-symbols-outlined text-[16px]">close</span>
+          </button>
+        `;
+        container.appendChild(tag);
       });
+      
+      document.getElementById('fieldScripturesArray').value = JSON.stringify(currentScriptures);
     }
 
-    // Create Modal Listeners
-    btnOpenCreate.addEventListener('click', () => createModal.classList.remove('hidden'));
-    closeCreateModal.addEventListener('click', () => {
-      createModal.classList.add('hidden');
-      createForm.reset();
-    });
+    window.removeScripture = (index) => {
+      currentScriptures.splice(index, 1);
+      updateScriptureTags();
+    };
 
-    // Handle Create Record
-    createForm.addEventListener('submit', async (e) => {
+    const openModal = () => {
+      recordModal.classList.remove('hidden');
+      setTimeout(() => {
+        recordModal.classList.remove('opacity-0');
+        modalContent.classList.remove('scale-95');
+      }, 10);
+    };
+
+    const closeModal = () => {
+      recordModal.classList.add('opacity-0');
+      modalContent.classList.add('scale-95');
+      setTimeout(() => {
+        recordModal.classList.add('hidden');
+        recordForm.reset();
+        currentScriptures = [];
+        updateScriptureTags();
+      }, 300);
+    };
+
+    btnOpenModal.addEventListener('click', openModal);
+    document.getElementById('btnCloseModal').addEventListener('click', closeModal);
+    document.getElementById('btnCancelModal').addEventListener('click', closeModal);
+
+    recordForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       
+      const rawDate = document.getElementById('fieldDate').value;
+      const isoDate = new Date(rawDate).toISOString();
+      
       const data = {
-        title: document.getElementById('fichaTitle').value,
-        category: document.getElementById('fichaCategory').value,
-        date: document.getElementById('fichaDate').value,
-        scriptures: document.getElementById('fichaScriptures').value,
-        notes: document.getElementById('fichaNotes').value,
-        user: pb.authStore.model.id // Opcional si agregas relation user
+        title: document.getElementById('fieldTitle').value,
+        date: isoDate,
+        category: document.getElementById('fieldCategory').value,
+        scriptures: document.getElementById('fieldScripturesArray').value,
+        notes: document.getElementById('fieldNotes').value,
       };
 
       try {
         await pb.collection('predicaciones').create(data);
         showToast('Ficha guardada correctamente');
-        createModal.classList.add('hidden');
-        createForm.reset();
-        loadRecords();
-      } catch (err) {
-        console.error(err);
-        showToast('Error al guardar. Verifica que creaste la colección "predicaciones"', true);
+        closeModal();
+        fetchPredicaciones();
+      } catch (error) {
+        console.error(error);
+        showToast('Error al guardar la ficha', 'error');
       }
     });
 
-    // Delete Record
-    window.deleteRecord = async function(id) {
+    async function fetchPredicaciones() {
       try {
-        await pb.collection('predicaciones').delete(id);
-        showToast('Ficha eliminada');
-        loadRecords();
-      } catch(err) {
-        showToast('Error al eliminar', true);
-      }
-    };
-
-    // Load and Render Records
-    async function loadRecords() {
-      try {
-        // Obtenemos los registros ordenados por fecha más próxima
-        const records = await pb.collection('predicaciones').getFullList({
-          sort: 'date',
-        });
+        loadingState.textContent = "Cargando registros...";
+        const records = await pb.collection('predicaciones').getFullList({ sort: '-date' });
         
-        if (records.length === 0) {
-          recordsContainer.innerHTML = `
-            <div class="bg-surface-container-low rounded-xl p-space-lg text-center border border-dashed border-outline-variant">
-              <p class="text-on-surface-variant">No tienes fichas programadas. Crea una nueva asignación.</p>
-            </div>`;
+        recordsContainer.innerHTML = '';
+        if(records.length === 0) {
+          recordsContainer.innerHTML = `<div class="text-center py-12 text-outline">No hay fichas registradas.</div>`;
           return;
         }
 
-        recordsContainer.innerHTML = '';
-        
         records.forEach(record => {
-          const dateObj = new Date(record.date);
-          const dateStr = dateObj.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase();
-          const timeStr = dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-          
-          let scripHtml = '';
-          if(record.scriptures) {
-            const arr = record.scriptures.split(',');
-            scripHtml = arr.map(s => `<span class="font-label-sm text-label-sm bg-surface-container text-secondary px-2 py-1 rounded">${s.trim()}</span>`).join('');
+          let parsedScriptures = [];
+          try {
+            parsedScriptures = JSON.parse(record.scriptures || "[]");
+          } catch (e) {
+            parsedScriptures = record.scriptures ? [record.scriptures] : [];
           }
 
-          let icon = 'event';
-          if(record.category === 'Discurso') icon = 'podium';
-          if(record.category === 'Revisita') icon = 'contacts_product';
-          if(record.category === 'Predicacion') icon = 'church';
+          const scripturesBlockHtml = parsedScriptures.length > 0 ? 
+            `<div class="mt-4 p-4 bg-[#141b21] rounded-lg border-l-4 border-secondary shadow-inner">
+              <h4 class="text-xs font-label-sm text-outline uppercase mb-3">Lecturas Asignadas</h4>
+              <div class="flex flex-col gap-3">
+                ${parsedScriptures.map(s => `
+                  <div class="flex flex-col">
+                    <span class="font-headline-sm text-lg text-secondary leading-tight">${s}</span>
+                    <span class="text-[0.7rem] text-tertiary mt-1 italic">Traducción del Nuevo Mundo</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>` : '';
+
+          const dateObj = new Date(record.date);
+          const dateString = isNaN(dateObj) ? "FECHA INVÁLIDA" : dateObj.toLocaleDateString('es-ES', {weekday: 'short', day: '2-digit', month: 'short', year: 'numeric'}).toUpperCase();
 
           const card = document.createElement('div');
-          card.className = "bg-surface-container-low rounded-xl p-space-lg shadow-sm hover:shadow-md transition-all relative group border border-transparent hover:border-surface-container-highest";
+          card.className = "bg-surface-container-low rounded-xl p-6 shadow-sm border border-outline/10";
           card.innerHTML = `
-            <button onclick="deleteRecord('${record.id}')" class="absolute top-4 right-4 text-on-surface-variant hover:text-error opacity-0 group-hover:opacity-100 transition-all bg-surface-container p-1 rounded" title="Eliminar Ficha">
-              <span class="material-symbols-outlined text-[18px]">delete</span>
-            </button>
-            
-            <div class="flex flex-col gap-space-sm mb-space-md">
-              <div class="flex flex-wrap items-center gap-space-xs">
-                <span class="font-label-sm text-label-sm bg-surface-container-highest text-primary px-space-xs py-0.5 rounded font-mono flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[14px]">${icon}</span> ${dateStr} • ${timeStr}
-                </span>
-                <span class="font-label-sm text-label-sm bg-surface-container text-tertiary px-space-xs py-0.5 rounded uppercase tracking-wider">${record.category}</span>
+            <div class="flex justify-between items-start mb-4">
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="font-label-sm text-[0.6875rem] bg-surface-container-highest text-primary px-2 py-0.5 rounded font-mono">${dateString}</span>
+                  <span class="font-label-sm text-[0.6875rem] bg-surface-container text-tertiary px-2 py-0.5 rounded">${record.category}</span>
+                </div>
+                <h3 class="font-headline-md text-2xl text-on-surface mt-1">${record.title}</h3>
               </div>
-              <h3 class="font-headline-md text-headline-md text-on-surface">${record.title}</h3>
+              <button onclick="deleteRecord('${record.id}')" class="text-outline hover:text-error transition-colors p-2"><span class="material-symbols-outlined text-[18px]">delete</span></button>
             </div>
             
+            ${scripturesBlockHtml}
+
             ${record.notes ? `
-            <blockquote class="bg-surface-container-high/40 pl-space-md pr-space-md py-space-sm rounded-lg mb-space-md border-l-2 border-primary/50">
-              <p class="font-scripture-quote text-scripture-quote text-on-surface italic">${record.notes}</p>
-            </blockquote>` : ''}
-            
-            ${scripHtml ? `
-            <div class="flex flex-wrap gap-1.5 border-t border-surface-container pt-space-md">
-              ${scripHtml}
+            <div class="mt-4 bg-surface-container-high/40 px-5 py-4 rounded-lg border border-outline/5">
+              <p class="font-body-md text-on-surface-variant leading-relaxed whitespace-pre-line">${record.notes}</p>
             </div>` : ''}
           `;
           recordsContainer.appendChild(card);
         });
-
-      } catch(err) {
-        console.error(err);
-        recordsContainer.innerHTML = `
-            <div class="bg-error-container/20 rounded-xl p-space-lg text-center border border-dashed border-error-container">
-              <p class="text-error font-medium">Error al cargar datos. Verifica que la colección "predicaciones" existe en PocketBase.</p>
-            </div>`;
+      } catch (error) {
+        console.error(error);
+        recordsContainer.innerHTML = `<div class="text-error p-4 bg-error-container/20 rounded-lg">Error al cargar datos. Verifica la conexión a PocketBase.</div>`;
       }
     }
 
-    // Inicializar UI al cargar
-    updateAuthState();
+    window.deleteRecord = async (id) => {
+      if(confirm('¿Eliminar esta ficha homilética?')) {
+        try {
+          await pb.collection('predicaciones').delete(id);
+          showToast('Registro eliminado');
+          fetchPredicaciones();
+        } catch(err) {
+          showToast('Error al eliminar', 'error');
+        }
+      }
+    };
 
+    updateUIAuth();
   </script>
 </body>
 </html>
