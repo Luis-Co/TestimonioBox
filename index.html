@@ -20,6 +20,10 @@
     @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
     .toast-enter { animation: slideIn 0.3s ease-out forwards; }
     .toast-exit { animation: fadeOut 0.3s ease-out forwards; }
+    
+    .calendar-day.selected { background-color: #fbc262; color: #281900; font-weight: 600; }
+    .calendar-day.has-record::after { content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background-color: #dda74a; }
+    .calendar-day.selected.has-record::after { background-color: #281900; }
   </style>
   
   <script src="https://cdn.tailwindcss.com"></script>
@@ -29,17 +33,13 @@
 </head>
 <body class="bg-background text-on-surface font-body-md text-body-md min-h-screen antialiased">
 
-  <!-- ================= VISTA DE LOGIN ================= -->
   <div id="loginView" class="min-h-screen flex flex-col items-center justify-center p-6 bg-background relative overflow-hidden">
-    <!-- Decoración de fondo suave -->
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
-    
     <div class="bg-surface-container-low p-10 rounded-2xl shadow-2xl flex flex-col items-center max-w-sm w-full border border-outline/10 relative z-10">
       <span class="material-symbols-outlined text-primary text-[56px] mb-4 drop-shadow-md">menu_book</span>
       <h1 class="font-headline-lg text-4xl text-on-surface mb-1">Kerygma</h1>
       <p class="text-tertiary mb-2 text-center uppercase tracking-widest text-xs font-bold">Ministerio & Pulpit</p>
       <p class="text-outline text-sm text-center mb-8">Inicia sesión para gestionar tus asignaciones homiléticas de forma segura.</p>
-      
       <button id="btnLoginGoogle" class="w-full flex items-center justify-center gap-3 bg-surface-container-high hover:bg-surface-container-highest text-on-surface px-6 py-3.5 rounded-xl transition-colors border border-outline/20 shadow-sm font-medium">
         <img src="https://img.icons8.com/color/24/google-logo.png" alt="Google" />
         <span>Continuar con Google</span>
@@ -47,7 +47,6 @@
     </div>
   </div>
 
-  <!-- ================= VISTA DE LA APLICACIÓN ================= -->
   <div id="appView" class="hidden">
     <aside class="fixed left-0 top-0 h-full w-72 bg-[#0b0e13] z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.3)]">
       <div class="flex flex-col">
@@ -89,10 +88,10 @@
 
       <main class="relative w-full pt-24 bg-background px-6 min-h-screen">
         <div class="flex flex-col w-full pb-16">
-          <section class="w-full mb-8 flex justify-between items-end">
+          <section class="w-full mb-6 flex justify-between items-end">
             <div class="flex flex-col">
               <h1 class="font-headline-lg text-[2.5rem] text-on-surface tracking-tight leading-none mb-2">Cronograma & Predicaciones</h1>
-              <p class="text-on-surface-variant">Gestor homilético sincronizado con PocketBase.</p>
+              <p class="text-on-surface-variant">Selecciona un día en el calendario para gestionar sus asignaciones.</p>
             </div>
             <button id="btnOpenModal" class="flex items-center gap-2 bg-primary hover:bg-primary-container text-[#432c00] font-semibold px-6 py-2.5 rounded-lg transition-all shadow-md">
               <span class="material-symbols-outlined text-[20px]">add_circle</span>
@@ -100,19 +99,46 @@
             </button>
           </section>
 
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div class="lg:col-span-8 flex flex-col gap-6" id="recordsContainer">
-              <div id="loadingState" class="text-center py-12 text-outline">
-                Cargando registros...
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-4 flex flex-col gap-4">
+              <div class="bg-surface-container-low rounded-xl p-5 shadow-sm border border-outline/10">
+                <div class="flex items-center justify-between mb-4">
+                  <h2 id="calendarMonthYear" class="font-headline-sm text-lg text-primary capitalize">Mes Año</h2>
+                  <div class="flex gap-1">
+                    <button id="btnPrevMonth" class="p-1 rounded hover:bg-surface-container-high text-on-surface-variant transition-colors"><span class="material-symbols-outlined">chevron_left</span></button>
+                    <button id="btnNextMonth" class="p-1 rounded hover:bg-surface-container-high text-on-surface-variant transition-colors"><span class="material-symbols-outlined">chevron_right</span></button>
+                  </div>
+                </div>
+                
+                <div class="grid grid-cols-7 gap-1 text-center font-label-sm text-[0.65rem] text-outline uppercase mb-2">
+                  <div>Do</div><div>Lu</div><div>Ma</div><div>Mi</div><div>Ju</div><div>Vi</div><div>Sa</div>
+                </div>
+                <div id="calendarGrid" class="grid grid-cols-7 gap-1 text-sm">
+                </div>
+                
+                <button id="btnClearFilter" class="w-full mt-4 py-2 text-xs font-label-sm uppercase tracking-wider text-outline hover:text-on-surface transition-colors hidden">
+                  Mostrar Todo el Mes
+                </button>
               </div>
             </div>
+
+            <div class="lg:col-span-8 flex flex-col gap-4">
+              <div id="filterStatusIndicator" class="font-label-sm text-xs text-outline uppercase tracking-wider hidden">
+                Mostrando registros para: <span id="filterStatusDate" class="text-primary font-bold"></span>
+              </div>
+              <div id="recordsContainer" class="flex flex-col gap-6">
+                <div id="loadingState" class="text-center py-12 text-outline">
+                  Cargando registros...
+                </div>
+              </div>
+            </div>
+            
           </div>
         </div>
       </main>
     </div>
   </div>
 
-  <!-- ================= MODAL NUEVA FICHA ================= -->
   <div id="recordModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300">
     <div class="bg-surface-container-low w-full max-w-lg rounded-xl shadow-2xl p-6 transform scale-95 transition-transform duration-300" id="modalContent">
       <div class="flex justify-between items-center mb-6">
@@ -149,6 +175,7 @@
           <div class="flex gap-2 mb-3">
             <select id="bibleBook" class="flex-1 bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2 text-on-surface focus:outline-none focus:border-primary">
               <option value="Génesis">Génesis</option>
+              <option value="Éxodo">Éxodo</option>
               <option value="Salmos">Salmos</option>
               <option value="Proverbios">Proverbios</option>
               <option value="Isaías">Isaías</option>
@@ -186,35 +213,44 @@
 
   <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3"></div>
 
-  <!-- PocketBase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/pocketbase@0.21.1/dist/pocketbase.umd.js"></script>
   
   <script>
     const pb = new PocketBase('https://pb-testimonio.webticocr.com');
     
-    // Referencias DOM
     const loginView = document.getElementById('loginView');
     const appView = document.getElementById('appView');
     const btnLoginGoogle = document.getElementById('btnLoginGoogle');
     const btnLogout = document.getElementById('btnLogout');
-    
     const userEmailDisplay = document.getElementById('userEmailDisplay');
     const btnOpenModal = document.getElementById('btnOpenModal');
     const recordsContainer = document.getElementById('recordsContainer');
-    const loadingState = document.getElementById('loadingState');
+    
     const recordModal = document.getElementById('recordModal');
     const modalContent = document.getElementById('modalContent');
     const recordForm = document.getElementById('recordForm');
-
+    
     let currentScriptures = [];
+    let globalRecords = [];
+    
+    const dateNow = new Date();
+    let currentMonth = dateNow.getMonth();
+    let currentYear = dateNow.getFullYear();
+    let selectedDateFilter = null; 
 
-    // Sistema de Notificaciones
+    const calendarGrid = document.getElementById('calendarGrid');
+    const calendarMonthYear = document.getElementById('calendarMonthYear');
+    const btnPrevMonth = document.getElementById('btnPrevMonth');
+    const btnNextMonth = document.getElementById('btnNextMonth');
+    const btnClearFilter = document.getElementById('btnClearFilter');
+    const filterStatusIndicator = document.getElementById('filterStatusIndicator');
+    const filterStatusDate = document.getElementById('filterStatusDate');
+
     function showToast(message, type = 'success') {
       const toast = document.createElement('div');
       const bgColor = type === 'success' ? 'bg-[#191c21] border-l-4 border-primary' : 'bg-[#93000a] text-white';
       toast.className = `toast-enter flex items-center px-4 py-3 rounded shadow-lg ${bgColor}`;
       toast.innerHTML = `<span class="text-sm font-medium">${message}</span>`;
-      
       document.getElementById('toastContainer').appendChild(toast);
       setTimeout(() => {
         toast.classList.replace('toast-enter', 'toast-exit');
@@ -222,17 +258,17 @@
       }, 3000);
     }
 
-    // Lógica de Autenticación y Vistas
+    function formatDateForInput(d) {
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
     function updateUIAuth() {
       if (pb.authStore.isValid) {
-        // Mostrar App, Ocultar Login
         loginView.classList.add('hidden');
         appView.classList.remove('hidden');
-        
         userEmailDisplay.textContent = pb.authStore.model.email;
-        fetchPredicaciones();
+        loadDataAndRender();
       } else {
-        // Mostrar Login, Ocultar App
         loginView.classList.remove('hidden');
         appView.classList.add('hidden');
       }
@@ -255,7 +291,176 @@
       showToast('Sesión cerrada');
     });
 
-    // Lógica de Textos Bíblicos
+    function renderCalendar() {
+      calendarGrid.innerHTML = '';
+      
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      
+      const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      calendarMonthYear.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+      
+      const recordDates = new Set();
+      globalRecords.forEach(r => {
+        const d = new Date(r.date);
+        recordDates.add(formatDateForInput(d));
+      });
+
+      for (let i = 0; i < firstDay; i++) {
+        const emptyDiv = document.createElement('div');
+        calendarGrid.appendChild(emptyDiv);
+      }
+
+      for (let i = 1; i <= daysInMonth; i++) {
+        const dayDiv = document.createElement('div');
+        const loopDateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+        
+        dayDiv.className = 'calendar-day relative py-2 flex items-center justify-center rounded-lg cursor-pointer hover:bg-surface-container-high transition-colors text-on-surface';
+        dayDiv.textContent = i;
+        
+        if (recordDates.has(loopDateStr)) {
+          dayDiv.classList.add('has-record');
+        }
+
+        if (selectedDateFilter === loopDateStr) {
+          dayDiv.classList.add('selected');
+        }
+
+        dayDiv.addEventListener('click', () => {
+          selectedDateFilter = loopDateStr;
+          renderCalendar();
+          renderRecords();
+        });
+
+        calendarGrid.appendChild(dayDiv);
+      }
+      
+      if (selectedDateFilter) {
+        btnClearFilter.classList.remove('hidden');
+        filterStatusIndicator.classList.remove('hidden');
+        filterStatusDate.textContent = selectedDateFilter;
+      } else {
+        btnClearFilter.classList.add('hidden');
+        filterStatusIndicator.classList.add('hidden');
+      }
+    }
+
+    btnPrevMonth.addEventListener('click', () => {
+      currentMonth--;
+      if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+      selectedDateFilter = null;
+      renderCalendar();
+      renderRecords();
+    });
+
+    btnNextMonth.addEventListener('click', () => {
+      currentMonth++;
+      if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+      selectedDateFilter = null;
+      renderCalendar();
+      renderRecords();
+    });
+
+    btnClearFilter.addEventListener('click', () => {
+      selectedDateFilter = null;
+      renderCalendar();
+      renderRecords();
+    });
+
+    async function loadDataAndRender() {
+      recordsContainer.innerHTML = `<div class="text-center py-12 text-outline">Cargando registros...</div>`;
+      try {
+        globalRecords = await pb.collection('predicaciones').getFullList({ sort: '-date' });
+        renderCalendar();
+        renderRecords();
+      } catch (error) {
+        console.error(error);
+        recordsContainer.innerHTML = `<div class="text-error p-4 bg-error-container/20 rounded-lg">Error al cargar datos. Verifica la conexión a PocketBase.</div>`;
+      }
+    }
+
+    function renderRecords() {
+      recordsContainer.innerHTML = '';
+      
+      let filteredRecords = globalRecords.filter(r => {
+        const d = new Date(r.date);
+        if (d.getMonth() !== currentMonth || d.getFullYear() !== currentYear) return false;
+        if (selectedDateFilter) {
+          return formatDateForInput(d) === selectedDateFilter;
+        }
+        return true;
+      });
+
+      if(filteredRecords.length === 0) {
+        recordsContainer.innerHTML = `
+          <div class="text-center py-12 bg-surface-container-low rounded-xl border border-outline/10">
+            <p class="text-outline mb-4">No hay fichas para esta selección.</p>
+            <button onclick="openModal()" class="text-primary hover:text-primary-container font-medium transition-colors">Crear Nueva Asignación</button>
+          </div>`;
+        return;
+      }
+
+      filteredRecords.forEach(record => {
+        let parsedScriptures = [];
+        try {
+          parsedScriptures = JSON.parse(record.scriptures || "[]");
+        } catch (e) {
+          parsedScriptures = record.scriptures ? [record.scriptures] : [];
+        }
+
+        const scripturesBlockHtml = parsedScriptures.length > 0 ? 
+          `<div class="mt-4 p-4 bg-[#141b21] rounded-lg border-l-4 border-secondary shadow-inner">
+            <h4 class="text-xs font-label-sm text-outline uppercase mb-3">Lecturas Asignadas</h4>
+            <div class="flex flex-col gap-3">
+              ${parsedScriptures.map(s => `
+                <div class="flex flex-col">
+                  <span class="font-headline-sm text-lg text-secondary leading-tight">${s}</span>
+                  <span class="text-[0.7rem] text-tertiary mt-1 italic">Traducción del Nuevo Mundo</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>` : '';
+
+        const dateObj = new Date(record.date);
+        const dateString = isNaN(dateObj) ? "FECHA INVÁLIDA" : dateObj.toLocaleDateString('es-ES', {weekday: 'short', day: '2-digit', month: 'short', year: 'numeric'}).toUpperCase();
+
+        const card = document.createElement('div');
+        card.className = "bg-surface-container-low rounded-xl p-6 shadow-sm border border-outline/10";
+        card.innerHTML = `
+          <div class="flex justify-between items-start mb-4">
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="font-label-sm text-[0.6875rem] bg-surface-container-highest text-primary px-2 py-0.5 rounded font-mono">${dateString}</span>
+                <span class="font-label-sm text-[0.6875rem] bg-surface-container text-tertiary px-2 py-0.5 rounded">${record.category}</span>
+              </div>
+              <h3 class="font-headline-md text-2xl text-on-surface mt-1">${record.title}</h3>
+            </div>
+            <button onclick="deleteRecord('${record.id}')" class="text-outline hover:text-error transition-colors p-2" title="Eliminar Ficha"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+          </div>
+          
+          ${scripturesBlockHtml}
+
+          ${record.notes ? `
+          <div class="mt-4 bg-surface-container-high/40 px-5 py-4 rounded-lg border border-outline/5">
+            <p class="font-body-md text-on-surface-variant leading-relaxed whitespace-pre-line">${record.notes}</p>
+          </div>` : ''}
+        `;
+        recordsContainer.appendChild(card);
+      });
+    }
+
+    window.deleteRecord = async (id) => {
+      if(confirm('¿Eliminar esta ficha homilética?')) {
+        try {
+          await pb.collection('predicaciones').delete(id);
+          showToast('Registro eliminado');
+          loadDataAndRender();
+        } catch(err) {
+          showToast('Error al eliminar', 'error');
+        }
+      }
+    };
+
     document.getElementById('btnAddScripture').addEventListener('click', () => {
       const book = document.getElementById('bibleBook').value;
       const chapter = document.getElementById('bibleChapter').value;
@@ -274,7 +479,6 @@
     function updateScriptureTags() {
       const container = document.getElementById('scriptureTagsContainer');
       container.innerHTML = '';
-      
       currentScriptures.forEach((scripture, index) => {
         const tag = document.createElement('div');
         tag.className = 'flex items-center gap-2 bg-surface-container-highest text-secondary px-3 py-1.5 rounded-md text-sm border border-outline/20';
@@ -287,7 +491,6 @@
         `;
         container.appendChild(tag);
       });
-      
       document.getElementById('fieldScripturesArray').value = JSON.stringify(currentScriptures);
     }
 
@@ -296,8 +499,14 @@
       updateScriptureTags();
     };
 
-    // Control del Modal
-    const openModal = () => {
+    window.openModal = () => {
+      const dateInput = document.getElementById('fieldDate');
+      if (selectedDateFilter) {
+        dateInput.value = selectedDateFilter;
+      } else {
+        dateInput.value = formatDateForInput(new Date());
+      }
+
       recordModal.classList.remove('hidden');
       setTimeout(() => {
         recordModal.classList.remove('opacity-0');
@@ -320,12 +529,10 @@
     document.getElementById('btnCloseModal').addEventListener('click', closeModal);
     document.getElementById('btnCancelModal').addEventListener('click', closeModal);
 
-    // Guardar Ficha
     recordForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
       const rawDate = document.getElementById('fieldDate').value;
-      const isoDate = new Date(rawDate).toISOString();
+      const isoDate = new Date(rawDate + 'T12:00:00Z').toISOString();
       
       const data = {
         title: document.getElementById('fieldTitle').value,
@@ -339,91 +546,13 @@
         await pb.collection('predicaciones').create(data);
         showToast('Ficha guardada correctamente');
         closeModal();
-        fetchPredicaciones();
+        loadDataAndRender();
       } catch (error) {
         console.error(error);
         showToast('Error al guardar la ficha', 'error');
       }
     });
 
-    // Obtener y Renderizar Fichas
-    async function fetchPredicaciones() {
-      try {
-        recordsContainer.innerHTML = `<div class="text-center py-12 text-outline">Cargando registros...</div>`;
-        const records = await pb.collection('predicaciones').getFullList({ sort: '-date' });
-        
-        recordsContainer.innerHTML = '';
-        if(records.length === 0) {
-          recordsContainer.innerHTML = `<div class="text-center py-12 text-outline">No hay fichas registradas.</div>`;
-          return;
-        }
-
-        records.forEach(record => {
-          let parsedScriptures = [];
-          try {
-            parsedScriptures = JSON.parse(record.scriptures || "[]");
-          } catch (e) {
-            parsedScriptures = record.scriptures ? [record.scriptures] : [];
-          }
-
-          const scripturesBlockHtml = parsedScriptures.length > 0 ? 
-            `<div class="mt-4 p-4 bg-[#141b21] rounded-lg border-l-4 border-secondary shadow-inner">
-              <h4 class="text-xs font-label-sm text-outline uppercase mb-3">Lecturas Asignadas</h4>
-              <div class="flex flex-col gap-3">
-                ${parsedScriptures.map(s => `
-                  <div class="flex flex-col">
-                    <span class="font-headline-sm text-lg text-secondary leading-tight">${s}</span>
-                    <span class="text-[0.7rem] text-tertiary mt-1 italic">Traducción del Nuevo Mundo</span>
-                  </div>
-                `).join('')}
-              </div>
-            </div>` : '';
-
-          const dateObj = new Date(record.date);
-          const dateString = isNaN(dateObj) ? "FECHA INVÁLIDA" : dateObj.toLocaleDateString('es-ES', {weekday: 'short', day: '2-digit', month: 'short', year: 'numeric'}).toUpperCase();
-
-          const card = document.createElement('div');
-          card.className = "bg-surface-container-low rounded-xl p-6 shadow-sm border border-outline/10";
-          card.innerHTML = `
-            <div class="flex justify-between items-start mb-4">
-              <div class="flex flex-col gap-1">
-                <div class="flex items-center gap-2 mb-1">
-                  <span class="font-label-sm text-[0.6875rem] bg-surface-container-highest text-primary px-2 py-0.5 rounded font-mono">${dateString}</span>
-                  <span class="font-label-sm text-[0.6875rem] bg-surface-container text-tertiary px-2 py-0.5 rounded">${record.category}</span>
-                </div>
-                <h3 class="font-headline-md text-2xl text-on-surface mt-1">${record.title}</h3>
-              </div>
-              <button onclick="deleteRecord('${record.id}')" class="text-outline hover:text-error transition-colors p-2" title="Eliminar Ficha"><span class="material-symbols-outlined text-[18px]">delete</span></button>
-            </div>
-            
-            ${scripturesBlockHtml}
-
-            ${record.notes ? `
-            <div class="mt-4 bg-surface-container-high/40 px-5 py-4 rounded-lg border border-outline/5">
-              <p class="font-body-md text-on-surface-variant leading-relaxed whitespace-pre-line">${record.notes}</p>
-            </div>` : ''}
-          `;
-          recordsContainer.appendChild(card);
-        });
-      } catch (error) {
-        console.error(error);
-        recordsContainer.innerHTML = `<div class="text-error p-4 bg-error-container/20 rounded-lg">Error al cargar datos. Verifica la conexión a PocketBase.</div>`;
-      }
-    }
-
-    window.deleteRecord = async (id) => {
-      if(confirm('¿Eliminar esta ficha homilética?')) {
-        try {
-          await pb.collection('predicaciones').delete(id);
-          showToast('Registro eliminado');
-          fetchPredicaciones();
-        } catch(err) {
-          showToast('Error al eliminar', 'error');
-        }
-      }
-    };
-
-    // Revisar estado de autenticación al cargar
     updateUIAuth();
   </script>
 </body>
