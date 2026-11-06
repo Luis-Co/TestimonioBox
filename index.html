@@ -199,6 +199,10 @@
                 <span class="material-symbols-outlined text-[15px]">content_paste</span>
                 <span>Pegar texto</span>
               </button>
+              <button type="button" id="btnCleanScripture" title="Limpiar símbolos (*, +) y caracteres especiales del texto bíblico" class="flex items-center gap-1 text-xs bg-surface-container-high hover:bg-surface-container-highest text-primary border border-primary/30 px-2.5 py-1.5 rounded-lg transition-colors">
+                <span class="material-symbols-outlined text-[15px]">auto_fix_high</span>
+                <span>Limpiar símbolos</span>
+              </button>
             </div>
           </div>
 
@@ -654,14 +658,43 @@
       document.getElementById('bibleText').focus();
     });
 
+    function cleanScriptureText(rawText) {
+      if (!rawText) return '';
+      return rawText
+        // Elimina símbolos de notas y referencias cruzadas de JW.ORG / Biblias (*, +, †, ‡, °, #, §, ¶)
+        .replace(/[*+†‡°#§¶]+/g, '')
+        // Elimina llamadas a pie de página entre corchetes como [a], [1], etc.
+        .replace(/\[[a-zA-Z0-9]+\]/g, '')
+        // Elimina caracteres de espacio de ancho cero o no separables
+        .replace(/[\u200B-\u200D\uFEFF\u00A0]/g, ' ')
+        // Ajusta espacios antes de signos de puntuación
+        .replace(/\s+([,.;:?!»”’])/g, '$1')
+        // Colapsa múltiples espacios seguidos
+        .replace(/[ \t]{2,}/g, ' ')
+        .trim();
+    }
+
+    document.getElementById('btnCleanScripture').addEventListener('click', () => {
+      const bibleTextEl = document.getElementById('bibleText');
+      if (!bibleTextEl.value.trim()) {
+        showToast('No hay texto bíblico para limpiar', 'error');
+        bibleTextEl.focus();
+        return;
+      }
+      bibleTextEl.value = cleanScriptureText(bibleTextEl.value);
+      bibleTextEl.focus();
+      showToast('Símbolos y caracteres especiales eliminados');
+    });
+
     document.getElementById('btnPasteScripture').addEventListener('click', async () => {
       const bibleTextEl = document.getElementById('bibleText');
       try {
         const clipText = await navigator.clipboard.readText();
         if (clipText) {
+          const cleaned = cleanScriptureText(clipText);
           bibleTextEl.value = bibleTextEl.value
-            ? bibleTextEl.value.trim() + '\n' + clipText.trim()
-            : clipText.trim();
+            ? bibleTextEl.value.trim() + '\n' + cleaned
+            : cleaned;
           bibleTextEl.focus();
           showToast('Texto bíblico pegado del portapapeles');
         } else {
