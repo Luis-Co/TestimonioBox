@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <meta content="web_dashboard" name="shell-type"/>
-  <title>Kerygma - Ministerio & Pulpit</title>
+  <title>TestimonioBox - Ministerio & Pulpit</title>
   
   <link rel="icon" type="image/png" href="https://img.icons8.com/fluency/48/calendar.png">
   
@@ -24,6 +24,20 @@
     .calendar-day.selected { background-color: #fbc262; color: #281900; font-weight: 600; }
     .calendar-day.has-record::after { content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background-color: #dda74a; }
     .calendar-day.selected.has-record::after { background-color: #281900; }
+
+    /* Estilos para contenido con formato enriquecido */
+    .rich-content h2 { font-family: 'Newsreader', serif; font-size: 1.5rem; font-weight: 600; color: #fbc262; margin: 0.75rem 0 0.35rem; line-height: 1.3; }
+    .rich-content h3 { font-family: 'Newsreader', serif; font-size: 1.2rem; font-weight: 600; color: #ecc076; margin: 0.6rem 0 0.25rem; line-height: 1.3; }
+    .rich-content p { margin-bottom: 0.5rem; }
+    .rich-content ul { list-style-type: disc; padding-left: 1.5rem; margin: 0.5rem 0; }
+    .rich-content ol { list-style-type: decimal; padding-left: 1.5rem; margin: 0.5rem 0; }
+    .rich-content li { margin-bottom: 0.2rem; }
+    .rich-content blockquote { border-left: 3px solid #ecc076; padding: 0.5rem 1rem; margin: 0.6rem 0; background-color: rgba(20, 27, 33, 0.7); border-radius: 0 0.5rem 0.5rem 0; font-style: italic; color: #d3c4b1; }
+    .rich-content hr { border: 0; border-top: 1px solid rgba(156, 143, 125, 0.25); margin: 0.75rem 0; }
+    #richEditor:empty:before { content: attr(data-placeholder); color: #9c8f7d; opacity: 0.6; pointer-events: none; }
+    .custom-scroll::-webkit-scrollbar { display: block; width: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(156, 143, 125, 0.3); border-radius: 9999px; }
   </style>
   
   <script src="https://cdn.tailwindcss.com"></script>
@@ -37,7 +51,7 @@
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
     <div class="bg-surface-container-low p-10 rounded-2xl shadow-2xl flex flex-col items-center max-w-sm w-full border border-outline/10 relative z-10">
       <span class="material-symbols-outlined text-primary text-[56px] mb-4 drop-shadow-md">menu_book</span>
-      <h1 class="font-headline-lg text-4xl text-on-surface mb-1">Kerygma</h1>
+      <h1 class="font-headline-lg text-4xl text-on-surface mb-1">TestimonioBox</h1>
       <p class="text-tertiary mb-2 text-center uppercase tracking-widest text-xs font-bold">Ministerio & Pulpit</p>
       <p class="text-outline text-sm text-center mb-8">Inicia sesión para gestionar tus asignaciones homiléticas de forma segura.</p>
       <button id="btnLoginGoogle" class="w-full flex items-center justify-center gap-3 bg-surface-container-high hover:bg-surface-container-highest text-on-surface px-6 py-3.5 rounded-xl transition-colors border border-outline/20 shadow-sm font-medium">
@@ -53,7 +67,7 @@
         <div class="h-16 flex items-center px-6 gap-2 bg-surface-container-low/40">
           <span class="material-symbols-outlined text-primary text-[24px]">menu_book</span>
           <div class="flex flex-col">
-            <span class="font-headline-sm text-[1.375rem] text-primary tracking-tight">Kerygma</span>
+            <span class="font-headline-sm text-[1.375rem] text-primary tracking-tight">TestimonioBox</span>
             <span class="font-label-sm text-[0.6875rem] text-tertiary tracking-wider uppercase">Ministerio & Pulpit</span>
           </div>
         </div>
@@ -139,29 +153,28 @@
     </div>
   </div>
 
-  <div id="recordModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300">
-    <div class="bg-surface-container-low w-full max-w-lg rounded-xl shadow-2xl p-6 transform scale-95 transition-transform duration-300" id="modalContent">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-headline-sm text-primary flex items-center gap-2">
-          <span class="material-symbols-outlined">post_add</span> Nueva Asignación
+  <div id="recordModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300 p-4">
+    <div class="bg-surface-container-low w-full max-w-4xl max-h-[92vh] overflow-y-auto custom-scroll rounded-2xl shadow-2xl p-6 sm:p-8 border border-outline/15 transform scale-95 transition-transform duration-300" id="modalContent">
+      <div class="flex justify-between items-center mb-6 pb-3 border-b border-outline/10">
+        <h2 class="text-2xl font-headline-sm text-primary flex items-center gap-2">
+          <span class="material-symbols-outlined text-[28px]">post_add</span> Nueva Asignación
         </h2>
-        <button id="btnCloseModal" class="text-outline hover:text-on-surface"><span class="material-symbols-outlined">close</span></button>
+        <button id="btnCloseModal" class="text-outline hover:text-on-surface p-1 rounded-lg hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined">close</span></button>
       </div>
       
-      <form id="recordForm" class="flex flex-col gap-4">
-        <div>
-          <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Tema / Título del Discurso</label>
-          <input type="text" id="fieldTitle" required class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2 text-on-surface focus:outline-none focus:border-primary">
-        </div>
-        
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Fecha</label>
-            <input type="date" id="fieldDate" required class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2 text-on-surface focus:outline-none focus:border-primary [color-scheme:dark]">
+      <form id="recordForm" class="flex flex-col gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+          <div class="md:col-span-6">
+            <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Tema / Título del Discurso</label>
+            <input type="text" id="fieldTitle" required placeholder="Ej. Cómo mantener el gozo en el ministerio" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3.5 py-2.5 text-on-surface focus:outline-none focus:border-primary">
           </div>
-          <div>
+          <div class="md:col-span-3">
+            <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Fecha</label>
+            <input type="date" id="fieldDate" required class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2.5 text-on-surface focus:outline-none focus:border-primary [color-scheme:dark]">
+          </div>
+          <div class="md:col-span-3">
             <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Categoría</label>
-            <select id="fieldCategory" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2 text-on-surface focus:outline-none focus:border-primary">
+            <select id="fieldCategory" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2.5 text-on-surface focus:outline-none focus:border-primary">
               <option value="Discurso Público">Discurso Público</option>
               <option value="Reunión Vida y Ministerio">Reunión Vida y Ministerio</option>
               <option value="Revisita">Revisita</option>
@@ -170,42 +183,187 @@
           </div>
         </div>
 
-        <div class="bg-surface-container/50 p-4 rounded-lg border border-outline/10">
-          <label class="block text-xs font-label-sm text-outline mb-2 uppercase">Asignación de Textos Bíblicos</label>
-          <div class="flex gap-2 mb-3">
-            <select id="bibleBook" class="flex-1 bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2 text-on-surface focus:outline-none focus:border-primary">
-              <option value="Génesis">Génesis</option>
-              <option value="Éxodo">Éxodo</option>
-              <option value="Salmos">Salmos</option>
-              <option value="Proverbios">Proverbios</option>
-              <option value="Isaías">Isaías</option>
-              <option value="Mateo">Mateo</option>
-              <option value="Marcos">Marcos</option>
-              <option value="Lucas">Lucas</option>
-              <option value="Juan">Juan</option>
-              <option value="Hechos">Hechos</option>
-              <option value="Romanos">Romanos</option>
-              <option value="1 Corintios">1 Corintios</option>
-              <option value="Hebreos">Hebreos</option>
-              <option value="Apocalipsis">Apocalipsis</option>
+        <div class="bg-surface-container/60 p-4 rounded-xl border border-outline/15 flex flex-col gap-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <label class="block text-xs font-label-sm text-outline uppercase">Asignación de Textos Bíblicos</label>
+            <div class="flex flex-wrap items-center gap-1.5">
+              <button type="button" id="btnSearchJW" title="Buscar pasaje en jw.org (WOL)" class="flex items-center gap-1 text-xs bg-surface-container-high hover:bg-surface-container-highest text-secondary border border-outline/20 px-2.5 py-1.5 rounded-lg transition-colors">
+                <span class="material-symbols-outlined text-[15px]">travel_explore</span>
+                <span>Buscar en JW.ORG</span>
+              </button>
+              <button type="button" id="btnSearchBG" title="Buscar pasaje en BibleGateway" class="flex items-center gap-1 text-xs bg-surface-container-high hover:bg-surface-container-highest text-tertiary border border-outline/20 px-2.5 py-1.5 rounded-lg transition-colors">
+                <span class="material-symbols-outlined text-[15px]">open_in_new</span>
+                <span>BibleGateway</span>
+              </button>
+              <button type="button" id="btnPasteScripture" title="Pegar desde el portapapeles" class="flex items-center gap-1 text-xs bg-surface-container-high hover:bg-surface-container-highest text-on-surface border border-outline/20 px-2.5 py-1.5 rounded-lg transition-colors">
+                <span class="material-symbols-outlined text-[15px]">content_paste</span>
+                <span>Pegar texto</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap sm:flex-nowrap gap-2">
+            <select id="bibleBook" class="flex-1 min-w-[160px] bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2 text-on-surface focus:outline-none focus:border-primary">
+              <optgroup label=" Escrituras Hebreo-Arameas">
+                <option value="Génesis">Génesis</option>
+                <option value="Éxodo">Éxodo</option>
+                <option value="Levítico">Levítico</option>
+                <option value="Números">Números</option>
+                <option value="Deuteronomio">Deuteronomio</option>
+                <option value="Josué">Josué</option>
+                <option value="Jueces">Jueces</option>
+                <option value="Rut">Rut</option>
+                <option value="1 Samuel">1 Samuel</option>
+                <option value="2 Samuel">2 Samuel</option>
+                <option value="1 Reyes">1 Reyes</option>
+                <option value="2 Reyes">2 Reyes</option>
+                <option value="1 Crónicas">1 Crónicas</option>
+                <option value="2 Crónicas">2 Crónicas</option>
+                <option value="Esdras">Esdras</option>
+                <option value="Nehemías">Nehemías</option>
+                <option value="Ester">Ester</option>
+                <option value="Job">Job</option>
+                <option value="Salmos">Salmos</option>
+                <option value="Proverbios">Proverbios</option>
+                <option value="Eclesiastés">Eclesiastés</option>
+                <option value="El Cantar de los Cantares">El Cantar de los Cantares</option>
+                <option value="Isaías">Isaías</option>
+                <option value="Jeremías">Jeremías</option>
+                <option value="Lamentaciones">Lamentaciones</option>
+                <option value="Ezequiel">Ezequiel</option>
+                <option value="Daniel">Daniel</option>
+                <option value="Oseas">Oseas</option>
+                <option value="Joel">Joel</option>
+                <option value="Amós">Amós</option>
+                <option value="Abdías">Abdías</option>
+                <option value="Jonás">Jonás</option>
+                <option value="Miqueas">Miqueas</option>
+                <option value="Nahúm">Nahúm</option>
+                <option value="Habacuc">Habacuc</option>
+                <option value="Sofonías">Sofonías</option>
+                <option value="Ageo">Ageo</option>
+                <option value="Zacarías">Zacarías</option>
+                <option value="Malaquías">Malaquías</option>
+              </optgroup>
+              <optgroup label="Escrituras Griegas Cristianas">
+                <option value="Mateo">Mateo</option>
+                <option value="Marcos">Marcos</option>
+                <option value="Lucas">Lucas</option>
+                <option value="Juan">Juan</option>
+                <option value="Hechos">Hechos</option>
+                <option value="Romanos">Romanos</option>
+                <option value="1 Corintios">1 Corintios</option>
+                <option value="2 Corintios">2 Corintios</option>
+                <option value="Gálatas">Gálatas</option>
+                <option value="Efesios">Efesios</option>
+                <option value="Filipenses">Filipenses</option>
+                <option value="Colosenses">Colosenses</option>
+                <option value="1 Tesalonicenses">1 Tesalonicenses</option>
+                <option value="2 Tesalonicenses">2 Tesalonicenses</option>
+                <option value="1 Timoteo">1 Timoteo</option>
+                <option value="2 Timoteo">2 Timoteo</option>
+                <option value="Tito">Tito</option>
+                <option value="Filemón">Filemón</option>
+                <option value="Hebreos">Hebreos</option>
+                <option value="Santiago">Santiago</option>
+                <option value="1 Pedro">1 Pedro</option>
+                <option value="2 Pedro">2 Pedro</option>
+                <option value="1 Juan">1 Juan</option>
+                <option value="2 Juan">2 Juan</option>
+                <option value="3 Juan">3 Juan</option>
+                <option value="Judas">Judas</option>
+                <option value="Apocalipsis">Apocalipsis</option>
+              </optgroup>
             </select>
-            <input type="number" id="bibleChapter" placeholder="Cap" min="1" class="w-20 bg-surface-container-high border border-outline/20 rounded-lg px-2 py-2 text-center text-on-surface focus:outline-none focus:border-primary">
-            <input type="text" id="bibleVerse" placeholder="Vers" class="w-20 bg-surface-container-high border border-outline/20 rounded-lg px-2 py-2 text-center text-on-surface focus:outline-none focus:border-primary">
-            <button type="button" id="btnAddScripture" class="bg-secondary text-[#271900] px-4 py-2 rounded-lg font-bold hover:bg-secondary-fixed-dim transition-colors">+</button>
+            <input type="number" id="bibleChapter" placeholder="Cap" min="1" class="w-24 bg-surface-container-high border border-outline/20 rounded-lg px-2 py-2 text-center text-on-surface focus:outline-none focus:border-primary">
+            <input type="text" id="bibleVerse" placeholder="Vers (ej. 1-3)" class="w-28 bg-surface-container-high border border-outline/20 rounded-lg px-2 py-2 text-center text-on-surface focus:outline-none focus:border-primary">
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-2">
+            <textarea id="bibleText" rows="2" placeholder="Pega o escribe aquí el contenido del versículo bíblico (opcional)..." class="flex-1 bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary resize-y"></textarea>
+            <div class="flex sm:flex-col gap-2">
+              <button type="button" id="btnAddScripture" class="flex-1 flex items-center justify-center gap-1.5 bg-secondary text-[#271900] px-4 py-2 rounded-lg font-semibold hover:bg-primary-container transition-colors text-sm whitespace-nowrap">
+                <span class="material-symbols-outlined text-[18px]">add</span>
+                <span>Agregar lectura</span>
+              </button>
+              <button type="button" id="btnInsertScriptureToNotes" title="Insertar cita y texto directamente en el bosquejo" class="flex items-center justify-center gap-1 bg-surface-container-highest hover:bg-surface-bright text-secondary px-3 py-1.5 rounded-lg text-xs font-medium border border-outline/20 transition-colors whitespace-nowrap">
+                <span class="material-symbols-outlined text-[16px]">format_quote</span>
+                <span>Al bosquejo</span>
+              </button>
+            </div>
           </div>
           
-          <div id="scriptureTagsContainer" class="flex flex-wrap gap-2 empty:hidden"></div>
+          <div id="scriptureTagsContainer" class="flex flex-col gap-2 empty:hidden pt-1"></div>
           <input type="hidden" id="fieldScripturesArray" value="[]">
         </div>
 
-        <div>
-          <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Bosquejo / Notas</label>
-          <textarea id="fieldNotes" rows="4" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2 text-on-surface focus:outline-none focus:border-primary resize-none"></textarea>
+        <div class="flex flex-col">
+          <label class="block text-xs font-label-sm text-outline mb-2 uppercase">Bosquejo / Notas (Texto Enriquecido)</label>
+          <div class="border border-outline/25 rounded-xl overflow-hidden bg-surface-container-high focus-within:border-primary transition-colors">
+            <!-- Barra de herramientas de texto enriquecido -->
+            <div class="flex flex-wrap items-center gap-1 p-2 bg-surface-container border-b border-outline/15">
+              <button type="button" data-cmd="bold" title="Negrita (Ctrl+B)" class="rt-btn p-1.5 rounded hover:bg-surface-container-highest text-on-surface transition-colors">
+                <span class="material-symbols-outlined text-[19px]">format_bold</span>
+              </button>
+              <button type="button" data-cmd="italic" title="Cursiva (Ctrl+I)" class="rt-btn p-1.5 rounded hover:bg-surface-container-highest text-on-surface transition-colors">
+                <span class="material-symbols-outlined text-[19px]">format_italic</span>
+              </button>
+              <button type="button" data-cmd="underline" title="Subrayado (Ctrl+U)" class="rt-btn p-1.5 rounded hover:bg-surface-container-highest text-on-surface transition-colors">
+                <span class="material-symbols-outlined text-[19px]">format_underlined</span>
+              </button>
+              <button type="button" data-cmd="strikeThrough" title="Tachado" class="rt-btn p-1.5 rounded hover:bg-surface-container-highest text-on-surface transition-colors">
+                <span class="material-symbols-outlined text-[19px]">strikethrough_s</span>
+              </button>
+
+              <div class="w-px h-5 bg-outline/20 mx-1"></div>
+
+              <button type="button" data-cmd="formatBlock" data-val="H2" title="Título de Sección" class="rt-btn px-2 py-1 rounded hover:bg-surface-container-highest text-on-surface font-headline-sm font-bold text-xs transition-colors">
+                H1
+              </button>
+              <button type="button" data-cmd="formatBlock" data-val="H3" title="Subtítulo" class="rt-btn px-2 py-1 rounded hover:bg-surface-container-highest text-on-surface font-headline-sm font-bold text-xs transition-colors">
+                H2
+              </button>
+              <button type="button" data-cmd="formatBlock" data-val="P" title="Párrafo normal" class="rt-btn px-2 py-1 rounded hover:bg-surface-container-highest text-on-surface-variant text-xs transition-colors">
+                Párrafo
+              </button>
+
+              <div class="w-px h-5 bg-outline/20 mx-1"></div>
+
+              <button type="button" data-cmd="insertUnorderedList" title="Lista con viñetas" class="rt-btn p-1.5 rounded hover:bg-surface-container-highest text-on-surface transition-colors">
+                <span class="material-symbols-outlined text-[19px]">format_list_bulleted</span>
+              </button>
+              <button type="button" data-cmd="insertOrderedList" title="Lista numerada" class="rt-btn p-1.5 rounded hover:bg-surface-container-highest text-on-surface transition-colors">
+                <span class="material-symbols-outlined text-[19px]">format_list_numbered</span>
+              </button>
+              <button type="button" data-cmd="formatBlock" data-val="BLOCKQUOTE" title="Cita destacada" class="rt-btn p-1.5 rounded hover:bg-surface-container-highest text-on-surface transition-colors">
+                <span class="material-symbols-outlined text-[19px]">format_quote</span>
+              </button>
+
+              <div class="w-px h-5 bg-outline/20 mx-1"></div>
+
+              <button type="button" data-cmd="foreColor" data-val="#fbc262" title="Texto dorado énfasis" class="rt-btn p-1.5 rounded hover:bg-surface-container-highest text-primary transition-colors">
+                <span class="material-symbols-outlined text-[19px]">format_color_text</span>
+              </button>
+              <button type="button" data-cmd="hiliteColor" data-val="#432c00" title="Resaltar texto" class="rt-btn p-1.5 rounded hover:bg-surface-container-highest text-secondary transition-colors">
+                <span class="material-symbols-outlined text-[19px]">ink_highlighter</span>
+              </button>
+              <button type="button" data-cmd="insertHorizontalRule" title="Línea divisoria" class="rt-btn p-1.5 rounded hover:bg-surface-container-highest text-on-surface transition-colors">
+                <span class="material-symbols-outlined text-[19px]">horizontal_rule</span>
+              </button>
+              <button type="button" data-cmd="removeFormat" title="Limpiar formato" class="rt-btn p-1.5 rounded hover:bg-surface-container-highest text-outline hover:text-on-surface transition-colors ml-auto">
+                <span class="material-symbols-outlined text-[19px]">format_clear</span>
+              </button>
+            </div>
+
+            <!-- Área editable grande -->
+            <div id="richEditor" contenteditable="true" data-placeholder="Desarrolla aquí tu bosquejo, introducción, puntos principales, ilustraciones y conclusión..." class="rich-content w-full min-h-[280px] max-h-[420px] overflow-y-auto custom-scroll px-4 py-3 text-on-surface focus:outline-none leading-relaxed"></div>
+          </div>
+          <input type="hidden" id="fieldNotes">
         </div>
 
-        <div class="mt-4 flex justify-end gap-3">
-          <button type="button" id="btnCancelModal" class="px-4 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors">Cancelar</button>
-          <button type="submit" class="px-6 py-2 bg-primary hover:bg-primary-container text-[#432c00] font-semibold rounded-lg shadow-md transition-colors">Guardar Ficha</button>
+        <div class="mt-2 pt-3 border-t border-outline/10 flex justify-end gap-3">
+          <button type="button" id="btnCancelModal" class="px-5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors">Cancelar</button>
+          <button type="submit" class="px-6 py-2.5 bg-primary hover:bg-primary-container text-[#432c00] font-semibold rounded-lg shadow-md transition-colors">Guardar Ficha</button>
         </div>
       </form>
     </div>
@@ -412,17 +570,23 @@
           `<div class="mt-4 p-4 bg-[#141b21] rounded-lg border-l-4 border-secondary shadow-inner">
             <h4 class="text-xs font-label-sm text-outline uppercase mb-3">Lecturas Asignadas</h4>
             <div class="flex flex-col gap-3">
-              ${parsedScriptures.map(s => `
+              ${parsedScriptures.map(s => {
+                const ref = typeof s === 'object' ? (s.ref || '') : s;
+                const text = typeof s === 'object' ? (s.text || '') : '';
+                return `
                 <div class="flex flex-col">
-                  <span class="font-headline-sm text-lg text-secondary leading-tight">${s}</span>
+                  <span class="font-headline-sm text-lg text-secondary leading-tight">${ref}</span>
+                  ${text ? `<p class="font-scripture-quote text-sm text-on-surface-variant mt-1.5 italic leading-relaxed border-l-2 border-outline/20 pl-3 whitespace-pre-line">“${text}”</p>` : ''}
                   <span class="text-[0.7rem] text-tertiary mt-1 italic">Traducción del Nuevo Mundo</span>
                 </div>
-              `).join('')}
+              `}).join('')}
             </div>
           </div>` : '';
 
         const dateObj = new Date(record.date);
         const dateString = isNaN(dateObj) ? "FECHA INVÁLIDA" : dateObj.toLocaleDateString('es-ES', {weekday: 'short', day: '2-digit', month: 'short', year: 'numeric'}).toUpperCase();
+
+        const isHtmlNotes = record.notes && /<[a-z][\s\S]*>/i.test(record.notes);
 
         const card = document.createElement('div');
         card.className = "bg-surface-container-low rounded-xl p-6 shadow-sm border border-outline/10";
@@ -442,7 +606,7 @@
 
           ${record.notes ? `
           <div class="mt-4 bg-surface-container-high/40 px-5 py-4 rounded-lg border border-outline/5">
-            <p class="font-body-md text-on-surface-variant leading-relaxed whitespace-pre-line">${record.notes}</p>
+            <div class="font-body-md text-on-surface-variant leading-relaxed ${isHtmlNotes ? 'rich-content' : 'whitespace-pre-line'}">${record.notes}</div>
           </div>` : ''}
         `;
         recordsContainer.appendChild(card);
@@ -461,33 +625,120 @@
       }
     };
 
+    // Funciones de búsqueda y pegado de texto bíblico
+    function getScriptureQuery() {
+      const book = document.getElementById('bibleBook').value;
+      const chapter = document.getElementById('bibleChapter').value.trim();
+      const verse = document.getElementById('bibleVerse').value.trim();
+      if (!chapter) {
+        showToast('Indica al menos el capítulo para buscar el texto bíblico', 'error');
+        document.getElementById('bibleChapter').focus();
+        return null;
+      }
+      return verse ? `${book} ${chapter}:${verse}` : `${book} ${chapter}`;
+    }
+
+    document.getElementById('btnSearchJW').addEventListener('click', () => {
+      const query = getScriptureQuery();
+      if (!query) return;
+      const url = `https://wol.jw.org/es/wol/l/r4/lp-s?q=${encodeURIComponent(query)}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+      document.getElementById('bibleText').focus();
+    });
+
+    document.getElementById('btnSearchBG').addEventListener('click', () => {
+      const query = getScriptureQuery();
+      if (!query) return;
+      const url = `https://www.biblegateway.com/passage/?search=${encodeURIComponent(query)}&version=RVR1960`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+      document.getElementById('bibleText').focus();
+    });
+
+    document.getElementById('btnPasteScripture').addEventListener('click', async () => {
+      const bibleTextEl = document.getElementById('bibleText');
+      try {
+        const clipText = await navigator.clipboard.readText();
+        if (clipText) {
+          bibleTextEl.value = bibleTextEl.value
+            ? bibleTextEl.value.trim() + '\n' + clipText.trim()
+            : clipText.trim();
+          bibleTextEl.focus();
+          showToast('Texto bíblico pegado del portapapeles');
+        } else {
+          showToast('El portapapeles está vacío', 'error');
+        }
+      } catch (err) {
+        bibleTextEl.focus();
+        showToast('Presiona Ctrl+V en el campo para pegar el texto', 'error');
+      }
+    });
+
+    document.getElementById('btnInsertScriptureToNotes').addEventListener('click', () => {
+      const book = document.getElementById('bibleBook').value;
+      const chapter = document.getElementById('bibleChapter').value.trim();
+      const verse = document.getElementById('bibleVerse').value.trim();
+      const text = document.getElementById('bibleText').value.trim();
+
+      if (!chapter && !text) {
+        showToast('Ingresa un capítulo/versículo o el texto para insertarlo al bosquejo', 'error');
+        return;
+      }
+
+      const ref = chapter ? `${book} ${chapter}${verse ? ':' + verse : ''}` : book;
+      const richEditor = document.getElementById('richEditor');
+      const quoteHtml = `<blockquote><strong>${ref}</strong>${text ? ` — “${text}”` : ''}</blockquote><p><br></p>`;
+
+      richEditor.focus();
+      document.execCommand('insertHTML', false, quoteHtml);
+      showToast('Cita insertada en el bosquejo');
+    });
+
     document.getElementById('btnAddScripture').addEventListener('click', () => {
       const book = document.getElementById('bibleBook').value;
-      const chapter = document.getElementById('bibleChapter').value;
-      const verse = document.getElementById('bibleVerse').value;
+      const chapter = document.getElementById('bibleChapter').value.trim();
+      const verse = document.getElementById('bibleVerse').value.trim();
+      const text = document.getElementById('bibleText').value.trim();
       
-      if (book && chapter && verse) {
-        const formattedScripture = `${book} capítulo ${chapter}, versículo ${verse}`;
-        currentScriptures.push(formattedScripture);
-        updateScriptureTags();
-        
-        document.getElementById('bibleChapter').value = '';
-        document.getElementById('bibleVerse').value = '';
+      if (!book || !chapter) {
+        showToast('Indica el libro y capítulo para agregar la lectura', 'error');
+        document.getElementById('bibleChapter').focus();
+        return;
       }
+
+      const formattedRef = verse
+        ? `${book} capítulo ${chapter}, versículo ${verse}`
+        : `${book} capítulo ${chapter}`;
+
+      currentScriptures.push({
+        ref: formattedRef,
+        text: text
+      });
+      updateScriptureTags();
+      
+      document.getElementById('bibleChapter').value = '';
+      document.getElementById('bibleVerse').value = '';
+      document.getElementById('bibleText').value = '';
     });
 
     function updateScriptureTags() {
       const container = document.getElementById('scriptureTagsContainer');
       container.innerHTML = '';
       currentScriptures.forEach((scripture, index) => {
+        const ref = typeof scripture === 'object' ? scripture.ref : scripture;
+        const text = typeof scripture === 'object' ? scripture.text : '';
         const tag = document.createElement('div');
-        tag.className = 'flex items-center gap-2 bg-surface-container-highest text-secondary px-3 py-1.5 rounded-md text-sm border border-outline/20';
+        tag.className = 'flex flex-col gap-1 bg-surface-container-highest px-3.5 py-2.5 rounded-lg text-sm border border-outline/20';
         tag.innerHTML = `
-          <span class="material-symbols-outlined text-[16px]">menu_book</span>
-          <span>${scripture}</span>
-          <button type="button" onclick="removeScripture(${index})" class="text-error hover:text-error-container ml-2 cursor-pointer">
-            <span class="material-symbols-outlined text-[16px]">close</span>
-          </button>
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 text-secondary font-medium">
+              <span class="material-symbols-outlined text-[18px]">menu_book</span>
+              <span>${ref}</span>
+            </div>
+            <button type="button" onclick="removeScripture(${index})" class="text-error hover:text-error-container cursor-pointer p-0.5" title="Quitar lectura">
+              <span class="material-symbols-outlined text-[18px]">close</span>
+            </button>
+          </div>
+          ${text ? `<p class="text-xs text-on-surface-variant italic pl-6 line-clamp-3">“${text}”</p>` : ''}
         `;
         container.appendChild(tag);
       });
@@ -498,6 +749,20 @@
       currentScriptures.splice(index, 1);
       updateScriptureTags();
     };
+
+    // Controles de la barra de herramientas de texto enriquecido
+    const richEditor = document.getElementById('richEditor');
+    document.querySelectorAll('.rt-btn').forEach(btn => {
+      btn.addEventListener('mousedown', (e) => {
+        e.preventDefault(); // Mantiene la selección activa en el editor
+      });
+      btn.addEventListener('click', () => {
+        const cmd = btn.getAttribute('data-cmd');
+        const val = btn.getAttribute('data-val') || null;
+        richEditor.focus();
+        document.execCommand(cmd, false, val);
+      });
+    });
 
     window.openModal = () => {
       const dateInput = document.getElementById('fieldDate');
@@ -520,6 +785,7 @@
       setTimeout(() => {
         recordModal.classList.add('hidden');
         recordForm.reset();
+        richEditor.innerHTML = '';
         currentScriptures = [];
         updateScriptureTags();
       }, 300);
@@ -533,6 +799,8 @@
       e.preventDefault();
       const rawDate = document.getElementById('fieldDate').value;
       const isoDate = new Date(rawDate + 'T12:00:00Z').toISOString();
+      const editorHtml = richEditor.innerHTML.trim();
+      document.getElementById('fieldNotes').value = (editorHtml === '<br>') ? '' : editorHtml;
       
       const data = {
         title: document.getElementById('fieldTitle').value,
