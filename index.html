@@ -44,6 +44,17 @@
     /* Tooltip del calendario */
     .cal-tooltip { opacity: 0; visibility: hidden; transform: translate(-50%, 4px); transition: all 0.18s ease; }
     .calendar-day:hover .cal-tooltip { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+
+    /* Modo encogido del Sidebar (solo íconos) */
+    #appView.sidebar-collapsed #appSidebar { width: 4.5rem; }
+    #appView.sidebar-collapsed #appContentWrapper { padding-left: 4.5rem; }
+    #appView.sidebar-collapsed #appTopHeader { left: 4.5rem; }
+    #appView.sidebar-collapsed .sidebar-text { display: none !important; }
+    #appView.sidebar-collapsed #sidebarBrandHeader { justify-content: center; padding-left: 0.5rem; padding-right: 0.5rem; }
+    #appView.sidebar-collapsed #sidebarBrandLogo { display: none; }
+    #appView.sidebar-collapsed #sidebarNavContainer { padding-left: 0.5rem; padding-right: 0.5rem; }
+    #appView.sidebar-collapsed #sidebarNavContainer nav a { justify-content: center; padding-left: 0; padding-right: 0; position: relative; }
+    #appView.sidebar-collapsed #navUnassignedBadge { position: absolute; top: 3px; right: 6px; padding: 0 4px; font-size: 9px; line-height: 14px; }
   </style>
   
   <script src="https://cdn.tailwindcss.com"></script>
@@ -70,34 +81,39 @@
   </div>
 
   <div id="appView" class="hidden">
-    <aside class="fixed left-0 top-0 h-full w-72 bg-[#0b0e13] z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.3)]">
+    <aside id="appSidebar" class="fixed left-0 top-0 h-full w-72 bg-[#0b0e13] z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.3)] transition-all duration-300">
       <div class="flex flex-col">
-        <div class="h-16 flex items-center px-6 gap-2 bg-surface-container-low/40">
-          <span class="material-symbols-outlined text-primary text-[24px]">menu_book</span>
-          <div class="flex flex-col">
-            <span class="font-headline-sm text-[1.375rem] text-primary tracking-tight">TestimonioBox</span>
-            <span class="font-label-sm text-[0.6875rem] text-tertiary tracking-wider uppercase">Ministerio de Jehová</span>
+        <div id="sidebarBrandHeader" class="h-16 flex items-center justify-between px-5 gap-2 bg-surface-container-low/40">
+          <div class="flex items-center gap-2 min-w-0">
+            <span id="sidebarBrandLogo" class="material-symbols-outlined text-primary text-[24px] flex-shrink-0">menu_book</span>
+            <div class="flex flex-col sidebar-text truncate">
+              <span class="font-headline-sm text-[1.375rem] text-primary tracking-tight leading-tight">TestimonioBox</span>
+              <span class="font-label-sm text-[0.6875rem] text-tertiary tracking-wider uppercase">Ministerio de Jehová</span>
+            </div>
           </div>
+          <button type="button" id="btnToggleSidebar" class="text-on-surface-variant hover:text-primary hover:bg-surface-container p-1.5 rounded-lg transition-colors cursor-pointer flex-shrink-0" title="Encoger / Expandir menú lateral">
+            <span id="sidebarToggleIcon" class="material-symbols-outlined text-[20px]">dock_to_right</span>
+          </button>
         </div>
-        <div class="px-4 py-2 mt-4">
-          <div class="font-label-sm text-[0.6875rem] text-outline px-2 mb-1 uppercase tracking-wider">Navegación Pastoral</div>
+        <div id="sidebarNavContainer" class="px-4 py-2 mt-4">
+          <div class="font-label-sm text-[0.6875rem] text-outline px-2 mb-1 uppercase tracking-wider sidebar-text">Navegación Pastoral</div>
           <nav class="flex flex-col gap-1">
-            <a id="navCronogramaBtn" class="flex items-center gap-2 px-2 py-2 rounded-lg bg-surface-container-high text-primary font-medium cursor-pointer transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">event_available</span><span>Cronograma & Predicaciones</span></a>
-            <a id="navUnassignedBtn" class="flex items-center justify-between gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer" href="#">
-              <span class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">library_books</span><span>Fichas Sin Fecha</span></span>
+            <a id="navCronogramaBtn" title="Cronograma & Predicaciones" class="flex items-center gap-2 px-2 py-2 rounded-lg bg-surface-container-high text-primary font-medium cursor-pointer transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">event_available</span><span class="sidebar-text">Cronograma & Predicaciones</span></a>
+            <a id="navUnassignedBtn" title="Fichas Sin Fecha Asociada" class="flex items-center justify-between gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer" href="#">
+              <span class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">library_books</span><span class="sidebar-text">Fichas Sin Fecha</span></span>
               <span id="navUnassignedBadge" class="text-[10px] font-mono bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold">0</span>
             </a>
-            <a id="navDashboardBtn" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer" href="#"><span class="material-symbols-outlined text-[20px]">monitoring</span><span>Dashboard</span></a>
-            <a id="navRevisitasBtn" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[20px]">contacts_product</span><span>Revisitas</span></a>
-            <a id="navPackBtn" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[20px]">inventory_2</span><span>Paquetes de Fichas</span></a>
-            <a id="navInformesBtn" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[20px]">assessment</span><span>Informes</span></a>
+            <a id="navDashboardBtn" title="Dashboard del Ministerio" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer" href="#"><span class="material-symbols-outlined text-[20px]">monitoring</span><span class="sidebar-text">Dashboard</span></a>
+            <a id="navRevisitasBtn" title="Registrar Revisita" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[20px]">contacts_product</span><span class="sidebar-text">Revisitas</span></a>
+            <a id="navPackBtn" title="Paquetes de Fichas" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[20px]">inventory_2</span><span class="sidebar-text">Paquetes de Fichas</span></a>
+            <a id="navInformesBtn" title="Informes Mensuales" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[20px]">assessment</span><span class="sidebar-text">Informes</span></a>
           </nav>
         </div>
       </div>
     </aside>
 
-    <div class="pl-72">
-      <header class="fixed top-0 left-72 right-0 h-16 bg-[#101418]/85 backdrop-blur-xl z-40 shadow-[0_1px_8px_rgba(0,0,0,0.15)] flex items-center justify-between px-6">
+    <div id="appContentWrapper" class="pl-72 transition-all duration-300">
+      <header id="appTopHeader" class="fixed top-0 left-72 right-0 h-16 bg-[#101418]/85 backdrop-blur-xl z-40 shadow-[0_1px_8px_rgba(0,0,0,0.15)] flex items-center justify-between px-6 transition-all duration-300">
         <div class="flex items-center gap-6">
           <div class="flex items-center gap-2 bg-surface-container-low px-4 py-1.5 rounded-lg border border-outline/5">
             <span class="material-symbols-outlined text-secondary text-[18px]">church</span>
@@ -2918,6 +2934,17 @@
     });
 
     // ================= NAVEGACIÓN SIDEBAR (CRONOGRAMA / DASHBOARD / INFORMES / REVISITAS) =================
+    const btnToggleSidebar = document.getElementById('btnToggleSidebar');
+    const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');
+    if (btnToggleSidebar) {
+      btnToggleSidebar.addEventListener('click', () => {
+        const isCollapsed = appView.classList.toggle('sidebar-collapsed');
+        if (sidebarToggleIcon) {
+          sidebarToggleIcon.textContent = isCollapsed ? 'menu_open' : 'dock_to_right';
+        }
+      });
+    }
+
     const cronogramaSection = document.getElementById('cronogramaSection');
     const informesSection = document.getElementById('informesSection');
     const dashboardSection = document.getElementById('dashboardSection');
