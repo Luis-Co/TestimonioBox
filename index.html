@@ -276,11 +276,16 @@
             <span id="parentCountBadge" class="text-[11px] text-outline font-mono"></span>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center">
-            <!-- Búsqueda por nombre de ficha -->
-            <div class="sm:col-span-5 relative">
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center relative">
+            <!-- Búsqueda por nombre de ficha con desplegable interactivo instantáneo -->
+            <div class="sm:col-span-5 relative" id="parentSearchWrapper">
               <span class="material-symbols-outlined text-[16px] text-outline absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">search</span>
-              <input type="text" id="parentSearchInput" placeholder="Buscar ficha por nombre o revista..." class="w-full bg-surface-container-high border border-outline/20 rounded-lg pl-9 pr-3 py-2 text-xs text-on-surface focus:outline-none focus:border-primary">
+              <input type="text" id="parentSearchInput" autocomplete="off" placeholder="Buscar ficha por nombre o revista..." class="w-full bg-surface-container-high border border-outline/20 rounded-lg pl-9 pr-8 py-2 text-xs text-on-surface focus:outline-none focus:border-primary">
+              <button type="button" id="btnClearParentSearch" title="Limpiar búsqueda" class="hidden text-outline hover:text-primary absolute right-2 top-1/2 -translate-y-1/2 p-0.5">
+                <span class="material-symbols-outlined text-[15px]">close</span>
+              </button>
+              <!-- Lista desplegable en vivo al escribir o filtrar -->
+              <div id="parentLiveResults" class="hidden absolute left-0 right-0 sm:w-[420px] top-full mt-1.5 bg-[#0f1318] border border-primary/40 rounded-xl shadow-2xl z-50 max-h-60 overflow-y-auto custom-scroll divide-y divide-outline/10"></div>
             </div>
 
             <!-- Filtro de calendario para no cargar todas -->
@@ -1743,6 +1748,9 @@
 
     // ================= LÓGICA DE FICHA PADRE / SERIE NUMERADA =================
     const parentSearchInput = document.getElementById('parentSearchInput');
+    const btnClearParentSearch = document.getElementById('btnClearParentSearch');
+    const parentLiveResults = document.getElementById('parentLiveResults');
+    const parentSearchWrapper = document.getElementById('parentSearchWrapper');
     const parentFilterDate = document.getElementById('parentFilterDate');
     const btnClearParentDate = document.getElementById('btnClearParentDate');
     const fieldParentRecord = document.getElementById('fieldParentRecord');
@@ -1761,6 +1769,16 @@
     let editingRecordId = null;
     let editingRevisitaId = null;
 
+    // Normaliza texto quitando tildes y signos (¿, ?, ¡, !) para que buscar "quien" encuentre "¿Quién es Dios?"
+    function normalizeForSearch(str) {
+      return String(str || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[¿?¡!.,;:()"'«»“”]/g, '')
+        .toLowerCase()
+        .trim();
+    }
+
     function computeSeriesContinuation(selectedRecord) {
       const selectedMeta = parseRecordMetadata(selectedRecord);
       const rootId = selectedMeta.parentRecordId || selectedRecord.id;
@@ -1774,6 +1792,7 @@
 
       let maxNum = 1;
       globalRecords.forEach(r => {
+        if (editingRecordId && r.id === editingRecordId) return;
         const m = parseRecordMetadata(r);
         const rBase = (m.parentRecordTitle || r.title || '').replace(/\s*(?:-\s*)?#\d+\s*$/i, '').trim();
         if (r.id === rootId || m.parentRecordId === rootId || (rBase.toLowerCase() === baseTitle.toLowerCase() && baseTitle.length > 0)) {
@@ -1809,10 +1828,17 @@
       };
     }
 
-    function populateParentRecordOptions(preserveSelectedId = '') {
+    function populateParentRecordOptions(preserveSelectedId = '', showLiveDropdown = false) {
       const currentVal = preserveSelectedId || fieldParentRecord.value;
-      const searchQ = parentSearchInput.value.trim().toLowerCase();
+      const rawSearch = parentSearchInput.value.trim();
+      const searchQ = normalizeForSearch(rawSearch);
       const dateQ = parentFilterDate.value;
+
+      if (rawSearch) {
+        btnClearParentSearch.classList.remove('hidden');
+      } else {
+        btnClearParentSearch.classList.add('hidden');
+      }
 
       if (dateQ) {
         btnClearParentDate.classList.remove('hidden');
@@ -1822,6 +1848,7 @@
 
       // Filtramos las fichas disponibles por búsqueda de nombre/subcategoría y/o por fecha de calendario
       let candidates = globalRecords.filter(r => {
+        if (editingRecordId && r.id === editingRecordId) return false;
         const meta = parseRecordMetadata(r);
         if (meta.revisitaData || r.category === 'Revisita') return false;
         if (dateQ) {
@@ -1829,14 +1856,13 @@
           if (rDate !== dateQ) return false;
         }
         if (searchQ) {
-          const haystack = `${r.title} ${meta.subcategory} ${meta.packageName || ''} ${meta.parentRecordTitle || ''}`.toLowerCase();
+          const haystack = normalizeForSearch(`${r.title} ${meta.subcategory} ${meta.packageName || ''} ${meta.parentRecordTitle || ''}`);
           if (!haystack.includes(searchQ)) return false;
         }
         return true;
       });
 
       const totalMatching = candidates.length;
-      // Para no cargar un listado gigante cuando no hay filtro activo, limitamos a las 25 más recientes
       const maxItems = (searchQ || dateQ) ? 60 : 20;
       const sliced = candidates.slice(0, maxItems);
 
@@ -1850,7 +1876,11 @@
         ? `${totalMatching} encontrada(s)`
         : `Últimas ${sliced.length} de ${totalMatching}`;
 
-      fieldParentRecord.innerHTML = `<option value="">-- Ficha nueva independiente (Sin padre) --</option>`;
+      const defaultOptionLabel = (searchQ || dateQ)
+        ? `-- ${totalMatching} coincidencia(s) (Elige aquí o en la lista) --`
+        : `-- Ficha nueva independiente (Sin padre) --`;
+
+      fieldParentRecord.innerHTML = `<option value="">${defaultOptionLabel}</option>`;
       sliced.forEach(r => {
         const meta = parseRecordMetadata(r);
         const dObj = new Date(r.date);
@@ -1864,7 +1894,48 @@
       if (currentVal && sliced.some(r => r.id === currentVal)) {
         fieldParentRecord.value = currentVal;
       }
+
+      // Renderizar lista desplegable interactiva en vivo cuando el usuario escribe, hace clic en buscar o filtra por fecha
+      if (showLiveDropdown) {
+        if (candidates.length === 0) {
+          parentLiveResults.innerHTML = `
+            <div class="p-3 text-xs text-outline text-center">
+              No se encontraron fichas${rawSearch || dateQ ? ` con "${rawSearch || dateQ}"` : ''}
+            </div>
+          `;
+        } else {
+          parentLiveResults.innerHTML = candidates.slice(0, 25).map(r => {
+            const meta = parseRecordMetadata(r);
+            const dObj = new Date(r.date);
+            const dStr = isNaN(dObj) ? '' : dObj.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+            return `
+              <button type="button" onclick="selectParentFromLiveList('${r.id}')" class="w-full text-left px-3 py-2.5 hover:bg-surface-container-highest transition-colors flex items-center gap-3">
+                <img src="${meta.coverImage}" alt="" class="w-8 h-11 object-cover rounded border border-outline/20 flex-shrink-0">
+                <div class="flex flex-col flex-1 min-w-0">
+                  <span class="text-xs font-semibold text-on-surface truncate">${r.title}</span>
+                  <div class="flex items-center gap-2 text-[10px] text-tertiary">
+                    <span>${meta.subcategory}</span>
+                    <span>&bull;</span>
+                    <span class="font-mono text-outline">${dStr}</span>
+                  </div>
+                </div>
+                <span class="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded font-medium whitespace-nowrap">Elegir padre</span>
+              </button>
+            `;
+          }).join('');
+        }
+        parentLiveResults.classList.remove('hidden');
+      } else {
+        parentLiveResults.classList.add('hidden');
+      }
     }
+
+    window.selectParentFromLiveList = (recordId) => {
+      populateParentRecordOptions(recordId, false);
+      fieldParentRecord.value = recordId;
+      parentLiveResults.classList.add('hidden');
+      applyParentSelectionUI();
+    };
 
     function applyParentSelectionUI() {
       const selectedId = fieldParentRecord.value;
@@ -1910,17 +1981,42 @@
       dateFieldCol.className = 'md:col-span-12';
     }
 
-    parentSearchInput.addEventListener('input', () => populateParentRecordOptions());
-    parentFilterDate.addEventListener('change', () => populateParentRecordOptions());
+    parentSearchInput.addEventListener('input', () => populateParentRecordOptions('', true));
+    parentSearchInput.addEventListener('focus', () => populateParentRecordOptions('', true));
+    parentSearchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const firstOpt = fieldParentRecord.options[1];
+        if (firstOpt && firstOpt.value) {
+          selectParentFromLiveList(firstOpt.value);
+        }
+      }
+    });
+    btnClearParentSearch.addEventListener('click', () => {
+      parentSearchInput.value = '';
+      populateParentRecordOptions('', false);
+      parentSearchInput.focus();
+    });
+    parentFilterDate.addEventListener('change', () => populateParentRecordOptions('', true));
     btnClearParentDate.addEventListener('click', () => {
       parentFilterDate.value = '';
-      populateParentRecordOptions();
+      populateParentRecordOptions('', Boolean(parentSearchInput.value.trim()));
     });
-    fieldParentRecord.addEventListener('change', applyParentSelectionUI);
+    fieldParentRecord.addEventListener('change', () => {
+      parentLiveResults.classList.add('hidden');
+      applyParentSelectionUI();
+    });
+    document.addEventListener('click', (e) => {
+      if (parentSearchWrapper && !parentSearchWrapper.contains(e.target) && e.target !== parentFilterDate) {
+        parentLiveResults.classList.add('hidden');
+      }
+    });
     btnClearParentSelection.addEventListener('click', () => {
       fieldParentRecord.value = '';
+      parentSearchInput.value = '';
       document.getElementById('fieldTitle').value = '';
       customCoverDataUrl = null;
+      populateParentRecordOptions('', false);
       applyParentSelectionUI();
       updateCoverPreview();
     });
