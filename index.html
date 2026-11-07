@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <meta content="web_dashboard" name="shell-type"/>
-  <title>TestimonioBox - Ministerio & Pulpit</title>
+  <title>TestimonioBox - Ministerio de Jehová</title>
   
   <link rel="icon" type="image/png" href="https://img.icons8.com/fluency/48/calendar.png">
   
@@ -18,8 +18,10 @@
     ::-webkit-scrollbar{display:none;}
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+    @keyframes bellPulse { 0%, 100% { transform: rotate(0deg); } 20% { transform: rotate(12deg); } 40% { transform: rotate(-10deg); } 60% { transform: rotate(6deg); } 80% { transform: rotate(-4deg); } }
     .toast-enter { animation: slideIn 0.3s ease-out forwards; }
     .toast-exit { animation: fadeOut 0.3s ease-out forwards; }
+    .bell-ring { animation: bellPulse 1.4s ease-in-out infinite; transform-origin: top center; }
     
     .calendar-day.selected { background-color: #fbc262; color: #281900; font-weight: 600; }
     .calendar-day.has-record::after { content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background-color: #dda74a; }
@@ -38,12 +40,18 @@
     .custom-scroll::-webkit-scrollbar { display: block; width: 6px; }
     .custom-scroll::-webkit-scrollbar-track { background: transparent; }
     .custom-scroll::-webkit-scrollbar-thumb { background: rgba(156, 143, 125, 0.3); border-radius: 9999px; }
+
+    /* Tooltip del calendario */
+    .cal-tooltip { opacity: 0; visibility: hidden; transform: translate(-50%, 4px); transition: all 0.18s ease; }
+    .calendar-day:hover .cal-tooltip { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
   </style>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script id="tailwind-config">
     tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "primary-container": "#dda74a", "surface-bright": "#36393f", "on-surface": "#e1e2e9", "background": "#101418", "surface-container": "#1d2025", "surface-container-low": "#191c21", "surface-container-highest": "#32353a", "surface-container-high": "#272a2f", "outline": "#9c8f7d", "primary": "#fbc262", "on-surface-variant": "#d3c4b1", "secondary": "#ecc076", "tertiary": "#bbcfd9", "error": "#ffb4ab", "error-container": "#93000a" }, "fontFamily": { "headline-lg": ["Newsreader"], "headline-sm": ["Newsreader"], "label-sm": ["JetBrains Mono"], "body-md": ["Inter"], "scripture-quote": ["Newsreader"], "body-sm": ["Inter"], "headline-md": ["Newsreader"] } } } };
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body class="bg-background text-on-surface font-body-md text-body-md min-h-screen antialiased">
 
@@ -52,7 +60,7 @@
     <div class="bg-surface-container-low p-10 rounded-2xl shadow-2xl flex flex-col items-center max-w-sm w-full border border-outline/10 relative z-10">
       <span class="material-symbols-outlined text-primary text-[56px] mb-4 drop-shadow-md">menu_book</span>
       <h1 class="font-headline-lg text-4xl text-on-surface mb-1">TestimonioBox</h1>
-      <p class="text-tertiary mb-2 text-center uppercase tracking-widest text-xs font-bold">Ministerio & Pulpit</p>
+      <p class="text-tertiary mb-2 text-center uppercase tracking-widest text-xs font-bold">Ministerio de Jehová</p>
       <p class="text-outline text-sm text-center mb-8">Inicia sesión para gestionar tus asignaciones homiléticas de forma segura.</p>
       <button id="btnLoginGoogle" class="w-full flex items-center justify-center gap-3 bg-surface-container-high hover:bg-surface-container-highest text-on-surface px-6 py-3.5 rounded-xl transition-colors border border-outline/20 shadow-sm font-medium">
         <img src="https://img.icons8.com/color/24/google-logo.png" alt="Google" />
@@ -68,14 +76,14 @@
           <span class="material-symbols-outlined text-primary text-[24px]">menu_book</span>
           <div class="flex flex-col">
             <span class="font-headline-sm text-[1.375rem] text-primary tracking-tight">TestimonioBox</span>
-            <span class="font-label-sm text-[0.6875rem] text-tertiary tracking-wider uppercase">Ministerio & Pulpit</span>
+            <span class="font-label-sm text-[0.6875rem] text-tertiary tracking-wider uppercase">Ministerio de Jehová</span>
           </div>
         </div>
         <div class="px-4 py-2 mt-4">
           <div class="font-label-sm text-[0.6875rem] text-outline px-2 mb-1 uppercase tracking-wider">Navegación Pastoral</div>
           <nav class="flex flex-col gap-1">
             <a class="flex items-center gap-2 px-2 py-2 rounded-lg bg-surface-container-high text-primary font-medium" href="#"><span class="material-symbols-outlined text-[20px]">event_available</span><span>Cronograma & Predicaciones</span></a>
-            <a class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">history_edu</span><span>Editor de Bosquejos</span></a>
+            <a id="navPackBtn" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[20px]">inventory_2</span><span>Paquetes de Fin de Semana</span></a>
           </nav>
         </div>
       </div>
@@ -92,7 +100,24 @@
             </div>
           </div>
         </div>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3">
+          <!-- Campanita de Notificaciones -->
+          <div class="relative" id="notificationWrapper">
+            <button id="btnNotifications" class="relative p-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" title="Notificaciones de Ministerio">
+              <span id="bellIcon" class="material-symbols-outlined text-[22px]">notifications</span>
+              <span id="notifBadge" class="hidden absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-error text-[#410002] font-bold text-[10px] rounded-full flex items-center justify-center shadow">!</span>
+            </button>
+            <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-surface-container-low border border-outline/20 rounded-xl shadow-2xl p-4 z-50">
+              <div class="flex items-center justify-between pb-2.5 mb-3 border-b border-outline/10">
+                <span class="font-label-sm text-xs uppercase tracking-wider text-primary flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[16px]">notifications_active</span> Recordatorios del Ministerio
+                </span>
+                <button id="btnCloseNotif" class="text-outline hover:text-on-surface"><span class="material-symbols-outlined text-[16px]">close</span></button>
+              </div>
+              <div id="notifContent" class="flex flex-col gap-3 text-sm"></div>
+            </div>
+          </div>
+
           <button id="btnLogout" class="flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors px-3 py-2 rounded-lg hover:bg-surface-container">
             <span class="material-symbols-outlined text-[20px]">logout</span>
             <span class="font-medium text-sm">Salir</span>
@@ -102,15 +127,21 @@
 
       <main class="relative w-full pt-24 bg-background px-6 min-h-screen">
         <div class="flex flex-col w-full pb-16">
-          <section class="w-full mb-6 flex justify-between items-end">
+          <section class="w-full mb-6 flex flex-wrap justify-between items-end gap-4">
             <div class="flex flex-col">
               <h1 class="font-headline-lg text-[2.5rem] text-on-surface tracking-tight leading-none mb-2">Cronograma & Predicaciones</h1>
-              <p class="text-on-surface-variant">Selecciona un día en el calendario para gestionar sus asignaciones.</p>
+              <p class="text-on-surface-variant">Selecciona un día en el calendario o organiza tus paquetes de fichas para el fin de semana.</p>
             </div>
-            <button id="btnOpenModal" class="flex items-center gap-2 bg-primary hover:bg-primary-container text-[#432c00] font-semibold px-6 py-2.5 rounded-lg transition-all shadow-md">
-              <span class="material-symbols-outlined text-[20px]">add_circle</span>
-              <span>Nueva Ficha</span>
-            </button>
+            <div class="flex flex-wrap items-center gap-2.5">
+              <button id="btnOpenWeekendModal" class="flex items-center gap-2 bg-surface-container-high hover:bg-surface-container-highest text-secondary border border-secondary/30 font-medium px-4 py-2.5 rounded-lg transition-all shadow-sm">
+                <span class="material-symbols-outlined text-[20px]">inventory_2</span>
+                <span>Paquete Fin de Semana</span>
+              </button>
+              <button id="btnOpenModal" class="flex items-center gap-2 bg-primary hover:bg-primary-container text-[#432c00] font-semibold px-6 py-2.5 rounded-lg transition-all shadow-md">
+                <span class="material-symbols-outlined text-[20px]">add_circle</span>
+                <span>Nueva Ficha</span>
+              </button>
+            </div>
           </section>
 
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -134,11 +165,16 @@
                   Mostrar Todo el Mes
                 </button>
               </div>
+
+              <!-- Tarjeta Resumen Próximo Fin de Semana -->
+              <div id="weekendSummaryBox" class="bg-surface-container-low rounded-xl p-5 shadow-sm border border-outline/10 flex flex-col gap-3">
+              </div>
             </div>
 
             <div class="lg:col-span-8 flex flex-col gap-4">
-              <div id="filterStatusIndicator" class="font-label-sm text-xs text-outline uppercase tracking-wider hidden">
-                Mostrando registros para: <span id="filterStatusDate" class="text-primary font-bold"></span>
+              <div id="filterStatusIndicator" class="font-label-sm text-xs text-outline uppercase tracking-wider hidden flex items-center justify-between bg-surface-container-low px-4 py-2.5 rounded-lg border border-outline/10">
+                <span>Mostrando registros para: <strong id="filterStatusDate" class="text-primary"></strong></span>
+                <button onclick="document.getElementById('btnClearFilter').click()" class="text-xs text-secondary hover:underline">Ver todo el mes</button>
               </div>
               <div id="recordsContainer" class="flex flex-col gap-6">
                 <div id="loadingState" class="text-center py-12 text-outline">
@@ -153,6 +189,7 @@
     </div>
   </div>
 
+  <!-- MODAL NUEVA / EDITAR ASIGNACIÓN -->
   <div id="recordModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300 p-4">
     <div class="bg-surface-container-low w-full max-w-4xl max-h-[92vh] overflow-y-auto custom-scroll rounded-2xl shadow-2xl p-6 sm:p-8 border border-outline/15 transform scale-95 transition-transform duration-300" id="modalContent">
       <div class="flex justify-between items-center mb-6 pb-3 border-b border-outline/10">
@@ -165,7 +202,7 @@
       <form id="recordForm" class="flex flex-col gap-5">
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
           <div class="md:col-span-6">
-            <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Tema / Título del Discurso</label>
+            <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Tema / Título del Discurso o Ficha</label>
             <input type="text" id="fieldTitle" required placeholder="Ej. Cómo mantener el gozo en el ministerio" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3.5 py-2.5 text-on-surface focus:outline-none focus:border-primary">
           </div>
           <div class="md:col-span-3">
@@ -180,6 +217,46 @@
               <option value="Revisita">Revisita</option>
               <option value="Servicio">Servicio del Campo</option>
             </select>
+          </div>
+        </div>
+
+        <!-- Subcategoría / Fuente + Paquete de Fin de Semana + Portada -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 bg-surface-container/40 p-4 rounded-xl border border-outline/10 items-center">
+          <div class="md:col-span-4">
+            <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Subcategoría / Fuente de Info</label>
+            <select id="fieldSubcategory" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2.5 text-on-surface focus:outline-none focus:border-primary">
+              <option value="La Atalaya">🗼 Revista La Atalaya</option>
+              <option value="¡Despertad!">🌅 Revista ¡Despertad!</option>
+              <option value="Investigación con IA">✨ Investigación en conjunto con IA</option>
+              <option value="Guía de Actividades">📘 Guía de Actividades</option>
+              <option value="Estudio Personal / Biblia">📖 Estudio Personal / Biblia</option>
+            </select>
+          </div>
+
+          <div class="md:col-span-4">
+            <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Paquete de Fin de Semana (Opcional)</label>
+            <input type="text" id="fieldPackageName" list="packageSuggestions" placeholder="Ej. Paquete Sáb 7 & Dom 8 Nov" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2.5 text-sm text-on-surface focus:outline-none focus:border-primary">
+            <datalist id="packageSuggestions"></datalist>
+          </div>
+
+          <div class="md:col-span-4 flex items-center gap-3">
+            <div class="relative w-14 h-18 rounded-lg overflow-hidden bg-surface-container-highest border border-outline/20 flex-shrink-0 flex items-center justify-center shadow-inner">
+              <img id="coverPreviewImg" src="" alt="Portada" class="w-full h-full object-cover">
+            </div>
+            <div class="flex flex-col gap-1.5 flex-1">
+              <label class="block text-[11px] font-label-sm text-outline uppercase">Imagen / Portada</label>
+              <div class="flex flex-wrap gap-1.5">
+                <label for="fieldCoverUpload" class="cursor-pointer inline-flex items-center gap-1 text-xs bg-surface-container-high hover:bg-surface-container-highest text-primary border border-primary/30 px-2.5 py-1.5 rounded-lg transition-colors">
+                  <span class="material-symbols-outlined text-[15px]">upload_file</span>
+                  <span>Subir portada</span>
+                </label>
+                <button type="button" id="btnResetCover" class="text-xs bg-surface-container-high hover:bg-surface-container-highest text-outline hover:text-on-surface px-2 py-1.5 rounded-lg border border-outline/15 transition-colors" title="Usar portada predefinida según la fuente">
+                  Predefinida
+                </button>
+              </div>
+              <input type="file" id="fieldCoverUpload" accept="image/*" class="hidden">
+              <span id="coverStatusLabel" class="text-[11px] text-tertiary">Portada predefinida automática</span>
+            </div>
           </div>
         </div>
 
@@ -208,7 +285,7 @@
 
           <div class="flex flex-wrap sm:flex-nowrap gap-2">
             <select id="bibleBook" class="flex-1 min-w-[160px] bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2 text-on-surface focus:outline-none focus:border-primary">
-              <optgroup label=" Escrituras Hebreo-Arameas">
+              <optgroup label="Escrituras Hebreo-Arameas">
                 <option value="Génesis">Génesis</option>
                 <option value="Éxodo">Éxodo</option>
                 <option value="Levítico">Levítico</option>
@@ -367,9 +444,57 @@
 
         <div class="mt-2 pt-3 border-t border-outline/10 flex justify-end gap-3">
           <button type="button" id="btnCancelModal" class="px-5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors">Cancelar</button>
-          <button type="submit" class="px-6 py-2.5 bg-primary hover:bg-primary-container text-[#432c00] font-semibold rounded-lg shadow-md transition-colors">Guardar Ficha</button>
+          <button type="submit" id="btnSubmitRecord" class="px-6 py-2.5 bg-primary hover:bg-primary-container text-[#432c00] font-semibold rounded-lg shadow-md transition-colors flex items-center gap-2">
+            <span class="material-symbols-outlined text-[19px]">save</span>
+            <span>Guardar Ficha</span>
+          </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- MODAL PAQUETE DE FIN DE SEMANA -->
+  <div id="weekendModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+    <div class="bg-surface-container-low w-full max-w-2xl rounded-2xl shadow-2xl p-6 sm:p-8 border border-outline/15 flex flex-col gap-5">
+      <div class="flex justify-between items-center pb-3 border-b border-outline/10">
+        <h2 class="text-xl font-headline-sm text-primary flex items-center gap-2">
+          <span class="material-symbols-outlined">inventory_2</span> Armar Paquete de Fichas para Fin de Semana
+        </h2>
+        <button id="btnCloseWeekendModal" class="text-outline hover:text-on-surface p-1 rounded-lg"><span class="material-symbols-outlined">close</span></button>
+      </div>
+
+      <p class="text-sm text-on-surface-variant">
+        Crea rápidamente un paquete de asignaciones o inicia una ficha directamente asignada al sábado o domingo del fin de semana que elijas.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Seleccionar Sábado del Fin de Semana</label>
+          <input type="date" id="weekendSatDate" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2.5 text-on-surface focus:outline-none focus:border-primary [color-scheme:dark]">
+        </div>
+        <div>
+          <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Nombre del Paquete</label>
+          <input type="text" id="weekendPackTitle" placeholder="Ej. Paquete Predicación Fin de Semana" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2.5 text-on-surface focus:outline-none focus:border-primary">
+        </div>
+      </div>
+
+      <div id="weekendExistingList" class="bg-surface-container/60 rounded-xl p-4 border border-outline/10 flex flex-col gap-2 max-h-56 overflow-y-auto custom-scroll"></div>
+
+      <div class="flex flex-wrap justify-between items-center gap-3 pt-2 border-t border-outline/10">
+        <div class="flex flex-wrap gap-2">
+          <button type="button" id="btnNewSatCard" class="flex items-center gap-1.5 bg-primary hover:bg-primary-container text-[#432c00] font-semibold px-4 py-2 rounded-lg text-sm transition-colors">
+            <span class="material-symbols-outlined text-[18px]">add</span>
+            <span>Crear Ficha Sábado</span>
+          </button>
+          <button type="button" id="btnNewSunCard" class="flex items-center gap-1.5 bg-secondary hover:bg-primary-container text-[#271900] font-semibold px-4 py-2 rounded-lg text-sm transition-colors">
+            <span class="material-symbols-outlined text-[18px]">add</span>
+            <span>Crear Ficha Domingo</span>
+          </button>
+        </div>
+        <button type="button" id="btnFilterWeekend" class="text-xs font-label-sm uppercase text-tertiary hover:text-primary transition-colors">
+          Filtrar ese Sábado en Calendario
+        </button>
+      </div>
     </div>
   </div>
 
@@ -379,7 +504,40 @@
   
   <script>
     const pb = new PocketBase('https://pb-testimonio.webticocr.com');
-    
+    // Evita el error "ClientResponseError 0: The request was autocancelled"
+    pb.autoCancellation(false);
+
+    const WHATSAPP_NUMBER = '50662278771';
+
+    // Portadas SVG predefinidas (Data URLs listas para exportar a imagen/PDF sin problemas de CORS)
+    function makePresetCoverSvg(title, subtitle, bgStart, bgEnd, accent, iconText) {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="320" viewBox="0 0 240 320">
+        <defs>
+          <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="${bgStart}"/>
+            <stop offset="100%" stop-color="${bgEnd}"/>
+          </linearGradient>
+        </defs>
+        <rect width="240" height="320" rx="16" fill="url(#g)"/>
+        <rect x="12" y="12" width="216" height="296" rx="12" fill="none" stroke="${accent}" stroke-opacity="0.35" stroke-width="2"/>
+        <circle cx="120" cy="110" r="44" fill="${accent}" fill-opacity="0.15"/>
+        <text x="120" y="126" text-anchor="middle" font-family="serif" font-size="44" fill="${accent}">${iconText}</text>
+        <text x="120" y="205" text-anchor="middle" font-family="Georgia, serif" font-weight="bold" font-size="22" fill="#ffffff">${title}</text>
+        <text x="120" y="232" text-anchor="middle" font-family="monospace" font-size="11" fill="${accent}" letter-spacing="1.5">${subtitle}</text>
+        <line x1="70" y1="252" x2="170" y2="252" stroke="${accent}" stroke-opacity="0.4" stroke-width="1.5"/>
+        <text x="120" y="278" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#d3c4b1" opacity="0.8">TESTIMONIOBOX</text>
+      </svg>`;
+      return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+    }
+
+    const PRESET_COVERS = {
+      'La Atalaya': makePresetCoverSvg('LA ATALAYA', 'ANUNCIANDO EL REINO', '#1b2838', '#0f1722', '#fbc262', '🗼'),
+      '¡Despertad!': makePresetCoverSvg('¡DESPERTAD!', 'REVISTA DE ESTUDIO', '#2d1f14', '#17110b', '#ecc076', '🌅'),
+      'Investigación con IA': makePresetCoverSvg('ESTUDIO + IA', 'INVESTIGACIÓN ASISTIDA', '#16242b', '#0d151a', '#7dd3fc', '✨'),
+      'Guía de Actividades': makePresetCoverSvg('VIDA Y MINISTERIO', 'GUÍA DE ACTIVIDADES', '#231c2e', '#120e17', '#d8b4fe', '📘'),
+      'Estudio Personal / Biblia': makePresetCoverSvg('SANTA BIBLIA', 'ESTUDIO PERSONAL', '#1c261e', '#0e1410', '#86efac', '📖')
+    };
+
     const loginView = document.getElementById('loginView');
     const appView = document.getElementById('appView');
     const btnLoginGoogle = document.getElementById('btnLoginGoogle');
@@ -394,6 +552,7 @@
     
     let currentScriptures = [];
     let globalRecords = [];
+    let customCoverDataUrl = null; // null = usar portada predefinida de la subcategoría
     
     const dateNow = new Date();
     let currentMonth = dateNow.getMonth();
@@ -410,25 +569,113 @@
 
     function showToast(message, type = 'success') {
       const toast = document.createElement('div');
-      const bgColor = type === 'success' ? 'bg-[#191c21] border-l-4 border-primary' : 'bg-[#93000a] text-white';
-      toast.className = `toast-enter flex items-center px-4 py-3 rounded shadow-lg ${bgColor}`;
+      const bgColor = type === 'success' ? 'bg-[#191c21] border-l-4 border-primary text-on-surface' : 'bg-[#93000a] text-white';
+      toast.className = `toast-enter flex items-center px-4 py-3 rounded-lg shadow-xl ${bgColor}`;
       toast.innerHTML = `<span class="text-sm font-medium">${message}</span>`;
       document.getElementById('toastContainer').appendChild(toast);
       setTimeout(() => {
         toast.classList.replace('toast-enter', 'toast-exit');
         setTimeout(() => toast.remove(), 300);
-      }, 3000);
+      }, 3500);
     }
 
     function formatDateForInput(d) {
       return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     }
 
+    // Decodifica la información de subcategoría, portada, paquete y escrituras guardada en `scriptures` (compatible con registros antiguos y nuevos)
+    function parseRecordMetadata(record) {
+      let parsed = null;
+      try {
+        parsed = JSON.parse(record.scriptures || '[]');
+      } catch (e) {
+        parsed = record.scriptures ? [record.scriptures] : [];
+      }
+
+      if (Array.isArray(parsed)) {
+        const subcat = record.subcategory || 'Estudio Personal / Biblia';
+        return {
+          items: parsed,
+          subcategory: subcat,
+          packageName: record.packageName || '',
+          coverImage: record.coverImage || PRESET_COVERS[subcat] || PRESET_COVERS['Estudio Personal / Biblia']
+        };
+      } else if (parsed && typeof parsed === 'object') {
+        const subcat = parsed.subcategory || record.subcategory || 'La Atalaya';
+        return {
+          items: Array.isArray(parsed.items) ? parsed.items : [],
+          subcategory: subcat,
+          packageName: parsed.packageName || record.packageName || '',
+          coverImage: parsed.coverImage || PRESET_COVERS[subcat] || PRESET_COVERS['La Atalaya']
+        };
+      }
+
+      return {
+        items: [],
+        subcategory: 'La Atalaya',
+        packageName: '',
+        coverImage: PRESET_COVERS['La Atalaya']
+      };
+    }
+
+    // Actualiza la vista previa de portada en el modal
+    function updateCoverPreview() {
+      const subcat = document.getElementById('fieldSubcategory').value;
+      const previewImg = document.getElementById('coverPreviewImg');
+      const statusLabel = document.getElementById('coverStatusLabel');
+      if (customCoverDataUrl) {
+        previewImg.src = customCoverDataUrl;
+        statusLabel.textContent = 'Portada personalizada cargada';
+      } else {
+        previewImg.src = PRESET_COVERS[subcat] || PRESET_COVERS['La Atalaya'];
+        statusLabel.textContent = `Predefinida: ${subcat}`;
+      }
+    }
+
+    document.getElementById('fieldSubcategory').addEventListener('change', updateCoverPreview);
+
+    document.getElementById('btnResetCover').addEventListener('click', () => {
+      customCoverDataUrl = null;
+      document.getElementById('fieldCoverUpload').value = '';
+      updateCoverPreview();
+    });
+
+    // Comprime la imagen subida en un canvas pequeño para que quepa sin problema en PocketBase
+    document.getElementById('fieldCoverUpload').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxW = 260;
+          const maxH = 340;
+          let w = img.width;
+          let h = img.height;
+          if (w > maxW || h > maxH) {
+            const ratio = Math.min(maxW / w, maxH / h);
+            w = Math.round(w * ratio);
+            h = Math.round(h * ratio);
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          customCoverDataUrl = canvas.toDataURL('image/jpeg', 0.78);
+          updateCoverPreview();
+          showToast('Portada cargada correctamente');
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
     function updateUIAuth() {
       if (pb.authStore.isValid) {
         loginView.classList.add('hidden');
         appView.classList.remove('hidden');
-        userEmailDisplay.textContent = pb.authStore.model.email;
+        userEmailDisplay.textContent = pb.authStore.model?.email || 'Usuario autenticado';
         loadDataAndRender();
       } else {
         loginView.classList.remove('hidden');
@@ -453,6 +700,138 @@
       showToast('Sesión cerrada');
     });
 
+    // Obtiene las fechas del próximo fin de semana (Sábado y Domingo)
+    function getUpcomingWeekendDates() {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const dayOfWeek = today.getDay(); // 0 = Dom, 6 = Sáb
+      let saturday = new Date(today);
+      let sunday = new Date(today);
+
+      if (dayOfWeek === 6) {
+        // Hoy es sábado
+        sunday.setDate(today.getDate() + 1);
+      } else if (dayOfWeek === 0) {
+        // Hoy es domingo: consideramos sábado ayer y domingo hoy
+        saturday.setDate(today.getDate() - 1);
+      } else {
+        const daysToSat = 6 - dayOfWeek;
+        saturday.setDate(today.getDate() + daysToSat);
+        sunday.setDate(today.getDate() + daysToSat + 1);
+      }
+
+      return {
+        saturday,
+        sunday,
+        satStr: formatDateForInput(saturday),
+        sunStr: formatDateForInput(sunday)
+      };
+    }
+
+    // Verifica si hay fichas para el próximo fin de semana y actualiza la campanita y el panel lateral
+    function checkWeekendNotifications() {
+      const { saturday, sunday, satStr, sunStr } = getUpcomingWeekendDates();
+      const satRecords = globalRecords.filter(r => formatDateForInput(new Date(r.date)) === satStr);
+      const sunRecords = globalRecords.filter(r => formatDateForInput(new Date(r.date)) === sunStr);
+      const totalWeekend = satRecords.length + sunRecords.length;
+
+      const notifBadge = document.getElementById('notifBadge');
+      const bellIcon = document.getElementById('bellIcon');
+      const notifContent = document.getElementById('notifContent');
+      const weekendSummaryBox = document.getElementById('weekendSummaryBox');
+
+      const satLabel = saturday.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+      const sunLabel = sunday.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+
+      // Actualizar sugerencias de paquetes
+      const packSet = new Set([`Fin de Semana (${satLabel} - ${sunLabel})`]);
+      globalRecords.forEach(r => {
+        const meta = parseRecordMetadata(r);
+        if (meta.packageName) packSet.add(meta.packageName);
+      });
+      const datalist = document.getElementById('packageSuggestions');
+      datalist.innerHTML = Array.from(packSet).map(p => `<option value="${p}">`).join('');
+
+      if (totalWeekend === 0) {
+        notifBadge.classList.remove('hidden');
+        notifBadge.textContent = '1';
+        bellIcon.classList.add('bell-ring', 'text-primary');
+        notifContent.innerHTML = `
+          <div class="p-3.5 rounded-xl bg-error-container/25 border border-error/30 text-on-surface flex flex-col gap-2.5">
+            <div class="flex items-start gap-2">
+              <span class="material-symbols-outlined text-error text-[20px] mt-0.5">warning</span>
+              <div>
+                <p class="font-semibold text-error text-xs uppercase tracking-wider">Fin de semana sin fichas</p>
+                <p class="text-xs text-on-surface-variant mt-1 leading-relaxed">
+                  Aún no has preparado notas ni fichas para este próximo fin de semana (<strong>${satLabel}</strong> y <strong>${sunLabel}</strong>).
+                </p>
+              </div>
+            </div>
+            <div class="flex gap-2 pt-1">
+              <button onclick="openModalForDate('${satStr}', 'Fin de Semana (${satLabel} - ${sunLabel})')" class="flex-1 bg-primary text-[#432c00] font-semibold text-xs py-1.5 px-3 rounded-lg hover:bg-primary-container transition-colors">
+                + Preparar Sábado
+              </button>
+              <button onclick="openModalForDate('${sunStr}', 'Fin de Semana (${satLabel} - ${sunLabel})')" class="flex-1 bg-surface-container-highest text-secondary font-semibold text-xs py-1.5 px-3 rounded-lg hover:bg-surface-bright transition-colors">
+                + Preparar Domingo
+              </button>
+            </div>
+          </div>
+        `;
+      } else {
+        notifBadge.classList.add('hidden');
+        bellIcon.classList.remove('bell-ring', 'text-primary');
+        notifContent.innerHTML = `
+          <div class="p-3.5 rounded-xl bg-surface-container-high border border-outline/15 flex flex-col gap-2">
+            <div class="flex items-center gap-2 text-primary font-medium text-xs uppercase">
+              <span class="material-symbols-outlined text-[18px]">check_circle</span>
+              <span>Fin de semana preparado (${totalWeekend} ${totalWeekend === 1 ? 'ficha' : 'fichas'})</span>
+            </div>
+            <p class="text-xs text-on-surface-variant">
+              Tienes <strong>${satRecords.length}</strong> para el ${satLabel} y <strong>${sunRecords.length}</strong> para el ${sunLabel}.
+            </p>
+          </div>
+        `;
+      }
+
+      // Panel lateral de resumen de fin de semana
+      weekendSummaryBox.innerHTML = `
+        <div class="flex items-center justify-between">
+          <h3 class="font-headline-sm text-base text-primary flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[19px]">weekend</span> Próximo Fin de Semana
+          </h3>
+          <span class="text-[11px] font-label-sm px-2 py-0.5 rounded ${totalWeekend > 0 ? 'bg-primary/20 text-primary' : 'bg-error-container/40 text-error'}">
+            ${totalWeekend > 0 ? `${totalWeekend} lista(s)` : 'Pendiente'}
+          </span>
+        </div>
+        <p class="text-xs text-outline">${satLabel} &bull; ${sunLabel}</p>
+        <div class="flex flex-col gap-1.5 text-xs">
+          <div class="flex items-center justify-between bg-surface-container px-3 py-2 rounded-lg">
+            <span class="text-on-surface-variant">Sábado (${satRecords.length})</span>
+            <button onclick="openModalForDate('${satStr}', 'Fin de Semana (${satLabel} - ${sunLabel})')" class="text-primary hover:underline font-medium">+ Ficha</button>
+          </div>
+          <div class="flex items-center justify-between bg-surface-container px-3 py-2 rounded-lg">
+            <span class="text-on-surface-variant">Domingo (${sunRecords.length})</span>
+            <button onclick="openModalForDate('${sunStr}', 'Fin de Semana (${satLabel} - ${sunLabel})')" class="text-secondary hover:underline font-medium">+ Ficha</button>
+          </div>
+        </div>
+      `;
+    }
+
+    // Eventos de la campanita
+    document.getElementById('btnNotifications').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('notifDropdown').classList.toggle('hidden');
+    });
+    document.getElementById('btnCloseNotif').addEventListener('click', () => {
+      document.getElementById('notifDropdown').classList.add('hidden');
+    });
+    document.addEventListener('click', (e) => {
+      const wrapper = document.getElementById('notificationWrapper');
+      if (wrapper && !wrapper.contains(e.target)) {
+        document.getElementById('notifDropdown').classList.add('hidden');
+      }
+    });
+
     function renderCalendar() {
       calendarGrid.innerHTML = '';
       
@@ -462,10 +841,15 @@
       const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
       calendarMonthYear.textContent = `${monthNames[currentMonth]} ${currentYear}`;
       
-      const recordDates = new Set();
+      // Agrupa títulos de notas por fecha YYYY-MM-DD para el tooltip
+      const recordsByDate = {};
       globalRecords.forEach(r => {
         const d = new Date(r.date);
-        recordDates.add(formatDateForInput(d));
+        if (!isNaN(d)) {
+          const key = formatDateForInput(d);
+          if (!recordsByDate[key]) recordsByDate[key] = [];
+          recordsByDate[key].push(r);
+        }
       });
 
       for (let i = 0; i < firstDay; i++) {
@@ -476,12 +860,28 @@
       for (let i = 1; i <= daysInMonth; i++) {
         const dayDiv = document.createElement('div');
         const loopDateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+        const dayRecords = recordsByDate[loopDateStr] || [];
         
         dayDiv.className = 'calendar-day relative py-2 flex items-center justify-center rounded-lg cursor-pointer hover:bg-surface-container-high transition-colors text-on-surface';
         dayDiv.textContent = i;
         
-        if (recordDates.has(loopDateStr)) {
+        if (dayRecords.length > 0) {
           dayDiv.classList.add('has-record');
+          // Tooltip flotante con los nombres de las notas de ese día
+          const tooltip = document.createElement('div');
+          tooltip.className = 'cal-tooltip pointer-events-none absolute bottom-full left-1/2 mb-2 w-52 bg-[#0b0e13] text-on-surface text-left p-2.5 rounded-lg shadow-2xl border border-primary/30 z-50';
+          tooltip.innerHTML = `
+            <div class="text-[10px] font-label-sm uppercase text-primary border-b border-outline/15 pb-1 mb-1.5">
+              ${dayRecords.length} ${dayRecords.length === 1 ? 'Asignación' : 'Asignaciones'}
+            </div>
+            <ul class="flex flex-col gap-1 text-xs">
+              ${dayRecords.map(r => {
+                const meta = parseRecordMetadata(r);
+                return `<li class="truncate text-on-surface-variant">&bull; <strong class="text-on-surface">${r.title}</strong> <span class="text-[10px] text-tertiary">(${meta.subcategory})</span></li>`;
+              }).join('')}
+            </ul>
+          `;
+          dayDiv.appendChild(tooltip);
         }
 
         if (selectedDateFilter === loopDateStr) {
@@ -532,9 +932,13 @@
     async function loadDataAndRender() {
       recordsContainer.innerHTML = `<div class="text-center py-12 text-outline">Cargando registros...</div>`;
       try {
-        globalRecords = await pb.collection('predicaciones').getFullList({ sort: '-date' });
+        globalRecords = await pb.collection('predicaciones').getFullList({
+          sort: '-date',
+          requestKey: null
+        });
         renderCalendar();
         renderRecords();
+        checkWeekendNotifications();
       } catch (error) {
         console.error(error);
         recordsContainer.innerHTML = `<div class="text-error p-4 bg-error-container/20 rounded-lg">Error al cargar datos. Verifica la conexión a PocketBase.</div>`;
@@ -553,7 +957,7 @@
         return true;
       });
 
-      if(filteredRecords.length === 0) {
+      if (filteredRecords.length === 0) {
         recordsContainer.innerHTML = `
           <div class="text-center py-12 bg-surface-container-low rounded-xl border border-outline/10">
             <p class="text-outline mb-4">No hay fichas para esta selección.</p>
@@ -563,12 +967,8 @@
       }
 
       filteredRecords.forEach(record => {
-        let parsedScriptures = [];
-        try {
-          parsedScriptures = JSON.parse(record.scriptures || "[]");
-        } catch (e) {
-          parsedScriptures = record.scriptures ? [record.scriptures] : [];
-        }
+        const meta = parseRecordMetadata(record);
+        const parsedScriptures = meta.items;
 
         const scripturesBlockHtml = parsedScriptures.length > 0 ? 
           `<div class="mt-4 p-4 bg-[#141b21] rounded-lg border-l-4 border-secondary shadow-inner">
@@ -593,17 +993,39 @@
         const isHtmlNotes = record.notes && /<[a-z][\s\S]*>/i.test(record.notes);
 
         const card = document.createElement('div');
-        card.className = "bg-surface-container-low rounded-xl p-6 shadow-sm border border-outline/10";
+        card.id = `ficha-card-${record.id}`;
+        card.className = "bg-surface-container-low rounded-xl p-6 shadow-sm border border-outline/10 transition-all hover:border-outline/25";
         card.innerHTML = `
-          <div class="flex justify-between items-start mb-4">
-            <div class="flex flex-col gap-1">
-              <div class="flex items-center gap-2 mb-1">
-                <span class="font-label-sm text-[0.6875rem] bg-surface-container-highest text-primary px-2 py-0.5 rounded font-mono">${dateString}</span>
-                <span class="font-label-sm text-[0.6875rem] bg-surface-container text-tertiary px-2 py-0.5 rounded">${record.category}</span>
+          <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
+            <div class="flex items-start gap-4 flex-1">
+              <img src="${meta.coverImage}" alt="${meta.subcategory}" class="w-16 h-22 sm:w-20 sm:h-28 object-cover rounded-lg border border-outline/20 shadow-md flex-shrink-0 bg-surface-container-high">
+              <div class="flex flex-col gap-1 flex-1">
+                <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                  <span class="font-label-sm text-[0.6875rem] bg-surface-container-highest text-primary px-2 py-0.5 rounded font-mono">${dateString}</span>
+                  <span class="font-label-sm text-[0.6875rem] bg-surface-container text-tertiary px-2 py-0.5 rounded">${record.category}</span>
+                  <span class="font-label-sm text-[0.6875rem] bg-primary/15 text-secondary border border-primary/25 px-2 py-0.5 rounded">${meta.subcategory}</span>
+                  ${meta.packageName ? `<span class="font-label-sm text-[0.6875rem] bg-surface-container-high text-on-surface-variant px-2 py-0.5 rounded flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">inventory_2</span>${meta.packageName}</span>` : ''}
+                </div>
+                <h3 class="font-headline-md text-2xl text-on-surface mt-0.5">${record.title}</h3>
               </div>
-              <h3 class="font-headline-md text-2xl text-on-surface mt-1">${record.title}</h3>
             </div>
-            <button onclick="deleteRecord('${record.id}')" class="text-outline hover:text-error transition-colors p-2" title="Eliminar Ficha"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+
+            <!-- Barra minimalista de exportación y acciones -->
+            <div class="flex items-center gap-1 self-end sm:self-start bg-surface-container px-2 py-1 rounded-lg border border-outline/10 no-export">
+              <button onclick="exportRecordImage('${record.id}')" class="text-outline hover:text-primary transition-colors p-1.5 rounded hover:bg-surface-container-high" title="Exportar a Imagen (PNG)">
+                <span class="material-symbols-outlined text-[18px]">image</span>
+              </button>
+              <button onclick="exportRecordPDF('${record.id}')" class="text-outline hover:text-secondary transition-colors p-1.5 rounded hover:bg-surface-container-high" title="Exportar a PDF">
+                <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+              </button>
+              <button onclick="sendRecordWhatsApp('${record.id}')" class="text-outline hover:text-[#4ade80] transition-colors p-1.5 rounded hover:bg-surface-container-high" title="Enviar al WhatsApp +506 6227-8771">
+                <span class="material-symbols-outlined text-[18px]">chat</span>
+              </button>
+              <div class="w-px h-4 bg-outline/20 mx-0.5"></div>
+              <button onclick="deleteRecord('${record.id}')" class="text-outline hover:text-error transition-colors p-1.5 rounded hover:bg-surface-container-high" title="Eliminar Ficha">
+                <span class="material-symbols-outlined text-[18px]">delete</span>
+              </button>
+            </div>
           </div>
           
           ${scripturesBlockHtml}
@@ -617,8 +1039,92 @@
       });
     }
 
+    // Exportar ficha a Imagen PNG
+    window.exportRecordImage = async (id) => {
+      const cardEl = document.getElementById(`ficha-card-${id}`);
+      const record = globalRecords.find(r => r.id === id);
+      if (!cardEl || !record) return;
+      showToast('Generando imagen de la ficha...');
+      try {
+        const canvas = await html2canvas(cardEl, {
+          backgroundColor: '#191c21',
+          scale: 2,
+          useCORS: true,
+          ignoreElements: (el) => el.classList && el.classList.contains('no-export')
+        });
+        const link = document.createElement('a');
+        const safeTitle = (record.title || 'ficha').replace(/[^a-z0-9áéíóúñ_-]/gi, '_');
+        link.download = `TestimonioBox_${safeTitle}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showToast('Imagen descargada correctamente');
+      } catch (err) {
+        console.error(err);
+        showToast('No se pudo exportar la imagen', 'error');
+      }
+    };
+
+    // Exportar ficha a PDF
+    window.exportRecordPDF = async (id) => {
+      const cardEl = document.getElementById(`ficha-card-${id}`);
+      const record = globalRecords.find(r => r.id === id);
+      if (!cardEl || !record) return;
+      showToast('Generando archivo PDF...');
+      try {
+        const safeTitle = (record.title || 'ficha').replace(/[^a-z0-9áéíóúñ_-]/gi, '_');
+        const clone = cardEl.cloneNode(true);
+        const actionBtns = clone.querySelector('.no-export');
+        if (actionBtns) actionBtns.remove();
+        clone.style.backgroundColor = '#191c21';
+        clone.style.color = '#e1e2e9';
+        clone.style.padding = '24px';
+
+        await html2pdf().set({
+          margin: 10,
+          filename: `TestimonioBox_${safeTitle}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#191c21' },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        }).from(clone).save();
+        showToast('PDF descargado correctamente');
+      } catch (err) {
+        console.error(err);
+        showToast('Error al exportar a PDF', 'error');
+      }
+    };
+
+    // Enviar ficha completa formateada por WhatsApp al +50662278771
+    window.sendRecordWhatsApp = (id) => {
+      const record = globalRecords.find(r => r.id === id);
+      if (!record) return;
+      const meta = parseRecordMetadata(record);
+      const dateObj = new Date(record.date);
+      const dateStr = isNaN(dateObj) ? '' : dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = record.notes || '';
+      const plainNotes = (tempDiv.innerText || tempDiv.textContent || '').trim();
+
+      const scripturesText = meta.items.map(s => {
+        const ref = typeof s === 'object' ? s.ref : s;
+        const txt = typeof s === 'object' && s.text ? `\n  “${s.text}”` : '';
+        return `• ${ref}${txt}`;
+      }).join('\n');
+
+      let msg = `📖 *TESTIMONIOBOX - MINISTERIO DE JEHOVÁ*\n`;
+      msg += `*Tema:* ${record.title}\n`;
+      msg += `*Fecha:* ${dateStr}\n`;
+      msg += `*Categoría:* ${record.category} (${meta.subcategory})\n`;
+      if (meta.packageName) msg += `*Paquete:* ${meta.packageName}\n`;
+      if (scripturesText) msg += `\n*Textos Bíblicos:*\n${scripturesText}\n`;
+      if (plainNotes) msg += `\n*Bosquejo / Notas:*\n${plainNotes}`;
+
+      const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+      window.open(waUrl, '_blank', 'noopener,noreferrer');
+    };
+
     window.deleteRecord = async (id) => {
-      if(confirm('¿Eliminar esta ficha homilética?')) {
+      if (confirm('¿Eliminar esta ficha homilética?')) {
         try {
           await pb.collection('predicaciones').delete(id);
           showToast('Registro eliminado');
@@ -661,15 +1167,10 @@
     function cleanScriptureText(rawText) {
       if (!rawText) return '';
       return rawText
-        // Elimina símbolos de notas y referencias cruzadas de JW.ORG / Biblias (*, +, †, ‡, °, #, §, ¶)
         .replace(/[*+†‡°#§¶]+/g, '')
-        // Elimina llamadas a pie de página entre corchetes como [a], [1], etc.
         .replace(/\[[a-zA-Z0-9]+\]/g, '')
-        // Elimina caracteres de espacio de ancho cero o no separables
         .replace(/[\u200B-\u200D\uFEFF\u00A0]/g, ' ')
-        // Ajusta espacios antes de signos de puntuación
         .replace(/\s+([,.;:?!»”’])/g, '$1')
-        // Colapsa múltiples espacios seguidos
         .replace(/[ \t]{2,}/g, ' ')
         .trim();
     }
@@ -787,7 +1288,7 @@
     const richEditor = document.getElementById('richEditor');
     document.querySelectorAll('.rt-btn').forEach(btn => {
       btn.addEventListener('mousedown', (e) => {
-        e.preventDefault(); // Mantiene la selección activa en el editor
+        e.preventDefault();
       });
       btn.addEventListener('click', () => {
         const cmd = btn.getAttribute('data-cmd');
@@ -804,12 +1305,24 @@
       } else {
         dateInput.value = formatDateForInput(new Date());
       }
+      updateCoverPreview();
 
       recordModal.classList.remove('hidden');
       setTimeout(() => {
         recordModal.classList.remove('opacity-0');
         modalContent.classList.remove('scale-95');
       }, 10);
+    };
+
+    window.openModalForDate = (dateStr, packageName = '') => {
+      document.getElementById('notifDropdown').classList.add('hidden');
+      document.getElementById('weekendModal').classList.add('hidden');
+      selectedDateFilter = dateStr;
+      openModal();
+      document.getElementById('fieldDate').value = dateStr;
+      if (packageName) {
+        document.getElementById('fieldPackageName').value = packageName;
+      }
     };
 
     const closeModal = () => {
@@ -820,7 +1333,9 @@
         recordForm.reset();
         richEditor.innerHTML = '';
         currentScriptures = [];
+        customCoverDataUrl = null;
         updateScriptureTags();
+        updateCoverPreview();
       }, 300);
     };
 
@@ -828,32 +1343,169 @@
     document.getElementById('btnCloseModal').addEventListener('click', closeModal);
     document.getElementById('btnCancelModal').addEventListener('click', closeModal);
 
+    // Modal de Paquete de Fin de Semana
+    const weekendModal = document.getElementById('weekendModal');
+    const weekendSatDate = document.getElementById('weekendSatDate');
+    const weekendPackTitle = document.getElementById('weekendPackTitle');
+    const weekendExistingList = document.getElementById('weekendExistingList');
+
+    function refreshWeekendModalView() {
+      const satVal = weekendSatDate.value;
+      if (!satVal) return;
+      const satD = new Date(satVal + 'T12:00:00');
+      const sunD = new Date(satD);
+      sunD.setDate(satD.getDate() + 1);
+      const sunVal = formatDateForInput(sunD);
+
+      const satLabel = satD.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+      const sunLabel = sunD.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+
+      if (!weekendPackTitle.value.trim()) {
+        weekendPackTitle.value = `Paquete Fin de Semana (${satLabel} - ${sunLabel})`;
+      }
+
+      const list = globalRecords.filter(r => {
+        const dStr = formatDateForInput(new Date(r.date));
+        return dStr === satVal || dStr === sunVal;
+      });
+
+      if (list.length === 0) {
+        weekendExistingList.innerHTML = `<p class="text-xs text-outline text-center py-4">No hay fichas todavía para este fin de semana (${satLabel} - ${sunLabel}).</p>`;
+      } else {
+        weekendExistingList.innerHTML = list.map(r => {
+          const meta = parseRecordMetadata(r);
+          const dStr = formatDateForInput(new Date(r.date));
+          const dayBadge = dStr === satVal ? 'SÁB' : 'DOM';
+          return `
+            <div class="flex items-center justify-between bg-surface-container-high px-3 py-2 rounded-lg border border-outline/10">
+              <div class="flex items-center gap-2.5 truncate">
+                <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-primary/20 text-primary font-bold">${dayBadge}</span>
+                <span class="text-sm text-on-surface font-medium truncate">${r.title}</span>
+                <span class="text-xs text-tertiary">(${meta.subcategory})</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function openWeekendPackModal() {
+      const { satStr } = getUpcomingWeekendDates();
+      weekendSatDate.value = satStr;
+      weekendPackTitle.value = '';
+      refreshWeekendModalView();
+      weekendModal.classList.remove('hidden');
+    }
+
+    document.getElementById('btnOpenWeekendModal').addEventListener('click', openWeekendPackModal);
+    document.getElementById('navPackBtn').addEventListener('click', openWeekendPackModal);
+    document.getElementById('btnCloseWeekendModal').addEventListener('click', () => weekendModal.classList.add('hidden'));
+    weekendSatDate.addEventListener('change', () => {
+      weekendPackTitle.value = '';
+      refreshWeekendModalView();
+    });
+
+    document.getElementById('btnNewSatCard').addEventListener('click', () => {
+      openModalForDate(weekendSatDate.value, weekendPackTitle.value.trim());
+    });
+
+    document.getElementById('btnNewSunCard').addEventListener('click', () => {
+      const satD = new Date(weekendSatDate.value + 'T12:00:00');
+      satD.setDate(satD.getDate() + 1);
+      openModalForDate(formatDateForInput(satD), weekendPackTitle.value.trim());
+    });
+
+    document.getElementById('btnFilterWeekend').addEventListener('click', () => {
+      const satD = new Date(weekendSatDate.value + 'T12:00:00');
+      currentMonth = satD.getMonth();
+      currentYear = satD.getFullYear();
+      selectedDateFilter = weekendSatDate.value;
+      weekendModal.classList.add('hidden');
+      renderCalendar();
+      renderRecords();
+    });
+
+    // Guardado robusto en PocketBase
+    let isSubmittingRecord = false;
     recordForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (isSubmittingRecord) return;
+
+      // Si el usuario escribió un capítulo/texto pero olvidó pulsar "+ Agregar lectura", lo agregamos automáticamente
+      const pendingChap = document.getElementById('bibleChapter').value.trim();
+      if (pendingChap) {
+        document.getElementById('btnAddScripture').click();
+      }
+
       const rawDate = document.getElementById('fieldDate').value;
       const isoDate = new Date(rawDate + 'T12:00:00Z').toISOString();
       const editorHtml = richEditor.innerHTML.trim();
-      document.getElementById('fieldNotes').value = (editorHtml === '<br>') ? '' : editorHtml;
-      
-      const data = {
-        title: document.getElementById('fieldTitle').value,
+      const cleanNotes = (editorHtml === '<br>') ? '' : editorHtml;
+      document.getElementById('fieldNotes').value = cleanNotes;
+
+      const subcategory = document.getElementById('fieldSubcategory').value;
+      const packageName = document.getElementById('fieldPackageName').value.trim();
+
+      // Empaquetamos metadatos junto con las lecturas para total compatibilidad con el esquema actual de PocketBase
+      const scripturesPayload = JSON.stringify({
+        items: currentScriptures,
+        subcategory: subcategory,
+        packageName: packageName,
+        coverImage: customCoverDataUrl || null
+      });
+
+      const baseData = {
+        title: document.getElementById('fieldTitle').value.trim(),
         date: isoDate,
         category: document.getElementById('fieldCategory').value,
-        scriptures: document.getElementById('fieldScripturesArray').value,
-        notes: document.getElementById('fieldNotes').value,
+        scriptures: scripturesPayload,
+        notes: cleanNotes
       };
 
+      // Si el usuario está autenticado, enviamos también user id por si la colección lo solicita
+      const userId = pb.authStore.model?.id;
+
+      const submitBtn = document.getElementById('btnSubmitRecord');
+      isSubmittingRecord = true;
+      submitBtn.disabled = true;
+
       try {
-        await pb.collection('predicaciones').create(data);
+        try {
+          await pb.collection('predicaciones').create(
+            userId ? { ...baseData, user: userId } : baseData,
+            { requestKey: null }
+          );
+        } catch (firstErr) {
+          // Si falló por el campo user o por el tamaño de una portada personalizada, reintentamos de forma segura
+          console.warn('Primer intento de guardado:', firstErr?.response || firstErr);
+          const fallbackPayload = JSON.stringify({
+            items: currentScriptures,
+            subcategory: subcategory,
+            packageName: packageName,
+            coverImage: null
+          });
+          await pb.collection('predicaciones').create(
+            { ...baseData, scriptures: fallbackPayload },
+            { requestKey: null }
+          );
+        }
+
         showToast('Ficha guardada correctamente');
         closeModal();
-        loadDataAndRender();
+        await loadDataAndRender();
       } catch (error) {
-        console.error(error);
-        showToast('Error al guardar la ficha', 'error');
+        console.error('Detalle del error en PocketBase:', error?.response || error);
+        const fieldErrors = error?.response?.data
+          ? Object.entries(error.response.data).map(([k, v]) => `${k}: ${v.message}`).join(' | ')
+          : (error?.message || 'Verifica los campos o permisos en PocketBase');
+        showToast(`Error al guardar: ${fieldErrors}`, 'error');
+      } finally {
+        isSubmittingRecord = false;
+        submitBtn.disabled = false;
       }
     });
 
+    updateCoverPreview();
     updateUIAuth();
   </script>
 </body>
