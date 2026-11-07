@@ -83,6 +83,10 @@
           <div class="font-label-sm text-[0.6875rem] text-outline px-2 mb-1 uppercase tracking-wider">Navegación Pastoral</div>
           <nav class="flex flex-col gap-1">
             <a id="navCronogramaBtn" class="flex items-center gap-2 px-2 py-2 rounded-lg bg-surface-container-high text-primary font-medium cursor-pointer transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">event_available</span><span>Cronograma & Predicaciones</span></a>
+            <a id="navUnassignedBtn" class="flex items-center justify-between gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer" href="#">
+              <span class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">library_books</span><span>Fichas Sin Fecha</span></span>
+              <span id="navUnassignedBadge" class="text-[10px] font-mono bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold">0</span>
+            </a>
             <a id="navDashboardBtn" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer" href="#"><span class="material-symbols-outlined text-[20px]">monitoring</span><span>Dashboard</span></a>
             <a id="navRevisitasBtn" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[20px]">contacts_product</span><span>Revisitas</span></a>
             <a id="navPackBtn" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[20px]">inventory_2</span><span>Paquetes de Fichas</span></a>
@@ -180,9 +184,28 @@
             </div>
 
             <div class="lg:col-span-8 flex flex-col gap-4">
-              <div id="filterStatusIndicator" class="font-label-sm text-xs text-outline uppercase tracking-wider hidden flex items-center justify-between bg-surface-container-low px-4 py-2.5 rounded-lg border border-outline/10">
-                <span>Mostrando registros para: <strong id="filterStatusDate" class="text-primary"></strong></span>
-                <button onclick="document.getElementById('btnClearFilter').click()" class="text-xs text-secondary hover:underline">Ver todo el mes</button>
+              <!-- Selector de vista: Fichas del Mes, Fichas Sin Fecha Asociada (Banco general) y Todas -->
+              <div class="flex flex-wrap items-center justify-between gap-3 bg-surface-container-low p-2.5 rounded-xl border border-outline/10">
+                <div class="flex flex-wrap items-center gap-1.5" id="recordsViewTabs">
+                  <button type="button" data-view="month" class="rec-view-tab px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-primary text-[#432c00] transition-colors flex items-center gap-1.5 cursor-pointer">
+                    <span class="material-symbols-outlined text-[16px]">calendar_month</span>
+                    <span>Del Mes Actual</span>
+                  </button>
+                  <button type="button" data-view="unassigned" class="rec-view-tab px-3.5 py-1.5 rounded-lg text-xs font-medium text-on-surface-variant hover:text-on-surface bg-surface-container hover:bg-surface-container-high transition-colors flex items-center gap-1.5 cursor-pointer">
+                    <span class="material-symbols-outlined text-[16px]">library_books</span>
+                    <span>Fichas Sin Fecha Asociada</span>
+                    <span id="tabUnassignedCount" class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-primary/20 text-primary font-bold">0</span>
+                  </button>
+                  <button type="button" data-view="all" class="rec-view-tab px-3.5 py-1.5 rounded-lg text-xs font-medium text-on-surface-variant hover:text-on-surface bg-surface-container hover:bg-surface-container-high transition-colors flex items-center gap-1.5 cursor-pointer">
+                    <span class="material-symbols-outlined text-[16px]">view_list</span>
+                    <span>Todas las Fichas</span>
+                    <span id="tabAllCount" class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-surface-container-highest text-tertiary">0</span>
+                  </button>
+                </div>
+                <div id="filterStatusIndicator" class="font-label-sm text-xs text-outline uppercase tracking-wider hidden flex items-center gap-3 bg-surface-container px-3 py-1.5 rounded-lg border border-primary/25">
+                  <span>Día seleccionado: <strong id="filterStatusDate" class="text-primary font-mono"></strong></span>
+                  <button onclick="document.getElementById('btnClearFilter').click()" class="text-xs text-secondary hover:underline cursor-pointer">Quitar filtro</button>
+                </div>
               </div>
               <div id="recordsContainer" class="flex flex-col gap-6">
                 <div id="loadingState" class="text-center py-12 text-outline">
@@ -943,7 +966,8 @@
     let currentYear = dateNow.getFullYear();
     let reportMonth = dateNow.getMonth();
     let reportYear = dateNow.getFullYear();
-    let selectedDateFilter = null; 
+    let selectedDateFilter = null;
+    let recordsViewMode = 'month'; // 'month' | 'unassigned' | 'all' 
 
     const calendarGrid = document.getElementById('calendarGrid');
     const calendarMonthYear = document.getElementById('calendarMonthYear');
@@ -1437,6 +1461,8 @@
 
         dayDiv.addEventListener('click', () => {
           selectedDateFilter = loopDateStr;
+          recordsViewMode = 'month';
+          updateRecordsViewTabsUI();
           renderCalendar();
           renderRecords();
         });
@@ -1494,8 +1520,43 @@
       }
     }
 
+    function updateRecordsViewTabsUI() {
+      const unassignedCount = globalRecords.filter(r => {
+        const meta = parseRecordMetadata(r);
+        return !meta.revisitaData && !meta.calendarAssigned;
+      }).length;
+
+      const tabUnassignedCount = document.getElementById('tabUnassignedCount');
+      const navUnassignedBadge = document.getElementById('navUnassignedBadge');
+      const tabAllCount = document.getElementById('tabAllCount');
+
+      if (tabUnassignedCount) tabUnassignedCount.textContent = unassignedCount;
+      if (navUnassignedBadge) navUnassignedBadge.textContent = unassignedCount;
+      if (tabAllCount) tabAllCount.textContent = globalRecords.length;
+
+      document.querySelectorAll('.rec-view-tab').forEach(btn => {
+        const v = btn.getAttribute('data-view');
+        if (v === recordsViewMode && !selectedDateFilter) {
+          btn.className = 'rec-view-tab px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-primary text-[#432c00] transition-colors flex items-center gap-1.5 cursor-pointer';
+        } else {
+          btn.className = 'rec-view-tab px-3.5 py-1.5 rounded-lg text-xs font-medium text-on-surface-variant hover:text-on-surface bg-surface-container hover:bg-surface-container-high transition-colors flex items-center gap-1.5 cursor-pointer';
+        }
+      });
+    }
+
+    document.querySelectorAll('.rec-view-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        recordsViewMode = btn.getAttribute('data-view') || 'month';
+        selectedDateFilter = null;
+        updateRecordsViewTabsUI();
+        renderCalendar();
+        renderRecords();
+      });
+    });
+
     function renderRecords() {
       recordsContainer.innerHTML = '';
+      updateRecordsViewTabsUI();
       
       let filteredRecords = globalRecords.filter(r => {
         const d = new Date(r.date);
@@ -1504,16 +1565,32 @@
           // Al filtrar por un día del calendario, mostrar únicamente las fichas asignadas a esa fecha
           return meta.calendarAssigned && formatDateForInput(d) === selectedDateFilter;
         }
-        // En la vista general del mes, mostrar todas las fichas (asignadas o creadas en este mes)
+        if (recordsViewMode === 'unassigned') {
+          // Mostrar todas las fichas creadas sin fecha de calendario asociada (de cualquier mes)
+          return !meta.revisitaData && !meta.calendarAssigned;
+        }
+        if (recordsViewMode === 'all') {
+          // Mostrar absolutamente todas las fichas y registros sin límite de mes
+          return true;
+        }
+        // En la vista del mes actual, mostrar las asignadas o creadas en este mes
         if (d.getMonth() !== currentMonth || d.getFullYear() !== currentYear) return false;
         return true;
       });
 
       if (filteredRecords.length === 0) {
+        const emptyMsg = selectedDateFilter
+          ? `No hay fichas asignadas para el día ${selectedDateFilter}. Puedes ir a "Fichas Sin Fecha Asociada" para asociar una.`
+          : (recordsViewMode === 'unassigned'
+              ? 'Todas tus fichas tienen ya una fecha asociada en el calendario.'
+              : 'No hay fichas para esta selección.');
         recordsContainer.innerHTML = `
-          <div class="text-center py-12 bg-surface-container-low rounded-xl border border-outline/10">
-            <p class="text-outline mb-4">No hay fichas para esta selección.</p>
-            <button onclick="openModal()" class="text-primary hover:text-primary-container font-medium transition-colors">Crear Nueva Asignación</button>
+          <div class="text-center py-12 bg-surface-container-low rounded-xl border border-outline/10 px-4">
+            <p class="text-outline mb-4">${emptyMsg}</p>
+            <div class="flex flex-wrap justify-center gap-3">
+              ${selectedDateFilter ? `<button onclick="document.querySelector('[data-view=\\'unassigned\\']').click()" class="bg-surface-container-high hover:bg-surface-container-highest text-secondary px-4 py-2 rounded-lg text-xs font-medium border border-secondary/30 transition-colors cursor-pointer">Ver Fichas Sin Fecha Asociada</button>` : ''}
+              <button onclick="openModal()" class="text-primary hover:text-primary-container font-medium text-sm transition-colors cursor-pointer">+ Crear Nueva Ficha</button>
+            </div>
           </div>`;
         return;
       }
@@ -1621,16 +1698,33 @@
             <div class="font-body-md text-on-surface-variant leading-relaxed ${isHtmlNotes ? 'rich-content' : 'whitespace-pre-line'}">${record.notes}</div>
           </div>` : ''}
 
-          <!-- Barra rápida en la nota para marcar si salí y cuántas horas hice -->
+          <!-- Barra rápida en la nota para asociar a cualquier fecha, marcar si salí y cuántas horas hice -->
           <div class="mt-4 pt-3 border-t border-outline/10 flex flex-wrap items-center justify-between gap-3 no-export">
-            <label class="flex items-center gap-2 cursor-pointer text-xs text-on-surface-variant hover:text-on-surface select-none">
-              <input type="checkbox" id="chk-out-${record.id}" ${meta.wentOut ? 'checked' : ''} onchange="updateRecordHours('${record.id}')" class="w-4 h-4 rounded accent-[#fbc262] cursor-pointer">
-              <span class="font-medium">Marcar que salí a predicar con esta nota</span>
-            </label>
+            <div class="flex flex-wrap items-center gap-4">
+              <label class="flex items-center gap-2 cursor-pointer text-xs text-on-surface-variant hover:text-on-surface select-none">
+                <input type="checkbox" id="chk-out-${record.id}" ${meta.wentOut ? 'checked' : ''} onchange="updateRecordHours('${record.id}')" class="w-4 h-4 rounded accent-[#fbc262] cursor-pointer">
+                <span class="font-medium">Salí a predicar</span>
+              </label>
+
+              ${!meta.revisitaData ? `
+              <div class="flex items-center gap-1.5 bg-surface-container px-2.5 py-1 rounded-lg border border-outline/15">
+                <span class="material-symbols-outlined text-[15px] text-primary">calendar_add_on</span>
+                <span class="text-[11px] font-label-sm uppercase text-outline">Asociar a fecha:</span>
+                <input type="date" id="inp-assign-date-${record.id}" value="${meta.calendarAssigned && !isNaN(dateObj) ? formatDateForInput(dateObj) : ''}" class="bg-surface-container-high border border-outline/20 rounded px-2 py-0.5 text-xs text-on-surface focus:outline-none focus:border-primary [color-scheme:dark]">
+                <button type="button" onclick="quickAssignCardDate('${record.id}')" class="text-[11px] bg-primary/20 hover:bg-primary text-primary hover:text-[#432c00] font-semibold px-2 py-0.5 rounded border border-primary/30 transition-colors cursor-pointer">
+                  Asociar
+                </button>
+                ${meta.calendarAssigned ? `
+                <button type="button" onclick="quickUnassignCardDate('${record.id}')" class="text-[11px] text-outline hover:text-error px-1.5 py-0.5 rounded transition-colors cursor-pointer" title="Desvincular de la fecha del calendario">
+                  Quitar fecha
+                </button>` : ''}
+              </div>` : ''}
+            </div>
+
             <div class="flex items-center gap-2">
               <span class="text-xs font-label-sm text-outline uppercase">Horas:</span>
               <input type="number" id="inp-hours-${record.id}" value="${meta.hours || ''}" step="0.5" min="0" max="24" placeholder="0" class="w-16 bg-surface-container-high border border-outline/20 rounded-lg px-2 py-1 text-center text-xs font-mono text-primary font-bold focus:outline-none focus:border-primary">
-              <button type="button" onclick="updateRecordHours('${record.id}')" class="text-xs bg-surface-container-highest hover:bg-primary hover:text-[#432c00] text-secondary font-medium px-2.5 py-1 rounded-lg border border-outline/20 transition-colors">
+              <button type="button" onclick="updateRecordHours('${record.id}')" class="text-xs bg-surface-container-highest hover:bg-primary hover:text-[#432c00] text-secondary font-medium px-2.5 py-1 rounded-lg border border-outline/20 transition-colors cursor-pointer">
                 Guardar horas
               </button>
             </div>
@@ -1639,6 +1733,63 @@
         recordsContainer.appendChild(card);
       });
     }
+
+    // Asocia o cambia rápidamente la fecha de calendario de una ficha directamente desde la tarjeta
+    window.quickAssignCardDate = async (id) => {
+      const record = globalRecords.find(r => r.id === id);
+      if (!record) return;
+      const dateInput = document.getElementById(`inp-assign-date-${id}`);
+      const targetDate = dateInput ? dateInput.value.trim() : '';
+      if (!targetDate) {
+        showToast('Selecciona una fecha en el calendario de la tarjeta para asociar la ficha', 'error');
+        if (dateInput) dateInput.focus();
+        return;
+      }
+
+      const meta = parseRecordMetadata(record);
+      const currentRecordDate = formatDateForInput(new Date(record.date));
+      const prevDate = meta.previousDateBeforePack || currentRecordDate;
+      const isCustomImg = meta.coverImage && (
+        meta.coverImage.startsWith('data:image/webp') ||
+        meta.coverImage.startsWith('data:image/jpeg') ||
+        meta.coverImage.startsWith('data:image/png')
+      );
+
+      const metaObj = {
+        items: meta.items,
+        subcategory: meta.subcategory,
+        packageName: meta.packageName,
+        calendarAssigned: true,
+        previousDateBeforePack: prevDate,
+        wentOut: meta.wentOut,
+        hours: meta.hours,
+        revisitaData: meta.revisitaData,
+        parentRecordId: meta.parentRecordId,
+        parentRecordTitle: meta.parentRecordTitle,
+        seriesNumber: meta.seriesNumber
+      };
+
+      try {
+        await updatePredicacionAdaptive(id, {
+          title: record.title,
+          rawDate: targetDate,
+          category: meta.categoryLabel || record.category,
+          metaObj: metaObj,
+          notes: record.notes || '',
+          customCover: isCustomImg ? meta.coverImage : null
+        });
+        const formatted = new Date(targetDate + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+        showToast(`Ficha "${record.title}" asociada al ${formatted}`);
+        await loadDataAndRender();
+      } catch (err) {
+        console.error(err);
+        showToast('Error al asociar la fecha en PocketBase', 'error');
+      }
+    };
+
+    window.quickUnassignCardDate = async (id) => {
+      await removeFichaFromPackage(id);
+    };
 
     // Actualiza rápidamente desde la tarjeta en PocketBase (VPS) si salió y cuántas horas hizo
     window.updateRecordHours = async (id) => {
@@ -2762,6 +2913,7 @@
     const informesSection = document.getElementById('informesSection');
     const dashboardSection = document.getElementById('dashboardSection');
     const navCronogramaBtn = document.getElementById('navCronogramaBtn');
+    const navUnassignedBtn = document.getElementById('navUnassignedBtn');
     const navDashboardBtn = document.getElementById('navDashboardBtn');
     const navInformesBtn = document.getElementById('navInformesBtn');
     const navRevisitasBtn = document.getElementById('navRevisitasBtn');
@@ -2771,6 +2923,8 @@
     function switchSection(section) {
       const activeClass = 'flex items-center gap-2 px-2 py-2 rounded-lg bg-surface-container-high text-primary font-medium cursor-pointer transition-colors';
       const inactiveClass = 'flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer';
+      const unassignedActiveClass = 'flex items-center justify-between gap-2 px-2 py-2 rounded-lg bg-surface-container-high text-primary font-medium cursor-pointer transition-colors';
+      const unassignedInactiveClass = 'flex items-center justify-between gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer';
 
       cronogramaSection.classList.add('hidden');
       informesSection.classList.add('hidden');
@@ -2783,6 +2937,7 @@
       navCronogramaBtn.className = inactiveClass;
       navInformesBtn.className = inactiveClass;
       if (navDashboardBtn) navDashboardBtn.className = inactiveClass;
+      if (navUnassignedBtn) navUnassignedBtn.className = unassignedInactiveClass;
 
       if (section === 'informes') {
         informesSection.classList.remove('hidden');
@@ -2794,6 +2949,14 @@
         dashboardSection.classList.add('flex');
         if (navDashboardBtn) navDashboardBtn.className = activeClass;
         renderDashboard();
+      } else if (section === 'unassigned') {
+        cronogramaSection.classList.remove('hidden');
+        if (navUnassignedBtn) navUnassignedBtn.className = unassignedActiveClass;
+        selectedDateFilter = null;
+        recordsViewMode = 'unassigned';
+        updateRecordsViewTabsUI();
+        renderCalendar();
+        renderRecords();
       } else {
         cronogramaSection.classList.remove('hidden');
         navCronogramaBtn.className = activeClass;
@@ -2802,8 +2965,20 @@
 
     navCronogramaBtn.addEventListener('click', (e) => {
       e.preventDefault();
+      recordsViewMode = 'month';
+      selectedDateFilter = null;
       switchSection('cronograma');
+      updateRecordsViewTabsUI();
+      renderCalendar();
+      renderRecords();
     });
+
+    if (navUnassignedBtn) {
+      navUnassignedBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchSection('unassigned');
+      });
+    }
 
     if (navDashboardBtn) {
       navDashboardBtn.addEventListener('click', (e) => {
