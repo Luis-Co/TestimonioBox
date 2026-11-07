@@ -259,7 +259,7 @@
   <div id="recordModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300 p-4">
     <div class="bg-surface-container-low w-full max-w-4xl max-h-[92vh] overflow-y-auto custom-scroll rounded-2xl shadow-2xl p-6 sm:p-8 border border-outline/15 transform scale-95 transition-transform duration-300" id="modalContent">
       <div class="flex justify-between items-center mb-6 pb-3 border-b border-outline/10">
-        <h2 class="text-2xl font-headline-sm text-primary flex items-center gap-2">
+        <h2 id="modalHeaderTitle" class="text-2xl font-headline-sm text-primary flex items-center gap-2">
           <span class="material-symbols-outlined text-[28px]">post_add</span> Nueva Asignación
         </h2>
         <button id="btnCloseModal" class="text-outline hover:text-on-surface p-1 rounded-lg hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined">close</span></button>
@@ -581,7 +581,7 @@
           <button type="button" id="btnCancelModal" class="px-5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors">Cancelar</button>
           <button type="submit" id="btnSubmitRecord" class="px-6 py-2.5 bg-primary hover:bg-primary-container text-[#432c00] font-semibold rounded-lg shadow-md transition-colors flex items-center gap-2">
             <span class="material-symbols-outlined text-[19px]">save</span>
-            <span>Guardar Ficha</span>
+            <span id="btnSubmitRecordLabel">Guardar Ficha</span>
           </button>
         </div>
       </form>
@@ -637,7 +637,7 @@
   <div id="revisitaModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
     <div class="bg-surface-container-low w-full max-w-2xl max-h-[92vh] overflow-y-auto custom-scroll rounded-2xl shadow-2xl p-6 sm:p-8 border border-outline/15 flex flex-col gap-5">
       <div class="flex justify-between items-center pb-3 border-b border-outline/10">
-        <h2 class="text-2xl font-headline-sm text-primary flex items-center gap-2">
+        <h2 id="revisitaModalTitle" class="text-2xl font-headline-sm text-primary flex items-center gap-2">
           <span class="material-symbols-outlined text-[28px]">person_pin_circle</span> Registrar Revisita
         </h2>
         <button id="btnCloseRevisitaModal" class="text-outline hover:text-on-surface p-1 rounded-lg hover:bg-surface-container-high"><span class="material-symbols-outlined">close</span></button>
@@ -702,7 +702,7 @@
           <button type="button" id="btnCancelRevisitaModal" class="px-5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors">Cancelar</button>
           <button type="submit" id="btnSubmitRevisita" class="px-6 py-2.5 bg-primary hover:bg-primary-container text-[#432c00] font-semibold rounded-lg shadow-md transition-colors flex items-center gap-2">
             <span class="material-symbols-outlined text-[19px]">save</span>
-            <span>Guardar Revisita</span>
+            <span id="btnSubmitRevisitaLabel">Guardar Revisita</span>
           </button>
         </div>
       </form>
@@ -867,6 +867,38 @@
           const created3 = await pb.collection('predicaciones').create(minimalPayload, { requestKey: null });
           return { record: created3, source: 'pocketbase' };
         }
+      }
+    }
+
+    // Actualización 100% en la base de datos PocketBase del VPS
+    async function updatePredicacionAdaptive(id, { title, rawDate, category, metaObj, notes, customCover }) {
+      const isoDate = new Date((rawDate || formatDateForInput(new Date())) + 'T12:00:00.000Z').toISOString();
+
+      const fullMeta = {
+        ...metaObj,
+        categoryLabel: category,
+        coverImage: customCover || null
+      };
+
+      const payload = {
+        title: title || 'Asignación Ministerial',
+        date: isoDate,
+        category: category,
+        scriptures: JSON.stringify(fullMeta),
+        notes: notes || '<p>Asignación preparada.</p>'
+      };
+
+      try {
+        const updated = await pb.collection('predicaciones').update(id, payload, { requestKey: null });
+        return { record: updated, source: 'pocketbase' };
+      } catch (err1) {
+        const adapted = {
+          ...payload,
+          category: LEGACY_CATEGORY_MAP[category] || 'Predicacion',
+          notes: notes && notes.trim() ? notes : 'Asignación registrada.'
+        };
+        const updated2 = await pb.collection('predicaciones').update(id, adapted, { requestKey: null });
+        return { record: updated2, source: 'pocketbase' };
       }
     }
 
@@ -1362,7 +1394,10 @@
 
             <!-- Barra minimalista de exportación y acciones -->
             <div class="flex items-center gap-1 self-end sm:self-start bg-surface-container px-2 py-1 rounded-lg border border-outline/10 no-export">
-              <button onclick="openModalWithParent('${record.id}')" class="text-outline hover:text-primary transition-colors p-1.5 rounded hover:bg-surface-container-high" title="Crear siguiente ficha numerada de esta serie/revista">
+              <button onclick="editRecord('${record.id}')" class="text-outline hover:text-primary transition-colors p-1.5 rounded hover:bg-surface-container-high" title="Editar Ficha">
+                <span class="material-symbols-outlined text-[18px]">edit</span>
+              </button>
+              <button onclick="openModalWithParent('${record.id}')" class="text-outline hover:text-secondary transition-colors p-1.5 rounded hover:bg-surface-container-high" title="Crear siguiente ficha numerada de esta serie/revista">
                 <span class="material-symbols-outlined text-[18px]">library_add</span>
               </button>
               <div class="w-px h-4 bg-outline/20 mx-0.5"></div>
@@ -1723,6 +1758,8 @@
     const standaloneSubcatRow = document.getElementById('standaloneSubcatRow');
 
     let activeSeriesParentInfo = null;
+    let editingRecordId = null;
+    let editingRevisitaId = null;
 
     function computeSeriesContinuation(selectedRecord) {
       const selectedMeta = parseRecordMetadata(selectedRecord);
@@ -1889,6 +1926,10 @@
     });
 
     window.openModal = (preselectParentId = '') => {
+      editingRecordId = null;
+      document.getElementById('modalHeaderTitle').innerHTML = `<span class="material-symbols-outlined text-[28px]">post_add</span> Nueva Asignación`;
+      document.getElementById('btnSubmitRecordLabel').textContent = 'Guardar Ficha';
+
       const dateInput = document.getElementById('fieldDate');
       if (selectedDateFilter) {
         dateInput.value = selectedDateFilter;
@@ -1901,6 +1942,81 @@
       fieldParentRecord.value = preselectParentId || '';
       applyParentSelectionUI();
       updateCoverPreview();
+
+      recordModal.classList.remove('hidden');
+      setTimeout(() => {
+        recordModal.classList.remove('opacity-0');
+        modalContent.classList.remove('scale-95');
+      }, 10);
+    };
+
+    window.editRecord = (id) => {
+      const record = globalRecords.find(r => r.id === id);
+      if (!record) return;
+      const meta = parseRecordMetadata(record);
+
+      // Si es una Revisita, abrir el modal de Revisitas en modo edición
+      if (meta.revisitaData) {
+        editingRevisitaId = id;
+        openRevisitaModal(true);
+        document.getElementById('revisitaModalTitle').innerHTML = `<span class="material-symbols-outlined text-[28px]">edit_note</span> Editar Revisita`;
+        document.getElementById('btnSubmitRevisitaLabel').textContent = 'Guardar Cambios';
+        document.getElementById('revPersonName').value = meta.revisitaData.personName || record.title.replace(/^Revisita:\s*/i, '');
+        const dObj = new Date(record.date);
+        document.getElementById('revDate').value = isNaN(dObj) ? formatDateForInput(new Date()) : formatDateForInput(dObj);
+        document.getElementById('revTime').value = meta.revisitaData.time || '10:00';
+        document.getElementById('revAddress').value = meta.revisitaData.address || '';
+        document.getElementById('revPhone').value = meta.revisitaData.phone || '';
+        revLinkedSelect.value = meta.revisitaData.linkedRecordId || '';
+        revLinkedSelect.dispatchEvent(new Event('change'));
+        document.getElementById('revWentOut').checked = Boolean(meta.wentOut);
+        document.getElementById('revHours').value = meta.hours || '';
+        document.getElementById('revNotes').value = record.notes || '';
+        return;
+      }
+
+      // Modo edición de Ficha normal o de serie
+      editingRecordId = id;
+      document.getElementById('modalHeaderTitle').innerHTML = `<span class="material-symbols-outlined text-[28px]">edit_note</span> Editar Asignación`;
+      document.getElementById('btnSubmitRecordLabel').textContent = 'Guardar Cambios';
+
+      parentSearchInput.value = '';
+      parentFilterDate.value = '';
+      populateParentRecordOptions(meta.parentRecordId || '');
+      fieldParentRecord.value = '';
+      applyParentSelectionUI();
+
+      // Si pertenecía a una serie, conservamos su vínculo pero mostramos todos los campos para que pueda editar título, portada o notas libremente
+      if (meta.parentRecordId) {
+        fieldParentRecord.value = meta.parentRecordId;
+        activeSeriesParentInfo = {
+          parentRecordId: meta.parentRecordId,
+          parentRecordTitle: meta.parentRecordTitle || '',
+          seriesNumber: meta.seriesNumber || null
+        };
+      }
+
+      document.getElementById('fieldTitle').value = record.title || '';
+      const dObj = new Date(record.date);
+      document.getElementById('fieldDate').value = isNaN(dObj) ? formatDateForInput(new Date()) : formatDateForInput(dObj);
+      document.getElementById('fieldCategory').value = meta.categoryLabel || record.category || 'Discurso Público';
+      document.getElementById('fieldSubcategory').value = meta.subcategory || 'La Atalaya';
+      document.getElementById('fieldPackageName').value = meta.packageName || '';
+      document.getElementById('fieldWentOut').checked = Boolean(meta.wentOut);
+      document.getElementById('fieldHours').value = meta.hours || '';
+
+      currentScriptures = Array.isArray(meta.items) ? meta.items.map(item => (typeof item === 'object' ? { ...item } : item)) : [];
+      updateScriptureTags();
+
+      const isCustomImg = meta.coverImage && (
+        meta.coverImage.startsWith('data:image/webp') ||
+        meta.coverImage.startsWith('data:image/jpeg') ||
+        meta.coverImage.startsWith('data:image/png')
+      );
+      customCoverDataUrl = isCustomImg ? meta.coverImage : null;
+      updateCoverPreview();
+
+      richEditor.innerHTML = record.notes || '';
 
       recordModal.classList.remove('hidden');
       setTimeout(() => {
@@ -1934,6 +2050,7 @@
         currentScriptures = [];
         customCoverDataUrl = null;
         activeSeriesParentInfo = null;
+        editingRecordId = null;
         fieldParentRecord.value = '';
         applyParentSelectionUI();
         updateScriptureTags();
@@ -2044,19 +2161,21 @@
       const cleanNotes = (editorHtml === '<br>') ? '' : editorHtml;
       document.getElementById('fieldNotes').value = cleanNotes;
 
-      const finalTitle = activeSeriesParentInfo
+      const isCreatingWithParent = !editingRecordId && activeSeriesParentInfo && activeSeriesParentInfo.numberedTitle;
+
+      const finalTitle = isCreatingWithParent
         ? activeSeriesParentInfo.numberedTitle
         : document.getElementById('fieldTitle').value.trim();
-      const category = activeSeriesParentInfo
+      const category = isCreatingWithParent
         ? activeSeriesParentInfo.category
         : document.getElementById('fieldCategory').value;
-      const subcategory = activeSeriesParentInfo
+      const subcategory = isCreatingWithParent
         ? activeSeriesParentInfo.subcategory
         : document.getElementById('fieldSubcategory').value;
-      const packageName = activeSeriesParentInfo
+      const packageName = isCreatingWithParent
         ? activeSeriesParentInfo.packageName
         : document.getElementById('fieldPackageName').value.trim();
-      const finalCover = activeSeriesParentInfo
+      const finalCover = isCreatingWithParent
         ? activeSeriesParentInfo.customCoverData
         : (customCoverDataUrl || null);
 
@@ -2080,16 +2199,28 @@
       submitBtn.disabled = true;
 
       try {
-        await createPredicacionAdaptive({
-          title: finalTitle,
-          rawDate: rawDate,
-          category: category,
-          metaObj: metaObj,
-          notes: cleanNotes,
-          customCover: finalCover
-        });
+        if (editingRecordId) {
+          await updatePredicacionAdaptive(editingRecordId, {
+            title: finalTitle,
+            rawDate: rawDate,
+            category: category,
+            metaObj: metaObj,
+            notes: cleanNotes,
+            customCover: finalCover
+          });
+          showToast('Ficha actualizada correctamente');
+        } else {
+          await createPredicacionAdaptive({
+            title: finalTitle,
+            rawDate: rawDate,
+            category: category,
+            metaObj: metaObj,
+            notes: cleanNotes,
+            customCover: finalCover
+          });
+          showToast(isCreatingWithParent ? `Ficha "${finalTitle}" guardada en la serie` : 'Ficha guardada correctamente');
+        }
 
-        showToast(activeSeriesParentInfo ? `Ficha "${finalTitle}" guardada en la serie` : 'Ficha guardada correctamente');
         closeModal();
         await loadDataAndRender();
       } catch (error) {
@@ -2143,12 +2274,18 @@
     const revLinkedSelect = document.getElementById('revLinkedRecord');
     const revLinkedPreview = document.getElementById('revLinkedPreview');
 
-    function openRevisitaModal() {
-      document.getElementById('revDate').value = selectedDateFilter || formatDateForInput(new Date());
+    function openRevisitaModal(isEditing = false) {
+      if (!isEditing) {
+        editingRevisitaId = null;
+        document.getElementById('revisitaModalTitle').innerHTML = `<span class="material-symbols-outlined text-[28px]">person_pin_circle</span> Registrar Revisita`;
+        document.getElementById('btnSubmitRevisitaLabel').textContent = 'Guardar Revisita';
+        document.getElementById('revDate').value = selectedDateFilter || formatDateForInput(new Date());
+      }
       // Poblar selector con las fichas existentes como referencia
       revLinkedSelect.innerHTML = `<option value="">-- Sin ficha de referencia vinculada --</option>`;
       globalRecords.forEach(r => {
         const meta = parseRecordMetadata(r);
+        if (meta.revisitaData) return;
         const dObj = new Date(r.date);
         const dStr = isNaN(dObj) ? '' : dObj.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
         const opt = document.createElement('option');
@@ -2163,6 +2300,7 @@
     function closeRevisitaModal() {
       revisitaModal.classList.add('hidden');
       revisitaForm.reset();
+      editingRevisitaId = null;
       revLinkedPreview.classList.add('hidden');
     }
 
@@ -2185,10 +2323,10 @@
       revLinkedPreview.classList.remove('hidden');
     });
 
-    document.getElementById('btnOpenRevisitaModal').addEventListener('click', openRevisitaModal);
+    document.getElementById('btnOpenRevisitaModal').addEventListener('click', () => openRevisitaModal(false));
     navRevisitasBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      openRevisitaModal();
+      openRevisitaModal(false);
     });
     document.getElementById('btnCloseRevisitaModal').addEventListener('click', closeRevisitaModal);
     document.getElementById('btnCancelRevisitaModal').addEventListener('click', closeRevisitaModal);
@@ -2229,15 +2367,27 @@
       btnSubmit.disabled = true;
 
       try {
-        await createPredicacionAdaptive({
-          title: `Revisita: ${personName}`,
-          rawDate: rawDate,
-          category: 'Revisita',
-          metaObj: metaObj,
-          notes: notesVal,
-          customCover: null
-        });
-        showToast('Revisita guardada correctamente');
+        if (editingRevisitaId) {
+          await updatePredicacionAdaptive(editingRevisitaId, {
+            title: `Revisita: ${personName}`,
+            rawDate: rawDate,
+            category: 'Revisita',
+            metaObj: metaObj,
+            notes: notesVal,
+            customCover: null
+          });
+          showToast('Revisita actualizada correctamente');
+        } else {
+          await createPredicacionAdaptive({
+            title: `Revisita: ${personName}`,
+            rawDate: rawDate,
+            category: 'Revisita',
+            metaObj: metaObj,
+            notes: notesVal,
+            customCover: null
+          });
+          showToast('Revisita guardada correctamente');
+        }
         closeRevisitaModal();
         await loadDataAndRender();
       } catch (err) {
