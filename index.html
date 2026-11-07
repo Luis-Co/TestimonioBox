@@ -449,15 +449,18 @@
           </div>
         </div>
 
-        <!-- Fecha siempre visible + Campos de ficha independiente (se ocultan solos al elegir Ficha Padre) -->
+        <!-- Fecha opcional de asignación al calendario + Campos de ficha independiente (se ocultan solos al elegir Ficha Padre) -->
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
           <div id="titleFieldCol" class="md:col-span-6">
             <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Tema / Título del Discurso o Ficha</label>
             <input type="text" id="fieldTitle" required placeholder="Ej. Cómo mantener el gozo en el ministerio" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3.5 py-2.5 text-on-surface focus:outline-none focus:border-primary">
           </div>
           <div id="dateFieldCol" class="md:col-span-3">
-            <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Fecha de esta ficha</label>
-            <input type="date" id="fieldDate" required class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2.5 text-on-surface focus:outline-none focus:border-primary [color-scheme:dark]">
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-label-sm text-outline uppercase" title="Si lo dejas vacío, se guarda con la fecha de creación pero no ocupa un día específico del calendario hasta que la asignes">Asignar a Día (Opcional)</label>
+              <button type="button" id="btnClearFieldDate" class="text-[10px] text-tertiary hover:text-primary">Sin fecha</button>
+            </div>
+            <input type="date" id="fieldDate" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2.5 text-on-surface focus:outline-none focus:border-primary [color-scheme:dark]">
           </div>
           <div id="categoryFieldCol" class="md:col-span-3">
             <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Categoría</label>
@@ -1088,6 +1091,7 @@
           categoryLabel: record.category || 'Asignación',
           subcategory: subcat,
           packageName: record.packageName || '',
+          calendarAssigned: true,
           wentOut: Boolean(record.wentOut),
           hours: parseFloat(record.hours) || 0,
           revisitaData: null,
@@ -1098,11 +1102,17 @@
         };
       } else if (parsed && typeof parsed === 'object') {
         const subcat = parsed.subcategory || record.subcategory || (record.category === 'Revisita' ? 'Revisita Pastoral' : 'La Atalaya');
+        const hasPackage = Boolean(parsed.packageName || record.packageName);
+        const isRevisita = Boolean(parsed.revisitaData || record.category === 'Revisita');
+        const calendarAssigned = typeof parsed.calendarAssigned === 'boolean'
+          ? parsed.calendarAssigned
+          : (hasPackage || isRevisita);
         return {
           items: Array.isArray(parsed.items) ? parsed.items : [],
           categoryLabel: parsed.categoryLabel || record.category || 'Asignación',
           subcategory: subcat,
           packageName: parsed.packageName || record.packageName || '',
+          calendarAssigned: calendarAssigned,
           previousDateBeforePack: parsed.previousDateBeforePack || null,
           wentOut: Boolean(parsed.wentOut),
           hours: parseFloat(parsed.hours) || 0,
@@ -1119,6 +1129,7 @@
         categoryLabel: record.category || 'Asignación',
         subcategory: 'La Atalaya',
         packageName: '',
+        calendarAssigned: false,
         wentOut: false,
         hours: 0,
         revisitaData: null,
@@ -1256,11 +1267,17 @@
       };
     }
 
-    // Verifica si hay fichas para el próximo fin de semana y actualiza la campanita y el panel lateral
+    // Verifica si hay fichas asignadas para el próximo fin de semana y actualiza la campanita y el panel lateral
     function checkWeekendNotifications() {
       const { saturday, sunday, satStr, sunStr } = getUpcomingWeekendDates();
-      const satRecords = globalRecords.filter(r => formatDateForInput(new Date(r.date)) === satStr);
-      const sunRecords = globalRecords.filter(r => formatDateForInput(new Date(r.date)) === sunStr);
+      const satRecords = globalRecords.filter(r => {
+        const meta = parseRecordMetadata(r);
+        return meta.calendarAssigned && formatDateForInput(new Date(r.date)) === satStr;
+      });
+      const sunRecords = globalRecords.filter(r => {
+        const meta = parseRecordMetadata(r);
+        return meta.calendarAssigned && formatDateForInput(new Date(r.date)) === sunStr;
+      });
       const totalWeekend = satRecords.length + sunRecords.length;
 
       const notifBadge = document.getElementById('notifBadge');
@@ -1369,9 +1386,11 @@
       const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
       calendarMonthYear.textContent = `${monthNames[currentMonth]} ${currentYear}`;
       
-      // Agrupa títulos de notas por fecha YYYY-MM-DD para el tooltip
+      // Agrupa títulos de notas asignadas por fecha YYYY-MM-DD para el calendario
       const recordsByDate = {};
       globalRecords.forEach(r => {
+        const meta = parseRecordMetadata(r);
+        if (!meta.calendarAssigned) return; // Solo marcar en calendario si fue asignada a una fecha
         const d = new Date(r.date);
         if (!isNaN(d)) {
           const key = formatDateForInput(d);
@@ -1480,10 +1499,13 @@
       
       let filteredRecords = globalRecords.filter(r => {
         const d = new Date(r.date);
-        if (d.getMonth() !== currentMonth || d.getFullYear() !== currentYear) return false;
+        const meta = parseRecordMetadata(r);
         if (selectedDateFilter) {
-          return formatDateForInput(d) === selectedDateFilter;
+          // Al filtrar por un día del calendario, mostrar únicamente las fichas asignadas a esa fecha
+          return meta.calendarAssigned && formatDateForInput(d) === selectedDateFilter;
         }
+        // En la vista general del mes, mostrar todas las fichas (asignadas o creadas en este mes)
+        if (d.getMonth() !== currentMonth || d.getFullYear() !== currentYear) return false;
         return true;
       });
 
@@ -1551,7 +1573,10 @@
               <img src="${meta.coverImage}" alt="${meta.subcategory}" class="w-16 h-22 sm:w-20 sm:h-28 object-cover rounded-lg border border-outline/20 shadow-md flex-shrink-0 bg-surface-container-high">
               <div class="flex flex-col gap-1 flex-1">
                 <div class="flex flex-wrap items-center gap-1.5 mb-1">
-                  <span class="font-label-sm text-[0.6875rem] bg-surface-container-highest text-primary px-2 py-0.5 rounded font-mono">${dateString}</span>
+                  ${meta.calendarAssigned
+                    ? `<span class="font-label-sm text-[0.6875rem] bg-surface-container-highest text-primary px-2 py-0.5 rounded font-mono flex items-center gap-1" title="Asignada a esta fecha en el calendario"><span class="material-symbols-outlined text-[12px]">event_available</span>${dateString}</span>`
+                    : `<span class="font-label-sm text-[0.6875rem] bg-surface-container text-outline px-2 py-0.5 rounded font-mono" title="Fecha de creación (sin día de calendario asignado)">CREADA: ${dateString}</span>`
+                  }
                   <span class="font-label-sm text-[0.6875rem] bg-surface-container text-tertiary px-2 py-0.5 rounded">${meta.categoryLabel || record.category}</span>
                   <span class="font-label-sm text-[0.6875rem] bg-primary/15 text-secondary border border-primary/25 px-2 py-0.5 rounded">${meta.subcategory}</span>
                   ${meta.seriesNumber ? `<span class="font-label-sm text-[0.6875rem] bg-secondary/20 text-primary border border-primary/35 px-2 py-0.5 rounded flex items-center gap-1" title="Ficha Padre: ${meta.parentRecordTitle}"><span class="material-symbols-outlined text-[13px]">library_books</span>Serie #${meta.seriesNumber}</span>` : ''}
@@ -1632,6 +1657,7 @@
         categoryLabel: meta.categoryLabel || record.category,
         subcategory: meta.subcategory,
         packageName: meta.packageName,
+        calendarAssigned: Boolean(meta.calendarAssigned),
         previousDateBeforePack: meta.previousDateBeforePack || null,
         wentOut: wentOutVal,
         hours: hoursVal,
@@ -2189,17 +2215,21 @@
       updateCoverPreview();
     });
 
+    const btnClearFieldDate = document.getElementById('btnClearFieldDate');
+    if (btnClearFieldDate) {
+      btnClearFieldDate.addEventListener('click', () => {
+        document.getElementById('fieldDate').value = '';
+      });
+    }
+
     window.openModal = (preselectParentId = '') => {
       editingRecordId = null;
       document.getElementById('modalHeaderTitle').innerHTML = `<span class="material-symbols-outlined text-[28px]">post_add</span> Nueva Asignación`;
       document.getElementById('btnSubmitRecordLabel').textContent = 'Guardar Ficha';
 
+      // Por defecto no se asigna a ningún día del calendario a menos que se elija o se asigne explícitamente
       const dateInput = document.getElementById('fieldDate');
-      if (selectedDateFilter) {
-        dateInput.value = selectedDateFilter;
-      } else {
-        dateInput.value = formatDateForInput(new Date());
-      }
+      dateInput.value = '';
       parentSearchInput.value = '';
       parentFilterDate.value = '';
       populateParentRecordOptions(preselectParentId);
@@ -2262,7 +2292,9 @@
 
       document.getElementById('fieldTitle').value = record.title || '';
       const dObj = new Date(record.date);
-      document.getElementById('fieldDate').value = isNaN(dObj) ? formatDateForInput(new Date()) : formatDateForInput(dObj);
+      document.getElementById('fieldDate').value = meta.calendarAssigned
+        ? (isNaN(dObj) ? '' : formatDateForInput(dObj))
+        : '';
       document.getElementById('fieldCategory').value = meta.categoryLabel || record.category || 'Discurso Público';
       document.getElementById('fieldSubcategory').value = meta.subcategory || 'La Atalaya';
       document.getElementById('fieldPackageName').value = meta.packageName || '';
@@ -2378,7 +2410,7 @@
         const meta = parseRecordMetadata(r);
         const rDateStr = formatDateForInput(new Date(r.date));
         const dFormatted = new Date(r.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
-        const isAlreadyInPack = (currentPackName && meta.packageName === currentPackName) || (rDateStr === selectedDateVal && Boolean(meta.packageName));
+        const isAlreadyInPack = (currentPackName && meta.packageName === currentPackName) || (meta.calendarAssigned && rDateStr === selectedDateVal);
 
         return `
           <div class="flex items-center justify-between gap-2 py-2 px-2.5 hover:bg-surface-container-high rounded-lg transition-colors">
@@ -2389,7 +2421,7 @@
                 <div class="flex flex-wrap items-center gap-1.5 text-[10px] text-outline">
                   <span class="text-tertiary">${meta.subcategory}</span>
                   <span>&bull;</span>
-                  <span class="font-mono">${dFormatted}</span>
+                  <span class="font-mono">${meta.calendarAssigned ? `Asignada: ${dFormatted}` : `Creada: ${dFormatted}`}</span>
                   ${meta.packageName ? `<span class="text-primary truncate max-w-[140px]">• ${meta.packageName}</span>` : ''}
                 </div>
               </div>
@@ -2418,8 +2450,8 @@
 
       const meta = parseRecordMetadata(record);
       const currentRecordDate = formatDateForInput(new Date(record.date));
-      // Guardamos la fecha original antes de asignarla al paquete, para poder restaurarla si la quita
-      const prevDate = meta.previousDateBeforePack || (currentRecordDate !== targetDate ? currentRecordDate : currentRecordDate);
+      // Guardamos la fecha original de creación antes de asignarla al paquete
+      const prevDate = meta.previousDateBeforePack || currentRecordDate;
 
       const isCustomImg = meta.coverImage && (
         meta.coverImage.startsWith('data:image/webp') ||
@@ -2431,6 +2463,7 @@
         items: meta.items,
         subcategory: meta.subcategory,
         packageName: packName,
+        calendarAssigned: true,
         previousDateBeforePack: prevDate,
         wentOut: meta.wentOut,
         hours: meta.hours,
@@ -2468,27 +2501,15 @@
         meta.coverImage.startsWith('data:image/png')
       );
 
-      const currentDateStr = formatDateForInput(new Date(record.date));
-      const modalDateStr = weekendSatDate.value;
-
-      // Si tenía una fecha previa distinta antes de meterse al paquete, vuelve a ella.
-      // Si no (o si estaba en el mismo domingo del paquete), se pasa al día base de preparación (hoy) para que salga del domingo.
-      let restoredDate = meta.previousDateBeforePack || currentDateStr;
-      if (restoredDate === modalDateStr) {
-        const todayStr = formatDateForInput(new Date());
-        if (todayStr !== modalDateStr) {
-          restoredDate = todayStr;
-        } else {
-          const dPrev = new Date(modalDateStr + 'T12:00:00');
-          dPrev.setDate(dPrev.getDate() - 1);
-          restoredDate = formatDateForInput(dPrev);
-        }
-      }
+      // Al quitarla del paquete/día, restauramos su fecha de creación original y marcamos calendarAssigned = false
+      const createdDateStr = record.created ? formatDateForInput(new Date(record.created)) : formatDateForInput(new Date());
+      const restoredDate = meta.previousDateBeforePack || createdDateStr;
 
       const metaObj = {
         items: meta.items,
         subcategory: meta.subcategory,
         packageName: '',
+        calendarAssigned: false,
         previousDateBeforePack: null,
         wentOut: meta.wentOut,
         hours: meta.hours,
@@ -2507,7 +2528,7 @@
           notes: record.notes || '',
           customCover: isCustomImg ? meta.coverImage : null
         });
-        showToast(`Ficha "${record.title}" quitada del paquete y de este día`);
+        showToast(`Ficha "${record.title}" quitada del paquete y del calendario`);
         await loadDataAndRender();
         refreshWeekendModalView();
       } catch (err) {
@@ -2532,7 +2553,7 @@
         const meta = parseRecordMetadata(r);
         if (meta.revisitaData) return false;
         const dStr = formatDateForInput(new Date(r.date));
-        return (currentPackName && meta.packageName === currentPackName) || dStr === satVal;
+        return (currentPackName && meta.packageName === currentPackName) || (meta.calendarAssigned && dStr === satVal);
       });
 
       if (packAssignedCount) {
@@ -2656,7 +2677,8 @@
         document.getElementById('btnAddScripture').click();
       }
 
-      const rawDate = document.getElementById('fieldDate').value;
+      const explicitDate = document.getElementById('fieldDate').value.trim();
+      const rawDate = explicitDate || formatDateForInput(new Date());
       const editorHtml = richEditor.innerHTML.trim();
       const cleanNotes = (editorHtml === '<br>') ? '' : editorHtml;
       document.getElementById('fieldNotes').value = cleanNotes;
@@ -2672,8 +2694,9 @@
       const subcategory = isCreatingWithParent
         ? activeSeriesParentInfo.subcategory
         : document.getElementById('fieldSubcategory').value;
+      // Al crear una nueva ficha de serie no hereda el paquete del padre automáticamente para que no se asigne sola al calendario
       const packageName = isCreatingWithParent
-        ? activeSeriesParentInfo.packageName
+        ? ''
         : document.getElementById('fieldPackageName').value.trim();
       const finalCover = isCreatingWithParent
         ? activeSeriesParentInfo.customCoverData
@@ -2681,11 +2704,13 @@
 
       const hoursVal = parseFloat(document.getElementById('fieldHours').value) || 0;
       const wentOutVal = document.getElementById('fieldWentOut').checked || hoursVal > 0;
+      const isCalendarAssigned = Boolean(explicitDate || packageName);
 
       const metaObj = {
         items: currentScriptures,
         subcategory: subcategory,
         packageName: packageName,
+        calendarAssigned: isCalendarAssigned,
         wentOut: wentOutVal,
         hours: hoursVal,
         revisitaData: null,
@@ -3282,6 +3307,7 @@
         items: inheritedScriptures,
         subcategory: linkedMeta ? linkedMeta.subcategory : 'Revisita Pastoral',
         packageName: '',
+        calendarAssigned: true,
         wentOut: wentOutVal,
         hours: hoursVal,
         revisitaData: {
