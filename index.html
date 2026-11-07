@@ -82,8 +82,10 @@
         <div class="px-4 py-2 mt-4">
           <div class="font-label-sm text-[0.6875rem] text-outline px-2 mb-1 uppercase tracking-wider">Navegación Pastoral</div>
           <nav class="flex flex-col gap-1">
-            <a class="flex items-center gap-2 px-2 py-2 rounded-lg bg-surface-container-high text-primary font-medium" href="#"><span class="material-symbols-outlined text-[20px]">event_available</span><span>Cronograma & Predicaciones</span></a>
+            <a id="navCronogramaBtn" class="flex items-center gap-2 px-2 py-2 rounded-lg bg-surface-container-high text-primary font-medium cursor-pointer transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">event_available</span><span>Cronograma & Predicaciones</span></a>
+            <a id="navRevisitasBtn" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[20px]">contacts_product</span><span>Revisitas</span></a>
             <a id="navPackBtn" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[20px]">inventory_2</span><span>Paquetes de Fin de Semana</span></a>
+            <a id="navInformesBtn" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[20px]">assessment</span><span>Informes</span></a>
           </nav>
         </div>
       </div>
@@ -126,13 +128,18 @@
       </header>
 
       <main class="relative w-full pt-24 bg-background px-6 min-h-screen">
-        <div class="flex flex-col w-full pb-16">
+        <!-- VISTA CRONOGRAMA & PREDICACIONES -->
+        <div id="cronogramaSection" class="flex flex-col w-full pb-16">
           <section class="w-full mb-6 flex flex-wrap justify-between items-end gap-4">
             <div class="flex flex-col">
               <h1 class="font-headline-lg text-[2.5rem] text-on-surface tracking-tight leading-none mb-2">Cronograma & Predicaciones</h1>
-              <p class="text-on-surface-variant">Selecciona un día en el calendario o organiza tus paquetes de fichas para el fin de semana.</p>
+              <p class="text-on-surface-variant">Selecciona un día en el calendario, registra tus horas de predicación o tus revisitas.</p>
             </div>
             <div class="flex flex-wrap items-center gap-2.5">
+              <button id="btnOpenRevisitaModal" class="flex items-center gap-2 bg-surface-container-high hover:bg-surface-container-highest text-tertiary border border-tertiary/30 font-medium px-4 py-2.5 rounded-lg transition-all shadow-sm">
+                <span class="material-symbols-outlined text-[20px]">person_pin_circle</span>
+                <span>Nueva Revisita</span>
+              </button>
               <button id="btnOpenWeekendModal" class="flex items-center gap-2 bg-surface-container-high hover:bg-surface-container-highest text-secondary border border-secondary/30 font-medium px-4 py-2.5 rounded-lg transition-all shadow-sm">
                 <span class="material-symbols-outlined text-[20px]">inventory_2</span>
                 <span>Paquete Fin de Semana</span>
@@ -183,6 +190,65 @@
               </div>
             </div>
             
+          </div>
+        </div>
+
+        <!-- VISTA INFORMES MENSUALES -->
+        <div id="informesSection" class="hidden flex-col w-full pb-16">
+          <section class="w-full mb-6 flex flex-wrap justify-between items-end gap-4">
+            <div class="flex flex-col">
+              <h1 class="font-headline-lg text-[2.5rem] text-on-surface tracking-tight leading-none mb-2">Informes Mensuales del Ministerio</h1>
+              <p class="text-on-surface-variant">Resumen de horas predicadas, salidas al ministerio y revisitas realizadas en el mes.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+              <div class="flex items-center gap-1 bg-surface-container-low px-3 py-1.5 rounded-xl border border-outline/15">
+                <button id="btnReportPrevMonth" class="p-1 rounded hover:bg-surface-container-high text-on-surface-variant"><span class="material-symbols-outlined text-[20px]">chevron_left</span></button>
+                <span id="reportMonthLabel" class="font-headline-sm text-base text-primary min-w-[140px] text-center capitalize">Mes Año</span>
+                <button id="btnReportNextMonth" class="p-1 rounded hover:bg-surface-container-high text-on-surface-variant"><span class="material-symbols-outlined text-[20px]">chevron_right</span></button>
+              </div>
+              <button id="btnSendReportWA" class="flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe57] text-[#072611] font-semibold px-5 py-2.5 rounded-lg transition-all shadow-md">
+                <span class="material-symbols-outlined text-[20px]">chat</span>
+                <span>Enviar Informe por WhatsApp</span>
+              </button>
+            </div>
+          </section>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="bg-surface-container-low p-5 rounded-xl border border-primary/25 shadow-sm flex flex-col gap-1">
+              <span class="text-xs font-label-sm uppercase text-outline">Total Horas del Mes</span>
+              <div class="flex items-baseline gap-2 mt-1">
+                <span id="statTotalHours" class="font-headline-lg text-4xl text-primary font-bold">0</span>
+                <span class="text-xs text-tertiary">horas registradas</span>
+              </div>
+            </div>
+            <div class="bg-surface-container-low p-5 rounded-xl border border-outline/15 shadow-sm flex flex-col gap-1">
+              <span class="text-xs font-label-sm uppercase text-outline">Días que Salí a Predicar</span>
+              <div class="flex items-baseline gap-2 mt-1">
+                <span id="statDaysOut" class="font-headline-lg text-4xl text-secondary font-bold">0</span>
+                <span class="text-xs text-tertiary">salidas en el mes</span>
+              </div>
+            </div>
+            <div class="bg-surface-container-low p-5 rounded-xl border border-outline/15 shadow-sm flex flex-col gap-1">
+              <span class="text-xs font-label-sm uppercase text-outline">Revisitas en el Mes</span>
+              <div class="flex items-baseline gap-2 mt-1">
+                <span id="statRevisitasCount" class="font-headline-lg text-4xl text-tertiary font-bold">0</span>
+                <span class="text-xs text-tertiary">visitas atendidas</span>
+              </div>
+            </div>
+            <div class="bg-surface-container-low p-5 rounded-xl border border-outline/15 shadow-sm flex flex-col gap-1">
+              <span class="text-xs font-label-sm uppercase text-outline">Fichas / Asignaciones</span>
+              <div class="flex items-baseline gap-2 mt-1">
+                <span id="statTotalFichas" class="font-headline-lg text-4xl text-on-surface font-bold">0</span>
+                <span class="text-xs text-tertiary">preparadas en el mes</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-surface-container-low rounded-xl border border-outline/10 p-6 shadow-sm">
+            <h3 class="font-headline-sm text-lg text-primary mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-[20px]">history</span> Desglose de Actividad del Mes
+            </h3>
+            <div id="reportDetailsList" class="flex flex-col gap-3"></div>
           </div>
         </div>
       </main>
@@ -257,6 +323,24 @@
               <input type="file" id="fieldCoverUpload" accept="image/*" class="hidden">
               <span id="coverStatusLabel" class="text-[11px] text-tertiary">Portada predefinida automática</span>
             </div>
+          </div>
+        </div>
+
+        <!-- Registro de Salida al Ministerio y Horas -->
+        <div class="bg-surface-container/40 p-4 rounded-xl border border-outline/10 flex flex-wrap items-center justify-between gap-4">
+          <label class="flex items-center gap-3 cursor-pointer select-none">
+            <input type="checkbox" id="fieldWentOut" class="w-5 h-5 rounded accent-[#fbc262] cursor-pointer">
+            <div class="flex flex-col">
+              <span class="text-sm font-medium text-on-surface flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-primary text-[18px]">directions_walk</span>
+                Marcar que salí al ministerio con esta asignación
+              </span>
+              <span class="text-xs text-outline">Se sumará automáticamente en la sección de Informes de fin de mes</span>
+            </div>
+          </label>
+          <div class="flex items-center gap-2">
+            <label for="fieldHours" class="text-xs font-label-sm text-outline uppercase">Horas realizadas:</label>
+            <input type="number" id="fieldHours" step="0.5" min="0" max="24" placeholder="0.0" class="w-24 bg-surface-container-high border border-outline/25 rounded-lg px-3 py-2 text-center text-on-surface font-mono font-semibold focus:outline-none focus:border-primary">
           </div>
         </div>
 
@@ -498,6 +582,82 @@
     </div>
   </div>
 
+  <!-- MODAL DE REVISITAS -->
+  <div id="revisitaModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+    <div class="bg-surface-container-low w-full max-w-2xl max-h-[92vh] overflow-y-auto custom-scroll rounded-2xl shadow-2xl p-6 sm:p-8 border border-outline/15 flex flex-col gap-5">
+      <div class="flex justify-between items-center pb-3 border-b border-outline/10">
+        <h2 class="text-2xl font-headline-sm text-primary flex items-center gap-2">
+          <span class="material-symbols-outlined text-[28px]">person_pin_circle</span> Registrar Revisita
+        </h2>
+        <button id="btnCloseRevisitaModal" class="text-outline hover:text-on-surface p-1 rounded-lg hover:bg-surface-container-high"><span class="material-symbols-outlined">close</span></button>
+      </div>
+
+      <form id="revisitaForm" class="flex flex-col gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+          <div class="sm:col-span-6">
+            <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Nombre de la Persona / Amo de Casa</label>
+            <input type="text" id="revPersonName" required placeholder="Ej. Sr. Carlos Gómez" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3.5 py-2.5 text-on-surface focus:outline-none focus:border-primary">
+          </div>
+          <div class="sm:col-span-3">
+            <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Fecha de Revisita</label>
+            <input type="date" id="revDate" required class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2.5 text-on-surface focus:outline-none focus:border-primary [color-scheme:dark]">
+          </div>
+          <div class="sm:col-span-3">
+            <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Hora</label>
+            <input type="time" id="revTime" required value="10:00" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2.5 text-on-surface focus:outline-none focus:border-primary [color-scheme:dark]">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+          <div class="sm:col-span-8">
+            <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Lugar / Dirección Exacta o Señas</label>
+            <input type="text" id="revAddress" required placeholder="Ej. 200m sur de la plaza, casa portón blanco #42" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3.5 py-2.5 text-on-surface focus:outline-none focus:border-primary">
+          </div>
+          <div class="sm:col-span-4">
+            <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Teléfono / Contacto (Opc.)</label>
+            <input type="text" id="revPhone" placeholder="Ej. +506 8888-8888" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3.5 py-2.5 text-on-surface focus:outline-none focus:border-primary">
+          </div>
+        </div>
+
+        <div class="bg-surface-container/60 p-4 rounded-xl border border-outline/15 flex flex-col gap-2">
+          <label class="block text-xs font-label-sm text-secondary uppercase flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px]">link</span>
+            Ficha / Asignación de Referencia (Tema del que se le habló)
+          </label>
+          <select id="revLinkedRecord" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2.5 text-on-surface focus:outline-none focus:border-primary">
+            <option value="">-- Sin ficha de referencia vinculada --</option>
+          </select>
+          <div id="revLinkedPreview" class="hidden text-xs text-on-surface-variant bg-surface-container-low p-3 rounded-lg border border-outline/10 mt-1"></div>
+        </div>
+
+        <!-- Salida y Horas en la Revisita -->
+        <div class="bg-surface-container/40 p-3.5 rounded-xl border border-outline/10 flex flex-wrap items-center justify-between gap-4">
+          <label class="flex items-center gap-2.5 cursor-pointer select-none">
+            <input type="checkbox" id="revWentOut" checked class="w-4 h-4 rounded accent-[#fbc262] cursor-pointer">
+            <span class="text-xs sm:text-sm font-medium text-on-surface">Marcar salida realizada y sumar horas al informe mensual</span>
+          </label>
+          <div class="flex items-center gap-2">
+            <label for="revHours" class="text-xs font-label-sm text-outline uppercase">Horas:</label>
+            <input type="number" id="revHours" step="0.5" min="0" max="24" placeholder="1.0" class="w-20 bg-surface-container-high border border-outline/25 rounded-lg px-2.5 py-1.5 text-center text-on-surface font-mono font-semibold focus:outline-none focus:border-primary">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Observaciones / Pregunta pendiente para la siguiente visita</label>
+          <textarea id="revNotes" rows="3" placeholder="Ej. Quedamos en leer Apocalipsis 21:4 y conversar sobre la promesa del Reino..." class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3.5 py-2.5 text-sm text-on-surface focus:outline-none focus:border-primary resize-y"></textarea>
+        </div>
+
+        <div class="pt-3 border-t border-outline/10 flex justify-end gap-3">
+          <button type="button" id="btnCancelRevisitaModal" class="px-5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors">Cancelar</button>
+          <button type="submit" id="btnSubmitRevisita" class="px-6 py-2.5 bg-primary hover:bg-primary-container text-[#432c00] font-semibold rounded-lg shadow-md transition-colors flex items-center gap-2">
+            <span class="material-symbols-outlined text-[19px]">save</span>
+            <span>Guardar Revisita</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/pocketbase@0.21.1/dist/pocketbase.umd.js"></script>
@@ -535,7 +695,8 @@
       '¡Despertad!': makePresetCoverSvg('¡DESPERTAD!', 'REVISTA DE ESTUDIO', '#2d1f14', '#17110b', '#ecc076', '🌅'),
       'Investigación con IA': makePresetCoverSvg('ESTUDIO + IA', 'INVESTIGACIÓN ASISTIDA', '#16242b', '#0d151a', '#7dd3fc', '✨'),
       'Guía de Actividades': makePresetCoverSvg('VIDA Y MINISTERIO', 'GUÍA DE ACTIVIDADES', '#231c2e', '#120e17', '#d8b4fe', '📘'),
-      'Estudio Personal / Biblia': makePresetCoverSvg('SANTA BIBLIA', 'ESTUDIO PERSONAL', '#1c261e', '#0e1410', '#86efac', '📖')
+      'Estudio Personal / Biblia': makePresetCoverSvg('SANTA BIBLIA', 'ESTUDIO PERSONAL', '#1c261e', '#0e1410', '#86efac', '📖'),
+      'Revisita Pastoral': makePresetCoverSvg('REVISITA', 'SEGUIMIENTO PASTORAL', '#17252a', '#0c1518', '#67e8f9', '🏠')
     };
 
     const loginView = document.getElementById('loginView');
@@ -557,6 +718,8 @@
     const dateNow = new Date();
     let currentMonth = dateNow.getMonth();
     let currentYear = dateNow.getFullYear();
+    let reportMonth = dateNow.getMonth();
+    let reportYear = dateNow.getFullYear();
     let selectedDateFilter = null; 
 
     const calendarGrid = document.getElementById('calendarGrid');
@@ -583,7 +746,7 @@
       return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     }
 
-    // Decodifica la información de subcategoría, portada, paquete y escrituras guardada en `scriptures` (compatible con registros antiguos y nuevos)
+    // Decodifica la información de subcategoría, portada, paquete, horas, salida y revisita guardada en `scriptures`
     function parseRecordMetadata(record) {
       let parsed = null;
       try {
@@ -598,14 +761,20 @@
           items: parsed,
           subcategory: subcat,
           packageName: record.packageName || '',
+          wentOut: Boolean(record.wentOut),
+          hours: parseFloat(record.hours) || 0,
+          revisitaData: null,
           coverImage: record.coverImage || PRESET_COVERS[subcat] || PRESET_COVERS['Estudio Personal / Biblia']
         };
       } else if (parsed && typeof parsed === 'object') {
-        const subcat = parsed.subcategory || record.subcategory || 'La Atalaya';
+        const subcat = parsed.subcategory || record.subcategory || (record.category === 'Revisita' ? 'Revisita Pastoral' : 'La Atalaya');
         return {
           items: Array.isArray(parsed.items) ? parsed.items : [],
           subcategory: subcat,
           packageName: parsed.packageName || record.packageName || '',
+          wentOut: Boolean(parsed.wentOut),
+          hours: parseFloat(parsed.hours) || 0,
+          revisitaData: parsed.revisitaData || null,
           coverImage: parsed.coverImage || PRESET_COVERS[subcat] || PRESET_COVERS['La Atalaya']
         };
       }
@@ -614,6 +783,9 @@
         items: [],
         subcategory: 'La Atalaya',
         packageName: '',
+        wentOut: false,
+        hours: 0,
+        revisitaData: null,
         coverImage: PRESET_COVERS['La Atalaya']
       };
     }
@@ -939,6 +1111,7 @@
         renderCalendar();
         renderRecords();
         checkWeekendNotifications();
+        renderInformes();
       } catch (error) {
         console.error(error);
         recordsContainer.innerHTML = `<div class="text-error p-4 bg-error-container/20 rounded-lg">Error al cargar datos. Verifica la conexión a PocketBase.</div>`;
@@ -992,6 +1165,26 @@
 
         const isHtmlNotes = record.notes && /<[a-z][\s\S]*>/i.test(record.notes);
 
+        // Bloque especial si es una Revisita con detalles de lugar/hora/ficha vinculada
+        const revInfo = meta.revisitaData;
+        const revisitaDetailsHtml = revInfo ? `
+          <div class="mt-3 p-3.5 bg-surface-container rounded-xl border border-tertiary/20 flex flex-col gap-2 text-xs">
+            <div class="flex flex-wrap items-center gap-4 text-on-surface">
+              ${revInfo.personName ? `<span class="flex items-center gap-1 font-medium text-tertiary"><span class="material-symbols-outlined text-[16px]">person</span> ${revInfo.personName}</span>` : ''}
+              ${revInfo.time ? `<span class="flex items-center gap-1 text-on-surface-variant font-mono"><span class="material-symbols-outlined text-[16px] text-primary">schedule</span> ${revInfo.time}</span>` : ''}
+              ${revInfo.phone ? `<span class="flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[16px]">call</span> ${revInfo.phone}</span>` : ''}
+            </div>
+            ${revInfo.address ? `<div class="flex items-start gap-1.5 text-on-surface-variant"><span class="material-symbols-outlined text-[16px] text-secondary mt-0.5">location_on</span><span><strong>Dirección / Lugar:</strong> ${revInfo.address}</span></div>` : ''}
+            ${revInfo.linkedRecordTitle ? `
+              <div class="flex items-center justify-between bg-surface-container-low px-3 py-2 rounded-lg border border-outline/10 mt-1">
+                <span class="flex items-center gap-1.5 text-secondary font-medium">
+                  <span class="material-symbols-outlined text-[16px]">menu_book</span>
+                  <span>Tema conversado (Ficha ref.): <strong>${revInfo.linkedRecordTitle}</strong></span>
+                </span>
+              </div>` : ''}
+          </div>
+        ` : '';
+
         const card = document.createElement('div');
         card.id = `ficha-card-${record.id}`;
         card.className = "bg-surface-container-low rounded-xl p-6 shadow-sm border border-outline/10 transition-all hover:border-outline/25";
@@ -1005,6 +1198,7 @@
                   <span class="font-label-sm text-[0.6875rem] bg-surface-container text-tertiary px-2 py-0.5 rounded">${record.category}</span>
                   <span class="font-label-sm text-[0.6875rem] bg-primary/15 text-secondary border border-primary/25 px-2 py-0.5 rounded">${meta.subcategory}</span>
                   ${meta.packageName ? `<span class="font-label-sm text-[0.6875rem] bg-surface-container-high text-on-surface-variant px-2 py-0.5 rounded flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">inventory_2</span>${meta.packageName}</span>` : ''}
+                  ${meta.wentOut ? `<span class="font-label-sm text-[0.6875rem] bg-[#1b3a24] text-[#86efac] border border-[#86efac]/30 px-2 py-0.5 rounded flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">check_circle</span>Salí (${meta.hours} h)</span>` : ''}
                 </div>
                 <h3 class="font-headline-md text-2xl text-on-surface mt-0.5">${record.title}</h3>
               </div>
@@ -1028,16 +1222,65 @@
             </div>
           </div>
           
+          ${revisitaDetailsHtml}
           ${scripturesBlockHtml}
 
           ${record.notes ? `
           <div class="mt-4 bg-surface-container-high/40 px-5 py-4 rounded-lg border border-outline/5">
             <div class="font-body-md text-on-surface-variant leading-relaxed ${isHtmlNotes ? 'rich-content' : 'whitespace-pre-line'}">${record.notes}</div>
           </div>` : ''}
+
+          <!-- Barra rápida en la nota para marcar si salí y cuántas horas hice -->
+          <div class="mt-4 pt-3 border-t border-outline/10 flex flex-wrap items-center justify-between gap-3 no-export">
+            <label class="flex items-center gap-2 cursor-pointer text-xs text-on-surface-variant hover:text-on-surface select-none">
+              <input type="checkbox" id="chk-out-${record.id}" ${meta.wentOut ? 'checked' : ''} onchange="updateRecordHours('${record.id}')" class="w-4 h-4 rounded accent-[#fbc262] cursor-pointer">
+              <span class="font-medium">Marcar que salí a predicar con esta nota</span>
+            </label>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-label-sm text-outline uppercase">Horas:</span>
+              <input type="number" id="inp-hours-${record.id}" value="${meta.hours || ''}" step="0.5" min="0" max="24" placeholder="0" class="w-16 bg-surface-container-high border border-outline/20 rounded-lg px-2 py-1 text-center text-xs font-mono text-primary font-bold focus:outline-none focus:border-primary">
+              <button type="button" onclick="updateRecordHours('${record.id}')" class="text-xs bg-surface-container-highest hover:bg-primary hover:text-[#432c00] text-secondary font-medium px-2.5 py-1 rounded-lg border border-outline/20 transition-colors">
+                Guardar horas
+              </button>
+            </div>
+          </div>
         `;
         recordsContainer.appendChild(card);
       });
     }
+
+    // Actualiza rápidamente desde la tarjeta si salió y cuántas horas hizo
+    window.updateRecordHours = async (id) => {
+      const record = globalRecords.find(r => r.id === id);
+      if (!record) return;
+      const chk = document.getElementById(`chk-out-${id}`);
+      const inp = document.getElementById(`inp-hours-${id}`);
+      const hoursVal = parseFloat(inp.value) || 0;
+      const wentOutVal = chk.checked || hoursVal > 0;
+      if (hoursVal > 0 && !chk.checked) chk.checked = true;
+
+      const meta = parseRecordMetadata(record);
+      const updatedPayload = JSON.stringify({
+        items: meta.items,
+        subcategory: meta.subcategory,
+        packageName: meta.packageName,
+        wentOut: wentOutVal,
+        hours: hoursVal,
+        revisitaData: meta.revisitaData,
+        coverImage: (record.scriptures && record.scriptures.includes('data:image/jpeg')) ? meta.coverImage : null
+      });
+
+      try {
+        await pb.collection('predicaciones').update(id, { scriptures: updatedPayload }, { requestKey: null });
+        record.scriptures = updatedPayload;
+        showToast(wentOutVal ? `Registrado: Salida con ${hoursVal} h para el informe` : 'Registro de salida actualizado');
+        renderRecords();
+        renderInformes();
+      } catch (err) {
+        console.error(err);
+        showToast('Error al actualizar las horas en la ficha', 'error');
+      }
+    };
 
     // Exportar ficha a Imagen PNG
     window.exportRecordImage = async (id) => {
@@ -1445,12 +1688,17 @@
 
       const subcategory = document.getElementById('fieldSubcategory').value;
       const packageName = document.getElementById('fieldPackageName').value.trim();
+      const hoursVal = parseFloat(document.getElementById('fieldHours').value) || 0;
+      const wentOutVal = document.getElementById('fieldWentOut').checked || hoursVal > 0;
 
       // Empaquetamos metadatos junto con las lecturas para total compatibilidad con el esquema actual de PocketBase
       const scripturesPayload = JSON.stringify({
         items: currentScriptures,
         subcategory: subcategory,
         packageName: packageName,
+        wentOut: wentOutVal,
+        hours: hoursVal,
+        revisitaData: null,
         coverImage: customCoverDataUrl || null
       });
 
@@ -1482,6 +1730,9 @@
             items: currentScriptures,
             subcategory: subcategory,
             packageName: packageName,
+            wentOut: wentOutVal,
+            hours: hoursVal,
+            revisitaData: null,
             coverImage: null
           });
           await pb.collection('predicaciones').create(
@@ -1503,6 +1754,281 @@
         isSubmittingRecord = false;
         submitBtn.disabled = false;
       }
+    });
+
+    // ================= NAVEGACIÓN SIDEBAR (CRONOGRAMA / INFORMES / REVISITAS) =================
+    const cronogramaSection = document.getElementById('cronogramaSection');
+    const informesSection = document.getElementById('informesSection');
+    const navCronogramaBtn = document.getElementById('navCronogramaBtn');
+    const navInformesBtn = document.getElementById('navInformesBtn');
+    const navRevisitasBtn = document.getElementById('navRevisitasBtn');
+
+    function switchSection(section) {
+      if (section === 'informes') {
+        cronogramaSection.classList.add('hidden');
+        informesSection.classList.remove('hidden');
+        informesSection.classList.add('flex');
+        navInformesBtn.className = 'flex items-center gap-2 px-2 py-2 rounded-lg bg-surface-container-high text-primary font-medium cursor-pointer transition-colors';
+        navCronogramaBtn.className = 'flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer';
+        renderInformes();
+      } else {
+        informesSection.classList.add('hidden');
+        informesSection.classList.remove('flex');
+        cronogramaSection.classList.remove('hidden');
+        navCronogramaBtn.className = 'flex items-center gap-2 px-2 py-2 rounded-lg bg-surface-container-high text-primary font-medium cursor-pointer transition-colors';
+        navInformesBtn.className = 'flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer';
+      }
+    }
+
+    navCronogramaBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchSection('cronograma');
+    });
+
+    navInformesBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      reportMonth = currentMonth;
+      reportYear = currentYear;
+      switchSection('informes');
+    });
+
+    // ================= MODAL DE REVISITAS =================
+    const revisitaModal = document.getElementById('revisitaModal');
+    const revisitaForm = document.getElementById('revisitaForm');
+    const revLinkedSelect = document.getElementById('revLinkedRecord');
+    const revLinkedPreview = document.getElementById('revLinkedPreview');
+
+    function openRevisitaModal() {
+      document.getElementById('revDate').value = selectedDateFilter || formatDateForInput(new Date());
+      // Poblar selector con las fichas existentes como referencia
+      revLinkedSelect.innerHTML = `<option value="">-- Sin ficha de referencia vinculada --</option>`;
+      globalRecords.forEach(r => {
+        const meta = parseRecordMetadata(r);
+        const dObj = new Date(r.date);
+        const dStr = isNaN(dObj) ? '' : dObj.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+        const opt = document.createElement('option');
+        opt.value = r.id;
+        opt.textContent = `${r.title} (${meta.subcategory} - ${dStr})`;
+        revLinkedSelect.appendChild(opt);
+      });
+      revLinkedPreview.classList.add('hidden');
+      revisitaModal.classList.remove('hidden');
+    }
+
+    function closeRevisitaModal() {
+      revisitaModal.classList.add('hidden');
+      revisitaForm.reset();
+      revLinkedPreview.classList.add('hidden');
+    }
+
+    revLinkedSelect.addEventListener('change', () => {
+      const recId = revLinkedSelect.value;
+      const rec = globalRecords.find(r => r.id === recId);
+      if (!rec) {
+        revLinkedPreview.classList.add('hidden');
+        return;
+      }
+      const meta = parseRecordMetadata(rec);
+      const refs = meta.items.map(s => typeof s === 'object' ? s.ref : s).join(', ');
+      revLinkedPreview.innerHTML = `
+        <div class="flex items-center justify-between text-secondary font-medium mb-1">
+          <span>Ficha seleccionada: ${rec.title}</span>
+          <span class="text-[11px] text-tertiary">${meta.subcategory}</span>
+        </div>
+        ${refs ? `<p class="text-[11px] text-outline">Lecturas de esa ficha: ${refs}</p>` : ''}
+      `;
+      revLinkedPreview.classList.remove('hidden');
+    });
+
+    document.getElementById('btnOpenRevisitaModal').addEventListener('click', openRevisitaModal);
+    navRevisitasBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openRevisitaModal();
+    });
+    document.getElementById('btnCloseRevisitaModal').addEventListener('click', closeRevisitaModal);
+    document.getElementById('btnCancelRevisitaModal').addEventListener('click', closeRevisitaModal);
+
+    revisitaForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const personName = document.getElementById('revPersonName').value.trim();
+      const rawDate = document.getElementById('revDate').value;
+      const timeVal = document.getElementById('revTime').value;
+      const addressVal = document.getElementById('revAddress').value.trim();
+      const phoneVal = document.getElementById('revPhone').value.trim();
+      const linkedId = revLinkedSelect.value;
+      const linkedRec = globalRecords.find(r => r.id === linkedId);
+      const hoursVal = parseFloat(document.getElementById('revHours').value) || 0;
+      const wentOutVal = document.getElementById('revWentOut').checked || hoursVal > 0;
+      const notesVal = document.getElementById('revNotes').value.trim();
+
+      const linkedMeta = linkedRec ? parseRecordMetadata(linkedRec) : null;
+      const inheritedScriptures = linkedMeta ? linkedMeta.items : [];
+
+      const revisitaPayload = JSON.stringify({
+        items: inheritedScriptures,
+        subcategory: linkedMeta ? linkedMeta.subcategory : 'Revisita Pastoral',
+        packageName: '',
+        wentOut: wentOutVal,
+        hours: hoursVal,
+        revisitaData: {
+          personName: personName,
+          address: addressVal,
+          time: timeVal,
+          phone: phoneVal,
+          linkedRecordId: linkedId || null,
+          linkedRecordTitle: linkedRec ? linkedRec.title : ''
+        },
+        coverImage: null
+      });
+
+      const isoDate = new Date(rawDate + 'T12:00:00Z').toISOString();
+      const baseData = {
+        title: `Revisita: ${personName}`,
+        date: isoDate,
+        category: 'Revisita',
+        scriptures: revisitaPayload,
+        notes: notesVal
+      };
+
+      const userId = pb.authStore.model?.id;
+      const btnSubmit = document.getElementById('btnSubmitRevisita');
+      btnSubmit.disabled = true;
+
+      try {
+        try {
+          await pb.collection('predicaciones').create(
+            userId ? { ...baseData, user: userId } : baseData,
+            { requestKey: null }
+          );
+        } catch (err1) {
+          await pb.collection('predicaciones').create(baseData, { requestKey: null });
+        }
+        showToast('Revisita guardada correctamente');
+        closeRevisitaModal();
+        await loadDataAndRender();
+      } catch (err) {
+        console.error(err);
+        showToast('Error al guardar la revisita', 'error');
+      } finally {
+        btnSubmit.disabled = false;
+      }
+    });
+
+    // ================= INFORMES MENSUALES Y WHATSAPP =================
+    function getMonthlyReportStats(monthIdx, yearNum) {
+      const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      const monthRecords = globalRecords.filter(r => {
+        const d = new Date(r.date);
+        return !isNaN(d) && d.getMonth() === monthIdx && d.getFullYear() === yearNum;
+      });
+
+      let totalHours = 0;
+      let daysOutSet = new Set();
+      let revisitasCount = 0;
+
+      monthRecords.forEach(r => {
+        const meta = parseRecordMetadata(r);
+        if (meta.hours > 0) {
+          totalHours += meta.hours;
+        }
+        if (meta.wentOut || meta.hours > 0) {
+          daysOutSet.add(formatDateForInput(new Date(r.date)));
+        }
+        if (r.category === 'Revisita' || meta.revisitaData) {
+          revisitasCount++;
+        }
+      });
+
+      return {
+        monthLabel: `${monthNames[monthIdx]} ${yearNum}`,
+        monthRecords,
+        totalHours: Math.round(totalHours * 100) / 100,
+        daysOut: daysOutSet.size,
+        revisitasCount,
+        totalFichas: monthRecords.length
+      };
+    }
+
+    function renderInformes() {
+      const stats = getMonthlyReportStats(reportMonth, reportYear);
+      document.getElementById('reportMonthLabel').textContent = stats.monthLabel;
+      document.getElementById('statTotalHours').textContent = stats.totalHours;
+      document.getElementById('statDaysOut').textContent = stats.daysOut;
+      document.getElementById('statRevisitasCount').textContent = stats.revisitasCount;
+      document.getElementById('statTotalFichas').textContent = stats.totalFichas;
+
+      const listContainer = document.getElementById('reportDetailsList');
+      if (stats.monthRecords.length === 0) {
+        listContainer.innerHTML = `<p class="text-sm text-outline text-center py-8">No hay actividad registrada en ${stats.monthLabel}.</p>`;
+        return;
+      }
+
+      listContainer.innerHTML = stats.monthRecords.map(r => {
+        const meta = parseRecordMetadata(r);
+        const dObj = new Date(r.date);
+        const dStr = isNaN(dObj) ? '' : dObj.toLocaleDateString('es-ES', { weekday: 'short', day: '2-digit', month: 'short' }).toUpperCase();
+        const rev = meta.revisitaData;
+        return `
+          <div class="flex flex-wrap items-center justify-between gap-3 bg-surface-container px-4 py-3 rounded-xl border border-outline/10">
+            <div class="flex flex-col gap-0.5">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-mono text-xs text-primary font-semibold">${dStr}</span>
+                <span class="text-xs bg-surface-container-highest text-tertiary px-2 py-0.5 rounded">${r.category}</span>
+                <span class="text-xs text-outline">(${meta.subcategory})</span>
+                ${rev ? `<span class="text-xs text-secondary flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">location_on</span>${rev.address} (${rev.time || ''})</span>` : ''}
+              </div>
+              <span class="text-base font-medium text-on-surface">${r.title}</span>
+              ${rev && rev.linkedRecordTitle ? `<span class="text-xs text-tertiary">Tema de referencia: ${rev.linkedRecordTitle}</span>` : ''}
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="px-3 py-1 rounded-lg text-xs font-mono font-bold ${meta.wentOut || meta.hours > 0 ? 'bg-[#1b3a24] text-[#86efac] border border-[#86efac]/30' : 'bg-surface-container-high text-outline'}">
+                ${meta.wentOut || meta.hours > 0 ? `Salí • ${meta.hours} h` : 'Sin salida marcada'}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    document.getElementById('btnReportPrevMonth').addEventListener('click', () => {
+      reportMonth--;
+      if (reportMonth < 0) { reportMonth = 11; reportYear--; }
+      renderInformes();
+    });
+
+    document.getElementById('btnReportNextMonth').addEventListener('click', () => {
+      reportMonth++;
+      if (reportMonth > 11) { reportMonth = 0; reportYear++; }
+      renderInformes();
+    });
+
+    document.getElementById('btnSendReportWA').addEventListener('click', () => {
+      const stats = getMonthlyReportStats(reportMonth, reportYear);
+      const outRecords = stats.monthRecords.filter(r => {
+        const m = parseRecordMetadata(r);
+        return m.wentOut || m.hours > 0 || r.category === 'Revisita';
+      });
+
+      let msg = `📊 *INFORME MENSUAL DEL MINISTERIO DE JEHOVÁ*\n`;
+      msg += `📅 *Mes:* ${stats.monthLabel}\n\n`;
+      msg += `✅ *Participé en el ministerio:* ${stats.daysOut > 0 ? 'Sí' : 'No'}\n`;
+      msg += `⏱️ *Total de Horas:* ${stats.totalHours} h\n`;
+      msg += `🚶 *Días de salida:* ${stats.daysOut}\n`;
+      msg += `🏠 *Revisitas realizadas:* ${stats.revisitasCount}\n`;
+      msg += `📑 *Asignaciones / Fichas del mes:* ${stats.totalFichas}\n`;
+
+      if (outRecords.length > 0) {
+        msg += `\n*Detalle de Salidas y Revisitas:*\n`;
+        outRecords.forEach(r => {
+          const m = parseRecordMetadata(r);
+          const d = new Date(r.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+          const revInfo = m.revisitaData ? ` [${m.revisitaData.address} - ${m.revisitaData.time}]` : '';
+          msg += `• ${d}: ${r.title} (${m.hours} h)${revInfo}\n`;
+        });
+      }
+
+      const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+      window.open(waUrl, '_blank', 'noopener,noreferrer');
     });
 
     updateCoverPreview();
