@@ -1103,6 +1103,7 @@
           categoryLabel: parsed.categoryLabel || record.category || 'Asignación',
           subcategory: subcat,
           packageName: parsed.packageName || record.packageName || '',
+          previousDateBeforePack: parsed.previousDateBeforePack || null,
           wentOut: Boolean(parsed.wentOut),
           hours: parseFloat(parsed.hours) || 0,
           revisitaData: parsed.revisitaData || null,
@@ -1631,6 +1632,7 @@
         categoryLabel: meta.categoryLabel || record.category,
         subcategory: meta.subcategory,
         packageName: meta.packageName,
+        previousDateBeforePack: meta.previousDateBeforePack || null,
         wentOut: wentOutVal,
         hours: hoursVal,
         revisitaData: meta.revisitaData,
@@ -2376,7 +2378,7 @@
         const meta = parseRecordMetadata(r);
         const rDateStr = formatDateForInput(new Date(r.date));
         const dFormatted = new Date(r.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
-        const isAlreadyInPack = (currentPackName && meta.packageName === currentPackName && rDateStr === selectedDateVal);
+        const isAlreadyInPack = (currentPackName && meta.packageName === currentPackName) || (rDateStr === selectedDateVal && Boolean(meta.packageName));
 
         return `
           <div class="flex items-center justify-between gap-2 py-2 px-2.5 hover:bg-surface-container-high rounded-lg transition-colors">
@@ -2393,7 +2395,10 @@
               </div>
             </div>
             ${isAlreadyInPack
-              ? `<span class="text-[10px] font-mono bg-[#1b3a24] text-[#86efac] border border-[#86efac]/30 px-2 py-1 rounded flex items-center gap-1 flex-shrink-0"><span class="material-symbols-outlined text-[12px]">check</span>Asignada</span>`
+              ? `<div class="flex items-center gap-1 flex-shrink-0">
+                  <span class="text-[10px] font-mono bg-[#1b3a24] text-[#86efac] border border-[#86efac]/30 px-2 py-1 rounded flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">check</span>Asignada</span>
+                  <button type="button" onclick="removeFichaFromPackage('${r.id}')" class="text-[11px] bg-error-container/30 hover:bg-error text-error hover:text-[#410002] px-2 py-1 rounded border border-error/30 transition-colors cursor-pointer" title="Quitar del paquete">Quitar</button>
+                </div>`
               : `<button type="button" onclick="assignFichaToPackage('${r.id}')" class="text-xs bg-primary/20 hover:bg-primary text-primary hover:text-[#432c00] font-semibold px-2.5 py-1 rounded-lg border border-primary/30 transition-colors flex items-center gap-1 flex-shrink-0 cursor-pointer">
                   <span class="material-symbols-outlined text-[14px]">add_circle</span>
                   <span>Asignar</span>
@@ -2412,6 +2417,10 @@
       weekendPackTitle.value = packName;
 
       const meta = parseRecordMetadata(record);
+      const currentRecordDate = formatDateForInput(new Date(record.date));
+      // Guardamos la fecha original antes de asignarla al paquete, para poder restaurarla si la quita
+      const prevDate = meta.previousDateBeforePack || (currentRecordDate !== targetDate ? currentRecordDate : currentRecordDate);
+
       const isCustomImg = meta.coverImage && (
         meta.coverImage.startsWith('data:image/webp') ||
         meta.coverImage.startsWith('data:image/jpeg') ||
@@ -2422,6 +2431,7 @@
         items: meta.items,
         subcategory: meta.subcategory,
         packageName: packName,
+        previousDateBeforePack: prevDate,
         wentOut: meta.wentOut,
         hours: meta.hours,
         revisitaData: meta.revisitaData,
@@ -2457,12 +2467,29 @@
         meta.coverImage.startsWith('data:image/jpeg') ||
         meta.coverImage.startsWith('data:image/png')
       );
-      const rDateStr = formatDateForInput(new Date(record.date));
+
+      const currentDateStr = formatDateForInput(new Date(record.date));
+      const modalDateStr = weekendSatDate.value;
+
+      // Si tenía una fecha previa distinta antes de meterse al paquete, vuelve a ella.
+      // Si no (o si estaba en el mismo domingo del paquete), se pasa al día base de preparación (hoy) para que salga del domingo.
+      let restoredDate = meta.previousDateBeforePack || currentDateStr;
+      if (restoredDate === modalDateStr) {
+        const todayStr = formatDateForInput(new Date());
+        if (todayStr !== modalDateStr) {
+          restoredDate = todayStr;
+        } else {
+          const dPrev = new Date(modalDateStr + 'T12:00:00');
+          dPrev.setDate(dPrev.getDate() - 1);
+          restoredDate = formatDateForInput(dPrev);
+        }
+      }
 
       const metaObj = {
         items: meta.items,
         subcategory: meta.subcategory,
         packageName: '',
+        previousDateBeforePack: null,
         wentOut: meta.wentOut,
         hours: meta.hours,
         revisitaData: meta.revisitaData,
@@ -2474,13 +2501,13 @@
       try {
         await updatePredicacionAdaptive(recordId, {
           title: record.title,
-          rawDate: rDateStr,
+          rawDate: restoredDate,
           category: meta.categoryLabel || record.category,
           metaObj: metaObj,
           notes: record.notes || '',
           customCover: isCustomImg ? meta.coverImage : null
         });
-        showToast(`Ficha desvinculada del paquete`);
+        showToast(`Ficha "${record.title}" quitada del paquete y de este día`);
         await loadDataAndRender();
         refreshWeekendModalView();
       } catch (err) {
@@ -2505,7 +2532,7 @@
         const meta = parseRecordMetadata(r);
         if (meta.revisitaData) return false;
         const dStr = formatDateForInput(new Date(r.date));
-        return dStr === satVal || (currentPackName && meta.packageName === currentPackName);
+        return (currentPackName && meta.packageName === currentPackName) || dStr === satVal;
       });
 
       if (packAssignedCount) {
@@ -2528,10 +2555,10 @@
                 ${meta.packageName ? `<span class="text-[10px] bg-surface-container px-2 py-0.5 rounded text-secondary truncate max-w-[140px]">${meta.packageName}</span>` : ''}
               </div>
               <div class="flex items-center gap-1 flex-shrink-0">
-                ${meta.packageName ? `
-                <button type="button" onclick="removeFichaFromPackage('${r.id}')" class="text-outline hover:text-error p-1 rounded" title="Quitar del paquete">
-                  <span class="material-symbols-outlined text-[15px]">link_off</span>
-                </button>` : ''}
+                <button type="button" onclick="removeFichaFromPackage('${r.id}')" class="flex items-center gap-1 text-[11px] text-outline hover:text-error bg-surface-container hover:bg-error-container/30 px-2 py-1 rounded border border-outline/15 transition-colors cursor-pointer" title="Quitar de este paquete / día">
+                  <span class="material-symbols-outlined text-[14px]">link_off</span>
+                  <span>Quitar</span>
+                </button>
               </div>
             </div>
           `;
