@@ -83,8 +83,9 @@
           <div class="font-label-sm text-[0.6875rem] text-outline px-2 mb-1 uppercase tracking-wider">Navegación Pastoral</div>
           <nav class="flex flex-col gap-1">
             <a id="navCronogramaBtn" class="flex items-center gap-2 px-2 py-2 rounded-lg bg-surface-container-high text-primary font-medium cursor-pointer transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">event_available</span><span>Cronograma & Predicaciones</span></a>
+            <a id="navDashboardBtn" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer" href="#"><span class="material-symbols-outlined text-[20px]">monitoring</span><span>Dashboard</span></a>
             <a id="navRevisitasBtn" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[20px]">contacts_product</span><span>Revisitas</span></a>
-            <a id="navPackBtn" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[20px]">inventory_2</span><span>Paquetes de Fin de Semana</span></a>
+            <a id="navPackBtn" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[20px]">inventory_2</span><span>Paquetes de Fichas</span></a>
             <a id="navInformesBtn" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[20px]">assessment</span><span>Informes</span></a>
           </nav>
         </div>
@@ -142,7 +143,7 @@
               </button>
               <button id="btnOpenWeekendModal" class="flex items-center gap-2 bg-surface-container-high hover:bg-surface-container-highest text-secondary border border-secondary/30 font-medium px-4 py-2.5 rounded-lg transition-all shadow-sm">
                 <span class="material-symbols-outlined text-[20px]">inventory_2</span>
-                <span>Paquete Fin de Semana</span>
+                <span>Armar Paquete de Fichas</span>
               </button>
               <button id="btnOpenModal" class="flex items-center gap-2 bg-primary hover:bg-primary-container text-[#432c00] font-semibold px-6 py-2.5 rounded-lg transition-all shadow-md">
                 <span class="material-symbols-outlined text-[20px]">add_circle</span>
@@ -249,6 +250,133 @@
               <span class="material-symbols-outlined text-[20px]">history</span> Desglose de Actividad del Mes
             </h3>
             <div id="reportDetailsList" class="flex flex-col gap-3"></div>
+          </div>
+        </div>
+
+        <!-- VISTA DASHBOARD DE MÉTRICAS DEL MINISTERIO -->
+        <div id="dashboardSection" class="hidden flex-col w-full pb-16">
+          <section class="w-full mb-6 flex flex-wrap justify-between items-end gap-4">
+            <div class="flex flex-col">
+              <h1 class="font-headline-lg text-[2.5rem] text-on-surface tracking-tight leading-none mb-2">Dashboard del Ministerio</h1>
+              <p class="text-on-surface-variant">Analítica completa de predicaciones, horas, fichas más utilizadas, territorios y personas más revisitadas.</p>
+            </div>
+            <!-- Selector de período temporal -->
+            <div class="flex flex-wrap items-center gap-1.5 bg-surface-container-low p-1.5 rounded-xl border border-outline/15" id="dashPeriodButtons">
+              <button type="button" data-period="week" class="dash-period-btn px-3 py-1.5 rounded-lg text-xs font-medium text-on-surface-variant hover:text-on-surface transition-colors">Esta Semana</button>
+              <button type="button" data-period="month" class="dash-period-btn px-3 py-1.5 rounded-lg text-xs font-medium text-on-surface-variant hover:text-on-surface transition-colors">Este Mes</button>
+              <button type="button" data-period="3months" class="dash-period-btn px-3 py-1.5 rounded-lg text-xs font-medium text-on-surface-variant hover:text-on-surface transition-colors">Últimos 3 Meses</button>
+              <button type="button" data-period="6months" class="dash-period-btn px-3 py-1.5 rounded-lg text-xs font-medium text-on-surface-variant hover:text-on-surface transition-colors">Últimos 6 Meses</button>
+              <button type="button" data-period="year" class="dash-period-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-[#432c00] font-semibold transition-colors">Este Año</button>
+              <button type="button" data-period="all" class="dash-period-btn px-3 py-1.5 rounded-lg text-xs font-medium text-on-surface-variant hover:text-on-surface transition-colors">Histórico Total</button>
+            </div>
+          </section>
+
+          <!-- Tarjetas KPI del período -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="bg-surface-container-low p-5 rounded-xl border border-primary/25 shadow-sm flex flex-col gap-1">
+              <span class="text-xs font-label-sm uppercase text-outline flex items-center justify-between">
+                <span>Horas de Predicación</span>
+                <span class="material-symbols-outlined text-primary text-[18px]">schedule</span>
+              </span>
+              <div class="flex items-baseline gap-2 mt-1">
+                <span id="dashKpiHours" class="font-headline-lg text-4xl text-primary font-bold">0</span>
+                <span id="dashKpiHoursSub" class="text-xs text-tertiary">horas en el período</span>
+              </div>
+            </div>
+
+            <div class="bg-surface-container-low p-5 rounded-xl border border-outline/15 shadow-sm flex flex-col gap-1">
+              <span class="text-xs font-label-sm uppercase text-outline flex items-center justify-between">
+                <span>Salidas y Predicaciones</span>
+                <span class="material-symbols-outlined text-secondary text-[18px]">directions_walk</span>
+              </span>
+              <div class="flex items-baseline gap-2 mt-1">
+                <span id="dashKpiDaysOut" class="font-headline-lg text-4xl text-secondary font-bold">0</span>
+                <span id="dashKpiDaysOutSub" class="text-xs text-tertiary">días de salida</span>
+              </div>
+            </div>
+
+            <div class="bg-surface-container-low p-5 rounded-xl border border-outline/15 shadow-sm flex flex-col gap-1">
+              <span class="text-xs font-label-sm uppercase text-outline flex items-center justify-between">
+                <span>Fichas y Series</span>
+                <span class="material-symbols-outlined text-on-surface text-[18px]">menu_book</span>
+              </span>
+              <div class="flex items-baseline gap-2 mt-1">
+                <span id="dashKpiFichas" class="font-headline-lg text-4xl text-on-surface font-bold">0</span>
+                <span id="dashKpiFichasSub" class="text-xs text-tertiary">fichas preparadas</span>
+              </div>
+            </div>
+
+            <div class="bg-surface-container-low p-5 rounded-xl border border-outline/15 shadow-sm flex flex-col gap-1">
+              <span class="text-xs font-label-sm uppercase text-outline flex items-center justify-between">
+                <span>Revisitas y Territorios</span>
+                <span class="material-symbols-outlined text-tertiary text-[18px]">location_on</span>
+              </span>
+              <div class="flex items-baseline gap-2 mt-1">
+                <span id="dashKpiRevisitas" class="font-headline-lg text-4xl text-tertiary font-bold">0</span>
+                <span id="dashKpiRevisitasSub" class="text-xs text-tertiary">revisitas realizadas</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gráficos de Evolución Temporal y Distribución por Revista / Fuente -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+            <div class="lg:col-span-7 bg-surface-container-low rounded-xl border border-outline/10 p-6 shadow-sm flex flex-col">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="font-headline-sm text-lg text-primary flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[20px]">bar_chart</span>
+                  <span id="dashTimelineTitle">Evolución de Horas y Predicaciones</span>
+                </h3>
+                <span id="dashPeriodBadge" class="text-xs font-mono text-outline bg-surface-container px-2.5 py-1 rounded"></span>
+              </div>
+              <div id="dashTimelineChart" class="flex-1 flex flex-col justify-center gap-2.5 min-h-[200px]"></div>
+            </div>
+
+            <div class="lg:col-span-5 bg-surface-container-low rounded-xl border border-outline/10 p-6 shadow-sm flex flex-col">
+              <h3 class="font-headline-sm text-lg text-primary mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-[20px]">pie_chart</span>
+                <span>Fichas por Fuente / Revista</span>
+              </h3>
+              <div id="dashSubcategoriesChart" class="flex flex-col gap-3"></div>
+            </div>
+          </div>
+
+          <!-- Rankings: Fichas Más Utilizadas, Territorios Más Revisitados y Personas Más Revisitadas -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- 1. Fichas Más Utilizadas -->
+            <div class="bg-surface-container-low rounded-xl border border-outline/10 p-6 shadow-sm flex flex-col">
+              <div class="flex items-center justify-between mb-4 pb-2 border-b border-outline/10">
+                <h3 class="font-headline-sm text-lg text-primary flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[20px]">workspace_premium</span>
+                  <span>Fichas Más Utilizadas</span>
+                </h3>
+                <span class="text-[11px] text-outline uppercase font-label-sm">Salidas + Revisitas</span>
+              </div>
+              <div id="dashTopFichasList" class="flex flex-col gap-3"></div>
+            </div>
+
+            <!-- 2. Territorios / Direcciones Más Revisitados -->
+            <div class="bg-surface-container-low rounded-xl border border-outline/10 p-6 shadow-sm flex flex-col">
+              <div class="flex items-center justify-between mb-4 pb-2 border-b border-outline/10">
+                <h3 class="font-headline-sm text-lg text-secondary flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[20px]">map</span>
+                  <span>Territorios Más Revisitados</span>
+                </h3>
+                <span class="text-[11px] text-outline uppercase font-label-sm">Por Lugar / Zona</span>
+              </div>
+              <div id="dashTopTerritoriosList" class="flex flex-col gap-3"></div>
+            </div>
+
+            <!-- 3. Personas Más Revisitadas -->
+            <div class="bg-surface-container-low rounded-xl border border-outline/10 p-6 shadow-sm flex flex-col">
+              <div class="flex items-center justify-between mb-4 pb-2 border-b border-outline/10">
+                <h3 class="font-headline-sm text-lg text-tertiary flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[20px]">group</span>
+                  <span>Personas Más Revisitadas</span>
+                </h3>
+                <span class="text-[11px] text-outline uppercase font-label-sm">Visitas y Temas</span>
+              </div>
+              <div id="dashTopPersonasList" class="flex flex-col gap-3"></div>
+            </div>
           </div>
         </div>
       </main>
@@ -593,46 +721,82 @@
     </div>
   </div>
 
-  <!-- MODAL PAQUETE DE FIN DE SEMANA -->
+  <!-- MODAL PAQUETE DE FICHAS PARA CUALQUIER DÍA DE PREDICACIÓN -->
   <div id="weekendModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
-    <div class="bg-surface-container-low w-full max-w-2xl rounded-2xl shadow-2xl p-6 sm:p-8 border border-outline/15 flex flex-col gap-5">
+    <div class="bg-surface-container-low w-full max-w-3xl max-h-[92vh] overflow-y-auto custom-scroll rounded-2xl shadow-2xl p-6 sm:p-8 border border-outline/15 flex flex-col gap-5">
       <div class="flex justify-between items-center pb-3 border-b border-outline/10">
         <h2 class="text-xl font-headline-sm text-primary flex items-center gap-2">
-          <span class="material-symbols-outlined">inventory_2</span> Armar Paquete de Fichas para Fin de Semana
+          <span class="material-symbols-outlined">inventory_2</span> Armar Paquete de Fichas para Día de Predicación
         </h2>
         <button id="btnCloseWeekendModal" class="text-outline hover:text-on-surface p-1 rounded-lg"><span class="material-symbols-outlined">close</span></button>
       </div>
 
       <p class="text-sm text-on-surface-variant">
-        Crea rápidamente un paquete de asignaciones o inicia una ficha directamente asignada al sábado o domingo del fin de semana que elijas.
+        Elige cualquier día de predicación, ponle nombre al paquete y busca fichas ya creadas por nombre para asignarlas a ese paquete, o crea una ficha nueva.
       </p>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Seleccionar Sábado del Fin de Semana</label>
+      <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-end">
+        <div class="sm:col-span-5">
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-label-sm text-outline uppercase">Día de Predicación</label>
+            <div class="flex items-center gap-1 text-[10px]">
+              <button type="button" id="btnPackQuickToday" class="text-tertiary hover:text-primary px-1.5 py-0.5 rounded bg-surface-container-high">Hoy</button>
+              <button type="button" id="btnPackQuickSat" class="text-primary hover:underline px-1.5 py-0.5 rounded bg-surface-container-high">Sáb</button>
+              <button type="button" id="btnPackQuickSun" class="text-secondary hover:underline px-1.5 py-0.5 rounded bg-surface-container-high">Dom</button>
+            </div>
+          </div>
           <input type="date" id="weekendSatDate" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2.5 text-on-surface focus:outline-none focus:border-primary [color-scheme:dark]">
         </div>
-        <div>
+        <div class="sm:col-span-7">
           <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Nombre del Paquete</label>
-          <input type="text" id="weekendPackTitle" placeholder="Ej. Paquete Predicación Fin de Semana" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2.5 text-on-surface focus:outline-none focus:border-primary">
+          <input type="text" id="weekendPackTitle" list="packageSuggestions" placeholder="Ej. Paquete Predicación Sábado 8 Nov" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2.5 text-on-surface focus:outline-none focus:border-primary">
         </div>
       </div>
 
-      <div id="weekendExistingList" class="bg-surface-container/60 rounded-xl p-4 border border-outline/10 flex flex-col gap-2 max-h-56 overflow-y-auto custom-scroll"></div>
+      <!-- Buscador de Fichas por Nombre para Asignar al Paquete -->
+      <div class="bg-surface-container/60 rounded-xl p-4 border border-primary/20 flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-label-sm uppercase text-primary flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px]">search</span>
+            <span>Buscar Fichas Existentes por Nombre o Revista para Asignar al Paquete</span>
+          </label>
+          <span id="packSearchCount" class="text-[11px] font-mono text-outline"></span>
+        </div>
+        <div class="relative">
+          <span class="material-symbols-outlined text-[16px] text-outline absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">search</span>
+          <input type="text" id="packSearchFichasInput" autocomplete="off" placeholder="Escribe el nombre de la ficha, tema o revista (ej. ¿Quién es Dios?, La Atalaya)..." class="w-full bg-surface-container-high border border-outline/25 rounded-lg pl-9 pr-8 py-2 text-xs text-on-surface focus:outline-none focus:border-primary">
+          <button type="button" id="btnClearPackSearch" class="hidden text-outline hover:text-primary absolute right-2.5 top-1/2 -translate-y-1/2">
+            <span class="material-symbols-outlined text-[15px]">close</span>
+          </button>
+        </div>
+        <div id="packSearchResultsList" class="flex flex-col gap-1.5 max-h-48 overflow-y-auto custom-scroll divide-y divide-outline/10"></div>
+      </div>
+
+      <!-- Fichas actualmente asignadas a este día / paquete -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-label-sm uppercase text-secondary flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px]">inventory_2</span>
+            <span>Fichas en este Paquete / Día de Predicación</span>
+          </span>
+          <span id="packAssignedCount" class="text-xs font-mono text-primary font-bold">0 fichas</span>
+        </div>
+        <div id="weekendExistingList" class="bg-surface-container/60 rounded-xl p-3.5 border border-outline/10 flex flex-col gap-2 max-h-52 overflow-y-auto custom-scroll"></div>
+      </div>
 
       <div class="flex flex-wrap justify-between items-center gap-3 pt-2 border-t border-outline/10">
         <div class="flex flex-wrap gap-2">
           <button type="button" id="btnNewSatCard" class="flex items-center gap-1.5 bg-primary hover:bg-primary-container text-[#432c00] font-semibold px-4 py-2 rounded-lg text-sm transition-colors">
             <span class="material-symbols-outlined text-[18px]">add</span>
-            <span>Crear Ficha Sábado</span>
+            <span>Crear Nueva Ficha en este Día</span>
           </button>
           <button type="button" id="btnNewSunCard" class="flex items-center gap-1.5 bg-secondary hover:bg-primary-container text-[#271900] font-semibold px-4 py-2 rounded-lg text-sm transition-colors">
             <span class="material-symbols-outlined text-[18px]">add</span>
-            <span>Crear Ficha Domingo</span>
+            <span>Crear Ficha Día Siguiente</span>
           </button>
         </div>
         <button type="button" id="btnFilterWeekend" class="text-xs font-label-sm uppercase text-tertiary hover:text-primary transition-colors">
-          Filtrar ese Sábado en Calendario
+          Ver este Día en Calendario
         </button>
       </div>
     </div>
@@ -1303,6 +1467,7 @@
         renderRecords();
         checkWeekendNotifications();
         renderInformes();
+        if (typeof renderDashboard === 'function') renderDashboard();
       } catch (error) {
         console.error(error);
         recordsContainer.innerHTML = `<div class="text-error p-4 bg-error-container/20 rounded-lg">Error al cargar datos. Verifica la conexión a PocketBase.</div>`;
@@ -1481,6 +1646,7 @@
         showToast(wentOutVal ? `Registrado en VPS: Salida con ${hoursVal} h para el informe` : 'Registro de salida actualizado en VPS');
         renderRecords();
         renderInformes();
+        if (typeof renderDashboard === 'function') renderDashboard();
       } catch (err) {
         console.error(err);
         showToast('Error al actualizar las horas en PocketBase', 'error');
@@ -2158,56 +2324,228 @@
     document.getElementById('btnCloseModal').addEventListener('click', closeModal);
     document.getElementById('btnCancelModal').addEventListener('click', closeModal);
 
-    // Modal de Paquete de Fin de Semana
+    // Modal de Paquete de Fichas para cualquier Día de Predicación
     const weekendModal = document.getElementById('weekendModal');
     const weekendSatDate = document.getElementById('weekendSatDate');
     const weekendPackTitle = document.getElementById('weekendPackTitle');
     const weekendExistingList = document.getElementById('weekendExistingList');
+    const packSearchFichasInput = document.getElementById('packSearchFichasInput');
+    const btnClearPackSearch = document.getElementById('btnClearPackSearch');
+    const packSearchResultsList = document.getElementById('packSearchResultsList');
+    const packSearchCount = document.getElementById('packSearchCount');
+    const packAssignedCount = document.getElementById('packAssignedCount');
+
+    function getDefaultPackageTitleForDate(dateVal) {
+      if (!dateVal) return 'Paquete de Predicación';
+      const d = new Date(dateVal + 'T12:00:00');
+      if (isNaN(d)) return 'Paquete de Predicación';
+      const dayName = d.toLocaleDateString('es-ES', { weekday: 'long' });
+      const capDay = dayName.charAt(0).toUpperCase() + dayName.slice(1);
+      const shortDate = d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+      return `Paquete ${capDay} (${shortDate})`;
+    }
+
+    function renderPackSearchFichas() {
+      const q = normalizeForSearch(packSearchFichasInput ? packSearchFichasInput.value : '');
+      const selectedDateVal = weekendSatDate.value;
+      const currentPackName = weekendPackTitle.value.trim();
+
+      if (btnClearPackSearch) {
+        btnClearPackSearch.classList.toggle('hidden', !(packSearchFichasInput && packSearchFichasInput.value));
+      }
+
+      // Todas las fichas que no sean revisitas puras
+      const candidateFichas = globalRecords.filter(r => {
+        const meta = parseRecordMetadata(r);
+        if (meta.revisitaData) return false;
+        if (!q) return true;
+        const searchable = normalizeForSearch(`${r.title} ${meta.subcategory} ${meta.categoryLabel || r.category} ${meta.packageName || ''}`);
+        return searchable.includes(q);
+      });
+
+      if (packSearchCount) {
+        packSearchCount.textContent = `${candidateFichas.length} ${candidateFichas.length === 1 ? 'ficha disponible' : 'fichas disponibles'}`;
+      }
+
+      if (candidateFichas.length === 0) {
+        packSearchResultsList.innerHTML = `<p class="text-xs text-outline text-center py-3">No se encontraron fichas con "${packSearchFichasInput.value}".</p>`;
+        return;
+      }
+
+      packSearchResultsList.innerHTML = candidateFichas.slice(0, 30).map(r => {
+        const meta = parseRecordMetadata(r);
+        const rDateStr = formatDateForInput(new Date(r.date));
+        const dFormatted = new Date(r.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+        const isAlreadyInPack = (currentPackName && meta.packageName === currentPackName && rDateStr === selectedDateVal);
+
+        return `
+          <div class="flex items-center justify-between gap-2 py-2 px-2.5 hover:bg-surface-container-high rounded-lg transition-colors">
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+              <img src="${meta.coverImage}" class="w-7 h-9 object-cover rounded border border-outline/20 flex-shrink-0">
+              <div class="flex flex-col min-w-0 flex-1">
+                <span class="text-xs font-medium text-on-surface truncate">${r.title}</span>
+                <div class="flex flex-wrap items-center gap-1.5 text-[10px] text-outline">
+                  <span class="text-tertiary">${meta.subcategory}</span>
+                  <span>&bull;</span>
+                  <span class="font-mono">${dFormatted}</span>
+                  ${meta.packageName ? `<span class="text-primary truncate max-w-[140px]">• ${meta.packageName}</span>` : ''}
+                </div>
+              </div>
+            </div>
+            ${isAlreadyInPack
+              ? `<span class="text-[10px] font-mono bg-[#1b3a24] text-[#86efac] border border-[#86efac]/30 px-2 py-1 rounded flex items-center gap-1 flex-shrink-0"><span class="material-symbols-outlined text-[12px]">check</span>Asignada</span>`
+              : `<button type="button" onclick="assignFichaToPackage('${r.id}')" class="text-xs bg-primary/20 hover:bg-primary text-primary hover:text-[#432c00] font-semibold px-2.5 py-1 rounded-lg border border-primary/30 transition-colors flex items-center gap-1 flex-shrink-0 cursor-pointer">
+                  <span class="material-symbols-outlined text-[14px]">add_circle</span>
+                  <span>Asignar</span>
+                </button>`
+            }
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.assignFichaToPackage = async (recordId) => {
+      const record = globalRecords.find(r => r.id === recordId);
+      if (!record) return;
+      const targetDate = weekendSatDate.value || formatDateForInput(new Date());
+      const packName = weekendPackTitle.value.trim() || getDefaultPackageTitleForDate(targetDate);
+      weekendPackTitle.value = packName;
+
+      const meta = parseRecordMetadata(record);
+      const isCustomImg = meta.coverImage && (
+        meta.coverImage.startsWith('data:image/webp') ||
+        meta.coverImage.startsWith('data:image/jpeg') ||
+        meta.coverImage.startsWith('data:image/png')
+      );
+
+      const metaObj = {
+        items: meta.items,
+        subcategory: meta.subcategory,
+        packageName: packName,
+        wentOut: meta.wentOut,
+        hours: meta.hours,
+        revisitaData: meta.revisitaData,
+        parentRecordId: meta.parentRecordId,
+        parentRecordTitle: meta.parentRecordTitle,
+        seriesNumber: meta.seriesNumber
+      };
+
+      try {
+        await updatePredicacionAdaptive(recordId, {
+          title: record.title,
+          rawDate: targetDate,
+          category: meta.categoryLabel || record.category,
+          metaObj: metaObj,
+          notes: record.notes || '',
+          customCover: isCustomImg ? meta.coverImage : null
+        });
+        showToast(`Ficha "${record.title}" asignada a ${packName}`);
+        await loadDataAndRender();
+        refreshWeekendModalView();
+      } catch (err) {
+        console.error(err);
+        showToast('Error al asignar la ficha al paquete en PocketBase', 'error');
+      }
+    };
+
+    window.removeFichaFromPackage = async (recordId) => {
+      const record = globalRecords.find(r => r.id === recordId);
+      if (!record) return;
+      const meta = parseRecordMetadata(record);
+      const isCustomImg = meta.coverImage && (
+        meta.coverImage.startsWith('data:image/webp') ||
+        meta.coverImage.startsWith('data:image/jpeg') ||
+        meta.coverImage.startsWith('data:image/png')
+      );
+      const rDateStr = formatDateForInput(new Date(record.date));
+
+      const metaObj = {
+        items: meta.items,
+        subcategory: meta.subcategory,
+        packageName: '',
+        wentOut: meta.wentOut,
+        hours: meta.hours,
+        revisitaData: meta.revisitaData,
+        parentRecordId: meta.parentRecordId,
+        parentRecordTitle: meta.parentRecordTitle,
+        seriesNumber: meta.seriesNumber
+      };
+
+      try {
+        await updatePredicacionAdaptive(recordId, {
+          title: record.title,
+          rawDate: rDateStr,
+          category: meta.categoryLabel || record.category,
+          metaObj: metaObj,
+          notes: record.notes || '',
+          customCover: isCustomImg ? meta.coverImage : null
+        });
+        showToast(`Ficha desvinculada del paquete`);
+        await loadDataAndRender();
+        refreshWeekendModalView();
+      } catch (err) {
+        console.error(err);
+        showToast('Error al quitar ficha del paquete', 'error');
+      }
+    };
 
     function refreshWeekendModalView() {
       const satVal = weekendSatDate.value;
       if (!satVal) return;
       const satD = new Date(satVal + 'T12:00:00');
-      const sunD = new Date(satD);
-      sunD.setDate(satD.getDate() + 1);
-      const sunVal = formatDateForInput(sunD);
-
-      const satLabel = satD.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
-      const sunLabel = sunD.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+      const satLabel = satD.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
 
       if (!weekendPackTitle.value.trim()) {
-        weekendPackTitle.value = `Paquete Fin de Semana (${satLabel} - ${sunLabel})`;
+        weekendPackTitle.value = getDefaultPackageTitleForDate(satVal);
       }
 
+      const currentPackName = weekendPackTitle.value.trim();
+
       const list = globalRecords.filter(r => {
+        const meta = parseRecordMetadata(r);
+        if (meta.revisitaData) return false;
         const dStr = formatDateForInput(new Date(r.date));
-        return dStr === satVal || dStr === sunVal;
+        return dStr === satVal || (currentPackName && meta.packageName === currentPackName);
       });
 
+      if (packAssignedCount) {
+        packAssignedCount.textContent = `${list.length} ${list.length === 1 ? 'ficha' : 'fichas'}`;
+      }
+
       if (list.length === 0) {
-        weekendExistingList.innerHTML = `<p class="text-xs text-outline text-center py-4">No hay fichas todavía para este fin de semana (${satLabel} - ${sunLabel}).</p>`;
+        weekendExistingList.innerHTML = `<p class="text-xs text-outline text-center py-4">No hay fichas asignadas todavía para este día (${satLabel}) o paquete.</p>`;
       } else {
         weekendExistingList.innerHTML = list.map(r => {
           const meta = parseRecordMetadata(r);
-          const dStr = formatDateForInput(new Date(r.date));
-          const dayBadge = dStr === satVal ? 'SÁB' : 'DOM';
+          const dObj = new Date(r.date);
+          const dayBadge = isNaN(dObj) ? '' : dObj.toLocaleDateString('es-ES', { weekday: 'short', day: '2-digit', month: 'short' }).toUpperCase();
           return `
-            <div class="flex items-center justify-between bg-surface-container-high px-3 py-2 rounded-lg border border-outline/10">
-              <div class="flex items-center gap-2.5 truncate">
-                <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-primary/20 text-primary font-bold">${dayBadge}</span>
+            <div class="flex items-center justify-between gap-2 bg-surface-container-high px-3 py-2 rounded-lg border border-outline/10">
+              <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-primary/20 text-primary font-bold flex-shrink-0">${dayBadge}</span>
                 <span class="text-sm text-on-surface font-medium truncate">${r.title}</span>
-                <span class="text-xs text-tertiary">(${meta.subcategory})</span>
+                <span class="text-xs text-tertiary flex-shrink-0">(${meta.subcategory})</span>
+                ${meta.packageName ? `<span class="text-[10px] bg-surface-container px-2 py-0.5 rounded text-secondary truncate max-w-[140px]">${meta.packageName}</span>` : ''}
+              </div>
+              <div class="flex items-center gap-1 flex-shrink-0">
+                ${meta.packageName ? `
+                <button type="button" onclick="removeFichaFromPackage('${r.id}')" class="text-outline hover:text-error p-1 rounded" title="Quitar del paquete">
+                  <span class="material-symbols-outlined text-[15px]">link_off</span>
+                </button>` : ''}
               </div>
             </div>
           `;
         }).join('');
       }
+
+      renderPackSearchFichas();
     }
 
     function openWeekendPackModal() {
-      const { satStr } = getUpcomingWeekendDates();
-      weekendSatDate.value = satStr;
-      weekendPackTitle.value = '';
+      const targetDate = selectedDateFilter || getUpcomingWeekendDates().satStr;
+      weekendSatDate.value = targetDate;
+      weekendPackTitle.value = getDefaultPackageTitleForDate(targetDate);
+      if (packSearchFichasInput) packSearchFichasInput.value = '';
       refreshWeekendModalView();
       weekendModal.classList.remove('hidden');
     }
@@ -2215,8 +2553,46 @@
     document.getElementById('btnOpenWeekendModal').addEventListener('click', openWeekendPackModal);
     document.getElementById('navPackBtn').addEventListener('click', openWeekendPackModal);
     document.getElementById('btnCloseWeekendModal').addEventListener('click', () => weekendModal.classList.add('hidden'));
+
     weekendSatDate.addEventListener('change', () => {
-      weekendPackTitle.value = '';
+      weekendPackTitle.value = getDefaultPackageTitleForDate(weekendSatDate.value);
+      refreshWeekendModalView();
+    });
+
+    weekendPackTitle.addEventListener('input', () => {
+      renderPackSearchFichas();
+    });
+
+    if (packSearchFichasInput) {
+      packSearchFichasInput.addEventListener('input', renderPackSearchFichas);
+    }
+
+    if (btnClearPackSearch) {
+      btnClearPackSearch.addEventListener('click', () => {
+        packSearchFichasInput.value = '';
+        renderPackSearchFichas();
+        packSearchFichasInput.focus();
+      });
+    }
+
+    document.getElementById('btnPackQuickToday').addEventListener('click', () => {
+      const todayStr = formatDateForInput(new Date());
+      weekendSatDate.value = todayStr;
+      weekendPackTitle.value = getDefaultPackageTitleForDate(todayStr);
+      refreshWeekendModalView();
+    });
+
+    document.getElementById('btnPackQuickSat').addEventListener('click', () => {
+      const { satStr } = getUpcomingWeekendDates();
+      weekendSatDate.value = satStr;
+      weekendPackTitle.value = getDefaultPackageTitleForDate(satStr);
+      refreshWeekendModalView();
+    });
+
+    document.getElementById('btnPackQuickSun').addEventListener('click', () => {
+      const { sunStr } = getUpcomingWeekendDates();
+      weekendSatDate.value = sunStr;
+      weekendPackTitle.value = getDefaultPackageTitleForDate(sunStr);
       refreshWeekendModalView();
     });
 
@@ -2236,6 +2612,7 @@
       currentYear = satD.getFullYear();
       selectedDateFilter = weekendSatDate.value;
       weekendModal.classList.add('hidden');
+      switchSection('cronograma');
       renderCalendar();
       renderRecords();
     });
@@ -2328,27 +2705,46 @@
       }
     });
 
-    // ================= NAVEGACIÓN SIDEBAR (CRONOGRAMA / INFORMES / REVISITAS) =================
+    // ================= NAVEGACIÓN SIDEBAR (CRONOGRAMA / DASHBOARD / INFORMES / REVISITAS) =================
     const cronogramaSection = document.getElementById('cronogramaSection');
     const informesSection = document.getElementById('informesSection');
+    const dashboardSection = document.getElementById('dashboardSection');
     const navCronogramaBtn = document.getElementById('navCronogramaBtn');
+    const navDashboardBtn = document.getElementById('navDashboardBtn');
     const navInformesBtn = document.getElementById('navInformesBtn');
     const navRevisitasBtn = document.getElementById('navRevisitasBtn');
 
+    let currentDashPeriod = 'year';
+
     function switchSection(section) {
+      const activeClass = 'flex items-center gap-2 px-2 py-2 rounded-lg bg-surface-container-high text-primary font-medium cursor-pointer transition-colors';
+      const inactiveClass = 'flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer';
+
+      cronogramaSection.classList.add('hidden');
+      informesSection.classList.add('hidden');
+      informesSection.classList.remove('flex');
+      if (dashboardSection) {
+        dashboardSection.classList.add('hidden');
+        dashboardSection.classList.remove('flex');
+      }
+
+      navCronogramaBtn.className = inactiveClass;
+      navInformesBtn.className = inactiveClass;
+      if (navDashboardBtn) navDashboardBtn.className = inactiveClass;
+
       if (section === 'informes') {
-        cronogramaSection.classList.add('hidden');
         informesSection.classList.remove('hidden');
         informesSection.classList.add('flex');
-        navInformesBtn.className = 'flex items-center gap-2 px-2 py-2 rounded-lg bg-surface-container-high text-primary font-medium cursor-pointer transition-colors';
-        navCronogramaBtn.className = 'flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer';
+        navInformesBtn.className = activeClass;
         renderInformes();
+      } else if (section === 'dashboard' && dashboardSection) {
+        dashboardSection.classList.remove('hidden');
+        dashboardSection.classList.add('flex');
+        if (navDashboardBtn) navDashboardBtn.className = activeClass;
+        renderDashboard();
       } else {
-        informesSection.classList.add('hidden');
-        informesSection.classList.remove('flex');
         cronogramaSection.classList.remove('hidden');
-        navCronogramaBtn.className = 'flex items-center gap-2 px-2 py-2 rounded-lg bg-surface-container-high text-primary font-medium cursor-pointer transition-colors';
-        navInformesBtn.className = 'flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer';
+        navCronogramaBtn.className = activeClass;
       }
     }
 
@@ -2357,12 +2753,424 @@
       switchSection('cronograma');
     });
 
+    if (navDashboardBtn) {
+      navDashboardBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchSection('dashboard');
+      });
+    }
+
     navInformesBtn.addEventListener('click', (e) => {
       e.preventDefault();
       reportMonth = currentMonth;
       reportYear = currentYear;
       switchSection('informes');
     });
+
+    // Selector de período del Dashboard
+    document.querySelectorAll('.dash-period-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentDashPeriod = btn.getAttribute('data-period') || 'year';
+        document.querySelectorAll('.dash-period-btn').forEach(b => {
+          b.className = 'dash-period-btn px-3 py-1.5 rounded-lg text-xs font-medium text-on-surface-variant hover:text-on-surface transition-colors';
+        });
+        btn.className = 'dash-period-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-[#432c00] font-semibold transition-colors';
+        renderDashboard();
+      });
+    });
+
+    function getDashboardDateRange(period) {
+      const now = new Date();
+      const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+      let startDate = null;
+      let label = 'Histórico Total';
+
+      if (period === 'week') {
+        const day = now.getDay();
+        const diffToMonday = day === 0 ? -6 : 1 - day;
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToMonday, 0, 0, 0, 0);
+        label = 'Esta Semana';
+      } else if (period === 'month') {
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+        label = now.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+      } else if (period === '3months') {
+        startDate = new Date(now.getFullYear(), now.getMonth() - 2, 1, 0, 0, 0, 0);
+        label = 'Últimos 3 Meses';
+      } else if (period === '6months') {
+        startDate = new Date(now.getFullYear(), now.getMonth() - 5, 1, 0, 0, 0, 0);
+        label = 'Últimos 6 Meses';
+      } else if (period === 'year') {
+        startDate = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0);
+        label = `Año ${now.getFullYear()}`;
+      }
+
+      return { startDate, endDate: todayEnd, label };
+    }
+
+    function renderDashboard() {
+      if (!dashboardSection) return;
+      const { startDate, label } = getDashboardDateRange(currentDashPeriod);
+      const periodBadge = document.getElementById('dashPeriodBadge');
+      if (periodBadge) periodBadge.textContent = label.toUpperCase();
+
+      const periodRecords = globalRecords.filter(r => {
+        const d = new Date(r.date);
+        if (isNaN(d)) return false;
+        if (!startDate) return true;
+        return d >= startDate;
+      });
+
+      // 1. Cálculo de KPIs
+      let totalHours = 0;
+      const daysOutSet = new Set();
+      let fichasCount = 0;
+      const seriesRootSet = new Set();
+      let revisitasCount = 0;
+      const territoriesSet = new Set();
+      const peopleSet = new Set();
+
+      periodRecords.forEach(r => {
+        const meta = parseRecordMetadata(r);
+        if (meta.hours > 0) totalHours += meta.hours;
+        if (meta.wentOut || meta.hours > 0) {
+          daysOutSet.add(formatDateForInput(new Date(r.date)));
+        }
+        if (r.category === 'Revisita' || meta.revisitaData) {
+          revisitasCount++;
+          if (meta.revisitaData) {
+            if (meta.revisitaData.address) territoriesSet.add(normalizeForSearch(meta.revisitaData.address));
+            if (meta.revisitaData.personName) peopleSet.add(normalizeForSearch(meta.revisitaData.personName));
+          }
+        } else {
+          fichasCount++;
+          if (meta.parentRecordId) seriesRootSet.add(meta.parentRecordId);
+        }
+      });
+
+      const roundedHours = Math.round(totalHours * 100) / 100;
+      const avgHoursPerDay = daysOutSet.size > 0 ? Math.round((totalHours / daysOutSet.size) * 10) / 10 : 0;
+
+      document.getElementById('dashKpiHours').textContent = roundedHours;
+      document.getElementById('dashKpiHoursSub').textContent = daysOutSet.size > 0 ? `promedio ${avgHoursPerDay} h / salida` : 'horas en el período';
+
+      document.getElementById('dashKpiDaysOut').textContent = daysOutSet.size;
+      document.getElementById('dashKpiDaysOutSub').textContent = `${periodRecords.length} registros en total`;
+
+      document.getElementById('dashKpiFichas').textContent = fichasCount;
+      document.getElementById('dashKpiFichasSub').textContent = seriesRootSet.size > 0 ? `incluye ${seriesRootSet.size} ${seriesRootSet.size === 1 ? 'serie activa' : 'series activas'}` : 'fichas preparadas';
+
+      document.getElementById('dashKpiRevisitas').textContent = revisitasCount;
+      document.getElementById('dashKpiRevisitasSub').textContent = `${territoriesSet.size} territorios • ${peopleSet.size} personas`;
+
+      // 2. Gráfico de Evolución Temporal (Barras Horizontales con Horas y Asignaciones)
+      const timelineChart = document.getElementById('dashTimelineChart');
+      const buckets = [];
+      const now = new Date();
+      const monthShortNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+      if (currentDashPeriod === 'week') {
+        const dayNames = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+        const day = now.getDay();
+        const diffToMonday = day === 0 ? -6 : 1 - day;
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToMonday + i);
+          const key = formatDateForInput(d);
+          buckets.push({ key, label: `${dayNames[i]} ${d.getDate()}`, hours: 0, count: 0 });
+        }
+        periodRecords.forEach(r => {
+          const k = formatDateForInput(new Date(r.date));
+          const b = buckets.find(x => x.key === k);
+          if (b) {
+            const m = parseRecordMetadata(r);
+            b.hours += (m.hours || 0);
+            b.count += 1;
+          }
+        });
+      } else if (currentDashPeriod === 'month') {
+        for (let w = 1; w <= 5; w++) {
+          buckets.push({ key: `W${w}`, label: `Semana ${w}`, hours: 0, count: 0 });
+        }
+        periodRecords.forEach(r => {
+          const d = new Date(r.date);
+          const wIdx = Math.min(4, Math.floor((d.getDate() - 1) / 7));
+          const m = parseRecordMetadata(r);
+          buckets[wIdx].hours += (m.hours || 0);
+          buckets[wIdx].count += 1;
+        });
+      } else {
+        const monthsCount = currentDashPeriod === '3months' ? 3 : (currentDashPeriod === '6months' ? 6 : 12);
+        for (let i = monthsCount - 1; i >= 0; i--) {
+          const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+          buckets.push({ key, label: `${monthShortNames[d.getMonth()]} ${String(d.getFullYear()).slice(-2)}`, hours: 0, count: 0 });
+        }
+        periodRecords.forEach(r => {
+          const d = new Date(r.date);
+          const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+          const b = buckets.find(x => x.key === key);
+          if (b) {
+            const m = parseRecordMetadata(r);
+            b.hours += (m.hours || 0);
+            b.count += 1;
+          }
+        });
+      }
+
+      const maxBucketMetric = Math.max(1, ...buckets.map(b => Math.max(b.hours, b.count)));
+      timelineChart.innerHTML = buckets.map(b => {
+        const hVal = Math.round(b.hours * 10) / 10;
+        const metricVal = hVal > 0 ? hVal : b.count;
+        const pct = Math.min(100, Math.round((metricVal / maxBucketMetric) * 100));
+        return `
+          <div class="flex items-center gap-3 text-xs">
+            <span class="w-16 font-mono text-on-surface-variant flex-shrink-0">${b.label}</span>
+            <div class="flex-1 h-5 bg-surface-container rounded-lg overflow-hidden border border-outline/10 relative">
+              <div class="h-full ${hVal > 0 ? 'bg-gradient-to-r from-primary/80 to-primary' : 'bg-secondary/40'} rounded-lg transition-all duration-300" style="width: ${pct}%"></div>
+            </div>
+            <div class="w-28 text-right font-mono flex items-center justify-end gap-1.5 flex-shrink-0">
+              <span class="text-primary font-bold">${hVal} h</span>
+              <span class="text-outline text-[10px]">(${b.count} reg.)</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // 3. Distribución por Fuente / Revista
+      const subcatCounts = {};
+      periodRecords.forEach(r => {
+        const m = parseRecordMetadata(r);
+        const sub = m.subcategory || 'General';
+        subcatCounts[sub] = (subcatCounts[sub] || 0) + 1;
+      });
+      const subcatEntries = Object.entries(subcatCounts).sort((a, b) => b[1] - a[1]);
+      const totalSubcat = Math.max(1, periodRecords.length);
+      const subcatChart = document.getElementById('dashSubcategoriesChart');
+
+      if (subcatEntries.length === 0) {
+        subcatChart.innerHTML = `<p class="text-xs text-outline text-center py-8">Sin datos en este período.</p>`;
+      } else {
+        subcatChart.innerHTML = subcatEntries.map(([subName, cnt]) => {
+          const pct = Math.round((cnt / totalSubcat) * 100);
+          return `
+            <div class="flex flex-col gap-1">
+              <div class="flex justify-between text-xs">
+                <span class="font-medium text-on-surface truncate">${subName}</span>
+                <span class="font-mono text-secondary">${cnt} (${pct}%)</span>
+              </div>
+              <div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+                <div class="h-full bg-secondary rounded-full" style="width: ${pct}%"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 4. TOP FICHAS MÁS UTILIZADAS (Salidas marcadas + Horas + Revisitas vinculadas + Partes de Serie)
+      const fichaStatsMap = new Map();
+      // Contabilizar primero todas las fichas que no son revisitas
+      periodRecords.forEach(r => {
+        const m = parseRecordMetadata(r);
+        if (m.revisitaData || r.category === 'Revisita') return;
+        const rootId = m.parentRecordId || r.id;
+        const rootRec = globalRecords.find(x => x.id === rootId) || r;
+        const baseTitle = (m.parentRecordTitle || rootRec.title || r.title).replace(/\s*(?:-\s*)?#\d+\s*$/i, '').trim();
+
+        if (!fichaStatsMap.has(rootId)) {
+          fichaStatsMap.set(rootId, {
+            id: rootId,
+            title: baseTitle,
+            subcategory: m.subcategory || 'La Atalaya',
+            coverImage: m.coverImage,
+            outings: 0,
+            hours: 0,
+            revisitasLinked: 0,
+            seriesParts: 0
+          });
+        }
+        const entry = fichaStatsMap.get(rootId);
+        entry.seriesParts += 1;
+        if (m.wentOut || m.hours > 0) entry.outings += 1;
+        if (m.hours > 0) entry.hours += m.hours;
+      });
+
+      // Sumar revisitas que hicieron referencia a cada ficha
+      periodRecords.forEach(r => {
+        const m = parseRecordMetadata(r);
+        if (!m.revisitaData || !m.revisitaData.linkedRecordId) return;
+        const linkedRec = globalRecords.find(x => x.id === m.revisitaData.linkedRecordId);
+        const linkedMeta = linkedRec ? parseRecordMetadata(linkedRec) : null;
+        const rootId = (linkedMeta && linkedMeta.parentRecordId) ? linkedMeta.parentRecordId : m.revisitaData.linkedRecordId;
+
+        if (!fichaStatsMap.has(rootId) && linkedRec) {
+          fichaStatsMap.set(rootId, {
+            id: rootId,
+            title: linkedRec.title,
+            subcategory: linkedMeta ? linkedMeta.subcategory : 'La Atalaya',
+            coverImage: linkedMeta ? linkedMeta.coverImage : MAGAZINE_COVERS['Default'],
+            outings: 0,
+            hours: 0,
+            revisitasLinked: 0,
+            seriesParts: 1
+          });
+        }
+        if (fichaStatsMap.has(rootId)) {
+          const entry = fichaStatsMap.get(rootId);
+          entry.revisitasLinked += 1;
+          if (m.hours > 0) entry.hours += m.hours;
+        }
+      });
+
+      const rankedFichas = Array.from(fichaStatsMap.values()).map(f => ({
+        ...f,
+        hours: Math.round(f.hours * 10) / 10,
+        usageScore: (f.outings * 3) + (f.revisitasLinked * 4) + f.hours + f.seriesParts
+      })).sort((a, b) => b.usageScore - a.usageScore).slice(0, 8);
+
+      const topFichasContainer = document.getElementById('dashTopFichasList');
+      if (rankedFichas.length === 0) {
+        topFichasContainer.innerHTML = `<p class="text-xs text-outline text-center py-6">No hay fichas registradas en este período.</p>`;
+      } else {
+        topFichasContainer.innerHTML = rankedFichas.map((f, idx) => `
+          <div class="flex items-center justify-between gap-3 bg-surface-container px-3.5 py-2.5 rounded-xl border border-outline/10">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <span class="font-mono text-xs font-bold text-primary w-5 text-center">${idx + 1}</span>
+              <img src="${f.coverImage}" class="w-8 h-11 object-cover rounded border border-outline/20 flex-shrink-0">
+              <div class="flex flex-col min-w-0 flex-1">
+                <span class="text-sm font-semibold text-on-surface truncate">${f.title}</span>
+                <div class="flex flex-wrap items-center gap-1.5 text-[11px] text-tertiary">
+                  <span>${f.subcategory}</span>
+                  ${f.seriesParts > 1 ? `<span class="text-primary font-mono">• ${f.seriesParts} partes</span>` : ''}
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col items-end text-right flex-shrink-0">
+              <span class="text-xs font-mono font-bold text-[#86efac]">${f.outings} ${f.outings === 1 ? 'salida' : 'salidas'} • ${f.hours}h</span>
+              <span class="text-[10px] font-mono text-secondary">${f.revisitasLinked} ${f.revisitasLinked === 1 ? 'revisita' : 'revisitas'}</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // 5. TOP TERRITORIOS / LUGARES MÁS REVISITADOS
+      const territoryMap = new Map();
+      periodRecords.forEach(r => {
+        const m = parseRecordMetadata(r);
+        if (!m.revisitaData || !m.revisitaData.address) return;
+        const rawAddr = m.revisitaData.address.trim();
+        if (!rawAddr) return;
+        const normAddr = normalizeForSearch(rawAddr);
+
+        if (!territoryMap.has(normAddr)) {
+          territoryMap.set(normAddr, {
+            address: rawAddr,
+            visits: 0,
+            hours: 0,
+            peopleSet: new Set(),
+            lastDate: new Date(r.date)
+          });
+        }
+        const t = territoryMap.get(normAddr);
+        t.visits += 1;
+        t.hours += (m.hours || 0);
+        if (m.revisitaData.personName) t.peopleSet.add(m.revisitaData.personName.trim());
+        const d = new Date(r.date);
+        if (d > t.lastDate) t.lastDate = d;
+      });
+
+      const rankedTerritories = Array.from(territoryMap.values())
+        .sort((a, b) => b.visits - a.visits || b.hours - a.hours)
+        .slice(0, 8);
+
+      const topTerritoriosContainer = document.getElementById('dashTopTerritoriosList');
+      if (rankedTerritories.length === 0) {
+        topTerritoriosContainer.innerHTML = `<p class="text-xs text-outline text-center py-6">Aún no hay territorios/direcciones de revisitas en este período.</p>`;
+      } else {
+        topTerritoriosContainer.innerHTML = rankedTerritories.map((t, idx) => {
+          const lastStr = isNaN(t.lastDate) ? '' : t.lastDate.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+          const peopleArr = Array.from(t.peopleSet);
+          return `
+            <div class="flex items-start justify-between gap-3 bg-surface-container px-3.5 py-2.5 rounded-xl border border-outline/10">
+              <div class="flex items-start gap-2.5 min-w-0 flex-1">
+                <span class="font-mono text-xs font-bold text-secondary w-5 text-center mt-0.5">${idx + 1}</span>
+                <div class="flex flex-col min-w-0 flex-1">
+                  <span class="text-sm font-semibold text-on-surface truncate flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[15px] text-secondary">location_on</span>
+                    <span class="truncate">${t.address}</span>
+                  </span>
+                  <span class="text-[11px] text-tertiary truncate">Personas: ${peopleArr.join(', ') || 'General'}</span>
+                </div>
+              </div>
+              <div class="flex flex-col items-end text-right flex-shrink-0">
+                <span class="text-xs font-mono font-bold text-primary bg-primary/15 px-2 py-0.5 rounded">${t.visits} ${t.visits === 1 ? 'visita' : 'visitas'}</span>
+                <span class="text-[10px] font-mono text-outline mt-0.5">Últ.: ${lastStr}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 6. TOP PERSONAS MÁS REVISITADAS
+      const personMap = new Map();
+      periodRecords.forEach(r => {
+        const m = parseRecordMetadata(r);
+        if (!m.revisitaData || !m.revisitaData.personName) return;
+        const rawName = m.revisitaData.personName.trim();
+        if (!rawName) return;
+        const normName = normalizeForSearch(rawName);
+
+        if (!personMap.has(normName)) {
+          personMap.set(normName, {
+            name: rawName,
+            address: m.revisitaData.address || '',
+            phone: m.revisitaData.phone || '',
+            visits: 0,
+            hours: 0,
+            topics: new Set(),
+            lastDate: new Date(r.date)
+          });
+        }
+        const p = personMap.get(normName);
+        p.visits += 1;
+        p.hours += (m.hours || 0);
+        if (m.revisitaData.address && !p.address) p.address = m.revisitaData.address;
+        if (m.revisitaData.linkedRecordTitle) p.topics.add(m.revisitaData.linkedRecordTitle);
+        const d = new Date(r.date);
+        if (d > p.lastDate) p.lastDate = d;
+      });
+
+      const rankedPeople = Array.from(personMap.values())
+        .sort((a, b) => b.visits - a.visits || b.hours - a.hours)
+        .slice(0, 8);
+
+      const topPersonasContainer = document.getElementById('dashTopPersonasList');
+      if (rankedPeople.length === 0) {
+        topPersonasContainer.innerHTML = `<p class="text-xs text-outline text-center py-6">Aún no hay personas registradas en revisitas en este período.</p>`;
+      } else {
+        topPersonasContainer.innerHTML = rankedPeople.map((p, idx) => {
+          const lastStr = isNaN(p.lastDate) ? '' : p.lastDate.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+          const topicsList = Array.from(p.topics).join(' • ');
+          return `
+            <div class="flex items-start justify-between gap-3 bg-surface-container px-3.5 py-2.5 rounded-xl border border-outline/10">
+              <div class="flex items-start gap-2.5 min-w-0 flex-1">
+                <span class="font-mono text-xs font-bold text-tertiary w-5 text-center mt-0.5">${idx + 1}</span>
+                <div class="flex flex-col min-w-0 flex-1">
+                  <span class="text-sm font-semibold text-on-surface truncate flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[15px] text-tertiary">person</span>
+                    <span class="truncate">${p.name}</span>
+                  </span>
+                  ${p.address ? `<span class="text-[11px] text-on-surface-variant truncate">${p.address}</span>` : ''}
+                  ${topicsList ? `<span class="text-[10px] text-secondary truncate">Temas: ${topicsList}</span>` : ''}
+                </div>
+              </div>
+              <div class="flex flex-col items-end text-right flex-shrink-0">
+                <span class="text-xs font-mono font-bold text-[#86efac] bg-[#1b3a24] px-2 py-0.5 rounded border border-[#86efac]/25">${p.visits} ${p.visits === 1 ? 'visita' : 'visitas'}</span>
+                <span class="text-[10px] font-mono text-outline mt-0.5">Últ.: ${lastStr}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
 
     // ================= MODAL DE REVISITAS =================
     const revisitaModal = document.getElementById('revisitaModal');
