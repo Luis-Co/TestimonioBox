@@ -266,16 +266,67 @@
       </div>
       
       <form id="recordForm" class="flex flex-col gap-5">
+        <!-- Selector de Serie / Ficha Padre con filtro de calendario y búsqueda por nombre -->
+        <div class="bg-surface-container/60 p-4 rounded-xl border border-primary/20 flex flex-col gap-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <label class="text-xs font-label-sm text-primary uppercase flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[17px]">library_books</span>
+              <span>¿Parte de una serie de temas / misma revista? (Ficha Padre opcional)</span>
+            </label>
+            <span id="parentCountBadge" class="text-[11px] text-outline font-mono"></span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center">
+            <!-- Búsqueda por nombre de ficha -->
+            <div class="sm:col-span-5 relative">
+              <span class="material-symbols-outlined text-[16px] text-outline absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">search</span>
+              <input type="text" id="parentSearchInput" placeholder="Buscar ficha por nombre o revista..." class="w-full bg-surface-container-high border border-outline/20 rounded-lg pl-9 pr-3 py-2 text-xs text-on-surface focus:outline-none focus:border-primary">
+            </div>
+
+            <!-- Filtro de calendario para no cargar todas -->
+            <div class="sm:col-span-3 flex items-center gap-1">
+              <input type="date" id="parentFilterDate" title="Filtrar fichas por fecha del calendario" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-2.5 py-1.5 text-xs text-on-surface focus:outline-none focus:border-primary [color-scheme:dark]">
+              <button type="button" id="btnClearParentDate" title="Quitar filtro de fecha" class="hidden text-outline hover:text-primary p-1.5 rounded-lg bg-surface-container-high border border-outline/15">
+                <span class="material-symbols-outlined text-[15px]">close</span>
+              </button>
+            </div>
+
+            <!-- Combo con las fichas filtradas -->
+            <div class="sm:col-span-4">
+              <select id="fieldParentRecord" class="w-full bg-surface-container-high border border-outline/25 rounded-lg px-3 py-2 text-xs text-on-surface focus:outline-none focus:border-primary">
+                <option value="">-- Ficha nueva independiente --</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Resumen automático cuando se elige una Ficha Padre (oculta título, categoría, subcategoría e imagen) -->
+          <div id="seriesInheritedSummary" class="hidden mt-1 p-3.5 rounded-xl bg-surface-container-high border border-primary/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3.5">
+              <img id="inheritedCoverImg" src="" alt="Portada heredada" class="w-12 h-16 object-cover rounded-lg border border-outline/25 shadow flex-shrink-0">
+              <div class="flex flex-col gap-0.5">
+                <span class="text-[10px] font-label-sm uppercase text-primary tracking-wider">Continuación automática de serie (hereda categoría, fuente y portada)</span>
+                <p id="inheritedGeneratedTitle" class="font-headline-sm text-lg text-on-surface font-bold leading-snug"></p>
+                <div id="inheritedBadges" class="flex flex-wrap items-center gap-1.5 text-[11px] text-tertiary mt-0.5"></div>
+              </div>
+            </div>
+            <button type="button" id="btnClearParentSelection" class="text-xs text-outline hover:text-error bg-surface-container px-2.5 py-1.5 rounded-lg border border-outline/15 transition-colors flex items-center gap-1 self-end sm:self-center whitespace-nowrap">
+              <span class="material-symbols-outlined text-[15px]">link_off</span>
+              <span>Desvincular padre</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Fecha siempre visible + Campos de ficha independiente (se ocultan solos al elegir Ficha Padre) -->
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-          <div class="md:col-span-6">
+          <div id="titleFieldCol" class="md:col-span-6">
             <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Tema / Título del Discurso o Ficha</label>
             <input type="text" id="fieldTitle" required placeholder="Ej. Cómo mantener el gozo en el ministerio" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3.5 py-2.5 text-on-surface focus:outline-none focus:border-primary">
           </div>
-          <div class="md:col-span-3">
-            <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Fecha</label>
+          <div id="dateFieldCol" class="md:col-span-3">
+            <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Fecha de esta ficha</label>
             <input type="date" id="fieldDate" required class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2.5 text-on-surface focus:outline-none focus:border-primary [color-scheme:dark]">
           </div>
-          <div class="md:col-span-3">
+          <div id="categoryFieldCol" class="md:col-span-3">
             <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Categoría</label>
             <select id="fieldCategory" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2.5 text-on-surface focus:outline-none focus:border-primary">
               <option value="Discurso Público">Discurso Público</option>
@@ -286,8 +337,8 @@
           </div>
         </div>
 
-        <!-- Subcategoría / Fuente + Paquete de Fin de Semana + Portada -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 bg-surface-container/40 p-4 rounded-xl border border-outline/10 items-center">
+        <!-- Subcategoría / Fuente + Paquete de Fin de Semana + Portada (se oculta al elegir Ficha Padre) -->
+        <div id="standaloneSubcatRow" class="grid grid-cols-1 md:grid-cols-12 gap-4 bg-surface-container/40 p-4 rounded-xl border border-outline/10 items-center">
           <div class="md:col-span-4">
             <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Subcategoría / Fuente de Info</label>
             <select id="fieldSubcategory" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2.5 text-on-surface focus:outline-none focus:border-primary">
@@ -839,6 +890,9 @@
           wentOut: Boolean(record.wentOut),
           hours: parseFloat(record.hours) || 0,
           revisitaData: null,
+          parentRecordId: null,
+          parentRecordTitle: '',
+          seriesNumber: null,
           coverImage: record.coverImage || PRESET_COVERS[subcat] || PRESET_COVERS['Estudio Personal / Biblia']
         };
       } else if (parsed && typeof parsed === 'object') {
@@ -851,6 +905,9 @@
           wentOut: Boolean(parsed.wentOut),
           hours: parseFloat(parsed.hours) || 0,
           revisitaData: parsed.revisitaData || null,
+          parentRecordId: parsed.parentRecordId || null,
+          parentRecordTitle: parsed.parentRecordTitle || '',
+          seriesNumber: parsed.seriesNumber || null,
           coverImage: parsed.coverImage || PRESET_COVERS[subcat] || PRESET_COVERS['La Atalaya']
         };
       }
@@ -863,6 +920,9 @@
         wentOut: false,
         hours: 0,
         revisitaData: null,
+        parentRecordId: null,
+        parentRecordTitle: '',
+        seriesNumber: null,
         coverImage: PRESET_COVERS['La Atalaya']
       };
     }
@@ -1291,15 +1351,21 @@
                   <span class="font-label-sm text-[0.6875rem] bg-surface-container-highest text-primary px-2 py-0.5 rounded font-mono">${dateString}</span>
                   <span class="font-label-sm text-[0.6875rem] bg-surface-container text-tertiary px-2 py-0.5 rounded">${meta.categoryLabel || record.category}</span>
                   <span class="font-label-sm text-[0.6875rem] bg-primary/15 text-secondary border border-primary/25 px-2 py-0.5 rounded">${meta.subcategory}</span>
+                  ${meta.seriesNumber ? `<span class="font-label-sm text-[0.6875rem] bg-secondary/20 text-primary border border-primary/35 px-2 py-0.5 rounded flex items-center gap-1" title="Ficha Padre: ${meta.parentRecordTitle}"><span class="material-symbols-outlined text-[13px]">library_books</span>Serie #${meta.seriesNumber}</span>` : ''}
                   ${meta.packageName ? `<span class="font-label-sm text-[0.6875rem] bg-surface-container-high text-on-surface-variant px-2 py-0.5 rounded flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">inventory_2</span>${meta.packageName}</span>` : ''}
                   ${meta.wentOut ? `<span class="font-label-sm text-[0.6875rem] bg-[#1b3a24] text-[#86efac] border border-[#86efac]/30 px-2 py-0.5 rounded flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">check_circle</span>Salí (${meta.hours} h)</span>` : ''}
                 </div>
                 <h3 class="font-headline-md text-2xl text-on-surface mt-0.5">${record.title}</h3>
+                ${meta.parentRecordTitle ? `<span class="text-xs text-tertiary flex items-center gap-1 mt-0.5"><span class="material-symbols-outlined text-[14px]">subdirectory_arrow_right</span> Parte de la serie: <strong>${meta.parentRecordTitle}</strong></span>` : ''}
               </div>
             </div>
 
             <!-- Barra minimalista de exportación y acciones -->
             <div class="flex items-center gap-1 self-end sm:self-start bg-surface-container px-2 py-1 rounded-lg border border-outline/10 no-export">
+              <button onclick="openModalWithParent('${record.id}')" class="text-outline hover:text-primary transition-colors p-1.5 rounded hover:bg-surface-container-high" title="Crear siguiente ficha numerada de esta serie/revista">
+                <span class="material-symbols-outlined text-[18px]">library_add</span>
+              </button>
+              <div class="w-px h-4 bg-outline/20 mx-0.5"></div>
               <button onclick="exportRecordImage('${record.id}')" class="text-outline hover:text-primary transition-colors p-1.5 rounded hover:bg-surface-container-high" title="Exportar a Imagen (PNG)">
                 <span class="material-symbols-outlined text-[18px]">image</span>
               </button>
@@ -1363,6 +1429,9 @@
         wentOut: wentOutVal,
         hours: hoursVal,
         revisitaData: meta.revisitaData,
+        parentRecordId: meta.parentRecordId || null,
+        parentRecordTitle: meta.parentRecordTitle || '',
+        seriesNumber: meta.seriesNumber || null,
         coverImage: isCustomImg ? meta.coverImage : null
       });
 
@@ -1637,13 +1706,200 @@
       });
     });
 
-    window.openModal = () => {
+    // ================= LÓGICA DE FICHA PADRE / SERIE NUMERADA =================
+    const parentSearchInput = document.getElementById('parentSearchInput');
+    const parentFilterDate = document.getElementById('parentFilterDate');
+    const btnClearParentDate = document.getElementById('btnClearParentDate');
+    const fieldParentRecord = document.getElementById('fieldParentRecord');
+    const parentCountBadge = document.getElementById('parentCountBadge');
+    const seriesInheritedSummary = document.getElementById('seriesInheritedSummary');
+    const inheritedCoverImg = document.getElementById('inheritedCoverImg');
+    const inheritedGeneratedTitle = document.getElementById('inheritedGeneratedTitle');
+    const inheritedBadges = document.getElementById('inheritedBadges');
+    const btnClearParentSelection = document.getElementById('btnClearParentSelection');
+    const titleFieldCol = document.getElementById('titleFieldCol');
+    const dateFieldCol = document.getElementById('dateFieldCol');
+    const categoryFieldCol = document.getElementById('categoryFieldCol');
+    const standaloneSubcatRow = document.getElementById('standaloneSubcatRow');
+
+    let activeSeriesParentInfo = null;
+
+    function computeSeriesContinuation(selectedRecord) {
+      const selectedMeta = parseRecordMetadata(selectedRecord);
+      const rootId = selectedMeta.parentRecordId || selectedRecord.id;
+      const rootRecord = globalRecords.find(r => r.id === rootId) || selectedRecord;
+      const rootMeta = parseRecordMetadata(rootRecord);
+
+      // Limpiamos sufijos tipo "#2", "- #2" para obtener el nombre base limpio de la serie
+      const baseTitle = (selectedMeta.parentRecordTitle || rootRecord.title || selectedRecord.title)
+        .replace(/\s*(?:-\s*)?#\d+\s*$/i, '')
+        .trim();
+
+      let maxNum = 1;
+      globalRecords.forEach(r => {
+        const m = parseRecordMetadata(r);
+        const rBase = (m.parentRecordTitle || r.title || '').replace(/\s*(?:-\s*)?#\d+\s*$/i, '').trim();
+        if (r.id === rootId || m.parentRecordId === rootId || (rBase.toLowerCase() === baseTitle.toLowerCase() && baseTitle.length > 0)) {
+          if (m.seriesNumber && m.seriesNumber > maxNum) {
+            maxNum = m.seriesNumber;
+          }
+          const matchNum = (r.title || '').match(/#(\d+)\s*$/);
+          if (matchNum) {
+            const parsedN = parseInt(matchNum[1], 10);
+            if (parsedN > maxNum) maxNum = parsedN;
+          }
+        }
+      });
+
+      const nextNum = maxNum + 1;
+      const numberedTitle = `${baseTitle} #${nextNum}`;
+      const isCustomImg = rootMeta.coverImage && (
+        rootMeta.coverImage.startsWith('data:image/webp') ||
+        rootMeta.coverImage.startsWith('data:image/jpeg') ||
+        rootMeta.coverImage.startsWith('data:image/png')
+      );
+
+      return {
+        parentRecordId: rootId,
+        parentRecordTitle: baseTitle,
+        seriesNumber: nextNum,
+        numberedTitle: numberedTitle,
+        category: rootMeta.categoryLabel || rootRecord.category || 'Servicio',
+        subcategory: rootMeta.subcategory || 'La Atalaya',
+        packageName: rootMeta.packageName || '',
+        coverImage: rootMeta.coverImage || PRESET_COVERS[rootMeta.subcategory] || PRESET_COVERS['La Atalaya'],
+        customCoverData: isCustomImg ? rootMeta.coverImage : null
+      };
+    }
+
+    function populateParentRecordOptions(preserveSelectedId = '') {
+      const currentVal = preserveSelectedId || fieldParentRecord.value;
+      const searchQ = parentSearchInput.value.trim().toLowerCase();
+      const dateQ = parentFilterDate.value;
+
+      if (dateQ) {
+        btnClearParentDate.classList.remove('hidden');
+      } else {
+        btnClearParentDate.classList.add('hidden');
+      }
+
+      // Filtramos las fichas disponibles por búsqueda de nombre/subcategoría y/o por fecha de calendario
+      let candidates = globalRecords.filter(r => {
+        const meta = parseRecordMetadata(r);
+        if (meta.revisitaData || r.category === 'Revisita') return false;
+        if (dateQ) {
+          const rDate = formatDateForInput(new Date(r.date));
+          if (rDate !== dateQ) return false;
+        }
+        if (searchQ) {
+          const haystack = `${r.title} ${meta.subcategory} ${meta.packageName || ''} ${meta.parentRecordTitle || ''}`.toLowerCase();
+          if (!haystack.includes(searchQ)) return false;
+        }
+        return true;
+      });
+
+      const totalMatching = candidates.length;
+      // Para no cargar un listado gigante cuando no hay filtro activo, limitamos a las 25 más recientes
+      const maxItems = (searchQ || dateQ) ? 60 : 20;
+      const sliced = candidates.slice(0, maxItems);
+
+      // Si había una seleccionada que no entró en el corte, la incluimos para no perder la selección
+      if (currentVal && !sliced.some(r => r.id === currentVal)) {
+        const selRec = globalRecords.find(r => r.id === currentVal);
+        if (selRec) sliced.unshift(selRec);
+      }
+
+      parentCountBadge.textContent = (searchQ || dateQ)
+        ? `${totalMatching} encontrada(s)`
+        : `Últimas ${sliced.length} de ${totalMatching}`;
+
+      fieldParentRecord.innerHTML = `<option value="">-- Ficha nueva independiente (Sin padre) --</option>`;
+      sliced.forEach(r => {
+        const meta = parseRecordMetadata(r);
+        const dObj = new Date(r.date);
+        const dStr = isNaN(dObj) ? '' : dObj.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+        const opt = document.createElement('option');
+        opt.value = r.id;
+        opt.textContent = `${r.title} • ${meta.subcategory} (${dStr})`;
+        fieldParentRecord.appendChild(opt);
+      });
+
+      if (currentVal && sliced.some(r => r.id === currentVal)) {
+        fieldParentRecord.value = currentVal;
+      }
+    }
+
+    function applyParentSelectionUI() {
+      const selectedId = fieldParentRecord.value;
+      const selectedRecord = globalRecords.find(r => r.id === selectedId);
+      const fieldTitle = document.getElementById('fieldTitle');
+
+      if (!selectedRecord) {
+        activeSeriesParentInfo = null;
+        seriesInheritedSummary.classList.add('hidden');
+        titleFieldCol.classList.remove('hidden');
+        categoryFieldCol.classList.remove('hidden');
+        standaloneSubcatRow.classList.remove('hidden');
+        dateFieldCol.className = 'md:col-span-3';
+        fieldTitle.required = true;
+        return;
+      }
+
+      const info = computeSeriesContinuation(selectedRecord);
+      activeSeriesParentInfo = info;
+
+      // Rellenar automáticamente los campos ocultos con los datos heredados del padre
+      fieldTitle.value = info.numberedTitle;
+      fieldTitle.required = false;
+      document.getElementById('fieldCategory').value = info.category;
+      document.getElementById('fieldSubcategory').value = info.subcategory;
+      document.getElementById('fieldPackageName').value = info.packageName;
+      customCoverDataUrl = info.customCoverData;
+
+      // Mostrar el resumen visual de serie y ocultar Título, Categoría, Subcategoría e Imagen
+      inheritedCoverImg.src = info.coverImage;
+      inheritedGeneratedTitle.textContent = info.numberedTitle;
+      inheritedBadges.innerHTML = `
+        <span class="bg-surface-container px-2 py-0.5 rounded text-primary font-mono">Ficha #${info.seriesNumber}</span>
+        <span class="bg-surface-container px-2 py-0.5 rounded text-on-surface-variant">${info.category}</span>
+        <span class="bg-primary/15 text-secondary border border-primary/25 px-2 py-0.5 rounded">${info.subcategory}</span>
+        <span class="text-outline">Padre: <strong>${info.parentRecordTitle}</strong></span>
+      `;
+
+      seriesInheritedSummary.classList.remove('hidden');
+      titleFieldCol.classList.add('hidden');
+      categoryFieldCol.classList.add('hidden');
+      standaloneSubcatRow.classList.add('hidden');
+      dateFieldCol.className = 'md:col-span-12';
+    }
+
+    parentSearchInput.addEventListener('input', () => populateParentRecordOptions());
+    parentFilterDate.addEventListener('change', () => populateParentRecordOptions());
+    btnClearParentDate.addEventListener('click', () => {
+      parentFilterDate.value = '';
+      populateParentRecordOptions();
+    });
+    fieldParentRecord.addEventListener('change', applyParentSelectionUI);
+    btnClearParentSelection.addEventListener('click', () => {
+      fieldParentRecord.value = '';
+      document.getElementById('fieldTitle').value = '';
+      customCoverDataUrl = null;
+      applyParentSelectionUI();
+      updateCoverPreview();
+    });
+
+    window.openModal = (preselectParentId = '') => {
       const dateInput = document.getElementById('fieldDate');
       if (selectedDateFilter) {
         dateInput.value = selectedDateFilter;
       } else {
         dateInput.value = formatDateForInput(new Date());
       }
+      parentSearchInput.value = '';
+      parentFilterDate.value = '';
+      populateParentRecordOptions(preselectParentId);
+      fieldParentRecord.value = preselectParentId || '';
+      applyParentSelectionUI();
       updateCoverPreview();
 
       recordModal.classList.remove('hidden');
@@ -1653,11 +1909,15 @@
       }, 10);
     };
 
+    window.openModalWithParent = (parentId) => {
+      openModal(parentId);
+    };
+
     window.openModalForDate = (dateStr, packageName = '') => {
       document.getElementById('notifDropdown').classList.add('hidden');
       document.getElementById('weekendModal').classList.add('hidden');
       selectedDateFilter = dateStr;
-      openModal();
+      openModal('');
       document.getElementById('fieldDate').value = dateStr;
       if (packageName) {
         document.getElementById('fieldPackageName').value = packageName;
@@ -1673,12 +1933,15 @@
         richEditor.innerHTML = '';
         currentScriptures = [];
         customCoverDataUrl = null;
+        activeSeriesParentInfo = null;
+        fieldParentRecord.value = '';
+        applyParentSelectionUI();
         updateScriptureTags();
         updateCoverPreview();
       }, 300);
     };
 
-    btnOpenModal.addEventListener('click', openModal);
+    btnOpenModal.addEventListener('click', () => openModal(''));
     document.getElementById('btnCloseModal').addEventListener('click', closeModal);
     document.getElementById('btnCancelModal').addEventListener('click', closeModal);
 
@@ -1781,9 +2044,22 @@
       const cleanNotes = (editorHtml === '<br>') ? '' : editorHtml;
       document.getElementById('fieldNotes').value = cleanNotes;
 
-      const category = document.getElementById('fieldCategory').value;
-      const subcategory = document.getElementById('fieldSubcategory').value;
-      const packageName = document.getElementById('fieldPackageName').value.trim();
+      const finalTitle = activeSeriesParentInfo
+        ? activeSeriesParentInfo.numberedTitle
+        : document.getElementById('fieldTitle').value.trim();
+      const category = activeSeriesParentInfo
+        ? activeSeriesParentInfo.category
+        : document.getElementById('fieldCategory').value;
+      const subcategory = activeSeriesParentInfo
+        ? activeSeriesParentInfo.subcategory
+        : document.getElementById('fieldSubcategory').value;
+      const packageName = activeSeriesParentInfo
+        ? activeSeriesParentInfo.packageName
+        : document.getElementById('fieldPackageName').value.trim();
+      const finalCover = activeSeriesParentInfo
+        ? activeSeriesParentInfo.customCoverData
+        : (customCoverDataUrl || null);
+
       const hoursVal = parseFloat(document.getElementById('fieldHours').value) || 0;
       const wentOutVal = document.getElementById('fieldWentOut').checked || hoursVal > 0;
 
@@ -1793,7 +2069,10 @@
         packageName: packageName,
         wentOut: wentOutVal,
         hours: hoursVal,
-        revisitaData: null
+        revisitaData: null,
+        parentRecordId: activeSeriesParentInfo ? activeSeriesParentInfo.parentRecordId : null,
+        parentRecordTitle: activeSeriesParentInfo ? activeSeriesParentInfo.parentRecordTitle : '',
+        seriesNumber: activeSeriesParentInfo ? activeSeriesParentInfo.seriesNumber : null
       };
 
       const submitBtn = document.getElementById('btnSubmitRecord');
@@ -1802,15 +2081,15 @@
 
       try {
         await createPredicacionAdaptive({
-          title: document.getElementById('fieldTitle').value.trim(),
+          title: finalTitle,
           rawDate: rawDate,
           category: category,
           metaObj: metaObj,
           notes: cleanNotes,
-          customCover: customCoverDataUrl || null
+          customCover: finalCover
         });
 
-        showToast('Ficha guardada correctamente');
+        showToast(activeSeriesParentInfo ? `Ficha "${finalTitle}" guardada en la serie` : 'Ficha guardada correctamente');
         closeModal();
         await loadDataAndRender();
       } catch (error) {
