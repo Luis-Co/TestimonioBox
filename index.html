@@ -1651,7 +1651,11 @@
               <div class="flex flex-col gap-1 flex-1">
                 <div class="flex flex-wrap items-center gap-1.5 mb-1">
                   ${meta.calendarAssigned
-                    ? `<span class="font-label-sm text-[0.6875rem] bg-surface-container-highest text-primary px-2 py-0.5 rounded font-mono flex items-center gap-1" title="Asignada a esta fecha en el calendario"><span class="material-symbols-outlined text-[12px]">event_available</span>${dateString}</span>`
+                    ? `<span class="font-label-sm text-[0.6875rem] bg-surface-container-highest text-primary px-2 py-0.5 rounded font-mono flex items-center gap-1.5" title="Asignada a esta fecha en el calendario">
+                        <span class="material-symbols-outlined text-[12px]">event_available</span>
+                        <span>${dateString}</span>
+                        ${!meta.revisitaData ? `<button type="button" onclick="quickUnassignCardDate('${record.id}')" class="ml-0.5 text-outline hover:text-error flex items-center cursor-pointer no-export" title="Desasignar de este día (no borra la ficha)"><span class="material-symbols-outlined text-[13px]">close</span></button>` : ''}
+                      </span>`
                     : `<span class="font-label-sm text-[0.6875rem] bg-surface-container text-outline px-2 py-0.5 rounded font-mono" title="Fecha de creación (sin día de calendario asignado)">CREADA: ${dateString}</span>`
                   }
                   <span class="font-label-sm text-[0.6875rem] bg-surface-container text-tertiary px-2 py-0.5 rounded">${meta.categoryLabel || record.category}</span>
@@ -1667,24 +1671,28 @@
 
             <!-- Barra minimalista de exportación y acciones -->
             <div class="flex items-center gap-1 self-end sm:self-start bg-surface-container px-2 py-1 rounded-lg border border-outline/10 no-export">
-              <button onclick="editRecord('${record.id}')" class="text-outline hover:text-primary transition-colors p-1.5 rounded hover:bg-surface-container-high" title="Editar Ficha">
+              <button onclick="editRecord('${record.id}')" class="text-outline hover:text-primary transition-colors p-1.5 rounded hover:bg-surface-container-high cursor-pointer" title="Editar Ficha">
                 <span class="material-symbols-outlined text-[18px]">edit</span>
               </button>
-              <button onclick="openModalWithParent('${record.id}')" class="text-outline hover:text-secondary transition-colors p-1.5 rounded hover:bg-surface-container-high" title="Crear siguiente ficha numerada de esta serie/revista">
+              <button onclick="openModalWithParent('${record.id}')" class="text-outline hover:text-secondary transition-colors p-1.5 rounded hover:bg-surface-container-high cursor-pointer" title="Crear siguiente ficha numerada de esta serie/revista">
                 <span class="material-symbols-outlined text-[18px]">library_add</span>
               </button>
+              ${meta.calendarAssigned && !meta.revisitaData ? `
+              <button onclick="quickUnassignCardDate('${record.id}')" class="text-secondary hover:text-error transition-colors p-1.5 rounded hover:bg-surface-container-high cursor-pointer" title="Desasignar de este día (conservar en Fichas Sin Fecha)">
+                <span class="material-symbols-outlined text-[18px]">event_busy</span>
+              </button>` : ''}
               <div class="w-px h-4 bg-outline/20 mx-0.5"></div>
-              <button onclick="exportRecordImage('${record.id}')" class="text-outline hover:text-primary transition-colors p-1.5 rounded hover:bg-surface-container-high" title="Exportar a Imagen (PNG)">
+              <button onclick="exportRecordImage('${record.id}')" class="text-outline hover:text-primary transition-colors p-1.5 rounded hover:bg-surface-container-high cursor-pointer" title="Exportar a Imagen (PNG)">
                 <span class="material-symbols-outlined text-[18px]">image</span>
               </button>
-              <button onclick="exportRecordPDF('${record.id}')" class="text-outline hover:text-secondary transition-colors p-1.5 rounded hover:bg-surface-container-high" title="Exportar a PDF">
+              <button onclick="exportRecordPDF('${record.id}')" class="text-outline hover:text-secondary transition-colors p-1.5 rounded hover:bg-surface-container-high cursor-pointer" title="Exportar a PDF">
                 <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
               </button>
-              <button onclick="sendRecordWhatsApp('${record.id}')" class="text-outline hover:text-[#4ade80] transition-colors p-1.5 rounded hover:bg-surface-container-high" title="Enviar al WhatsApp +506 6227-8771">
+              <button onclick="sendRecordWhatsApp('${record.id}')" class="text-outline hover:text-[#4ade80] transition-colors p-1.5 rounded hover:bg-surface-container-high cursor-pointer" title="Enviar al WhatsApp +506 6227-8771">
                 <span class="material-symbols-outlined text-[18px]">chat</span>
               </button>
               <div class="w-px h-4 bg-outline/20 mx-0.5"></div>
-              <button onclick="deleteRecord('${record.id}')" class="text-outline hover:text-error transition-colors p-1.5 rounded hover:bg-surface-container-high" title="Eliminar Ficha">
+              <button onclick="deleteRecord('${record.id}')" class="text-outline hover:text-error transition-colors p-1.5 rounded hover:bg-surface-container-high cursor-pointer" title="Eliminar Ficha Definitivamente">
                 <span class="material-symbols-outlined text-[18px]">delete</span>
               </button>
             </div>
@@ -1707,16 +1715,17 @@
               </label>
 
               ${!meta.revisitaData ? `
-              <div class="flex items-center gap-1.5 bg-surface-container px-2.5 py-1 rounded-lg border border-outline/15">
+              <div class="flex flex-wrap items-center gap-1.5 bg-surface-container px-2.5 py-1 rounded-lg border border-outline/15">
                 <span class="material-symbols-outlined text-[15px] text-primary">calendar_add_on</span>
-                <span class="text-[11px] font-label-sm uppercase text-outline">Asociar a fecha:</span>
+                <span class="text-[11px] font-label-sm uppercase text-outline">${meta.calendarAssigned ? 'Cambiar fecha:' : 'Asociar a fecha:'}</span>
                 <input type="date" id="inp-assign-date-${record.id}" value="${meta.calendarAssigned && !isNaN(dateObj) ? formatDateForInput(dateObj) : ''}" class="bg-surface-container-high border border-outline/20 rounded px-2 py-0.5 text-xs text-on-surface focus:outline-none focus:border-primary [color-scheme:dark]">
                 <button type="button" onclick="quickAssignCardDate('${record.id}')" class="text-[11px] bg-primary/20 hover:bg-primary text-primary hover:text-[#432c00] font-semibold px-2 py-0.5 rounded border border-primary/30 transition-colors cursor-pointer">
-                  Asociar
+                  ${meta.calendarAssigned ? 'Mover' : 'Asociar'}
                 </button>
                 ${meta.calendarAssigned ? `
-                <button type="button" onclick="quickUnassignCardDate('${record.id}')" class="text-[11px] text-outline hover:text-error px-1.5 py-0.5 rounded transition-colors cursor-pointer" title="Desvincular de la fecha del calendario">
-                  Quitar fecha
+                <button type="button" onclick="quickUnassignCardDate('${record.id}')" class="flex items-center gap-1 text-[11px] bg-error-container/25 hover:bg-error text-error hover:text-[#410002] font-medium px-2 py-0.5 rounded border border-error/30 transition-colors cursor-pointer" title="Desasignar de este día sin borrar la ficha">
+                  <span class="material-symbols-outlined text-[13px]">event_busy</span>
+                  <span>Desasignar de este día</span>
                 </button>` : ''}
               </div>` : ''}
             </div>
