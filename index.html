@@ -1596,6 +1596,250 @@
       renderRecords();
     });
 
+    // Sincronización automática (idempotente) de los puntos corregidos de las 3 revistas principales en PocketBase
+    const CORRECTED_MAGAZINE_SERIES = [
+      {
+        baseTitle: '¿Quién es Dios?',
+        subcategory: 'La Atalaya',
+        points: [
+          {
+            num: 1,
+            heading: '',
+            question: '¿Es Dios un juez distante y cruel o alguien a quien podemos acercarnos?',
+            scriptureRef: 'Santiago 4:8',
+            scriptureQuote: 'Santiago capítulo 4, versículo 8. La Biblia indica: "Acérquense a Dios y él se acercará a ustedes".',
+            explanation: 'Llegar a conocer a Dios es similar a forjar una amistad con un ser humano, descubriendo su nombre, su personalidad y sus acciones. El universo requirió una causa eterna y no material, identificando a Dios como un ser espiritual real y accesible.'
+          },
+          {
+            num: 2,
+            heading: '¿Cuál es el nombre de Dios?',
+            question: 'Al referirnos al Creador, ¿deberíamos utilizar solo un título o su nombre propio?',
+            scriptureRef: 'Isaías 42:8',
+            scriptureQuote: 'Isaías capítulo 42, versículo 8. La Biblia indica: "Yo soy Jehová. Ese es mi nombre".',
+            explanation: 'El nombre de Dios aparece unas 7.000 veces en los manuscritos hebreos originales y significa "él hace que llegue a ser". El uso de su nombre personal es necesario para iniciar una amistad con él, pues demuestra que valoramos su identidad.'
+          },
+          {
+            num: 3,
+            heading: '¿Cómo es Dios?',
+            question: '¿Qué cualidad domina la personalidad del Creador?',
+            scriptureRef: '1 Juan 4:8',
+            scriptureQuote: '1 Juan capítulo 4, versículo 8. La Biblia indica: "Dios es amor".',
+            explanation: 'Aunque Dios demuestra un inmenso poder a través de la creación, sabiduría mediante el diseño del cuerpo humano y una justicia imparcial, el amor es la motivación principal detrás de todas sus acciones hacia la humanidad.'
+          },
+          {
+            num: 4,
+            heading: '¿Qué ha hecho Dios?',
+            question: '¿Qué acción divina garantiza nuestro futuro a pesar de los errores humanos?',
+            scriptureRef: 'Romanos 5:19',
+            scriptureQuote: 'Romanos capítulo 5, versículo 19. La Biblia indica: "tal como muchos llegaron a ser pecadores por la desobediencia de un solo hombre, del mismo modo muchos llegarán a ser justos por la obediencia de una sola persona".',
+            explanation: 'Tras la desobediencia de Adán en el jardín de Edén, Dios proveyó a su Hijo Jesucristo como rescate para reparar el daño. Esto asegura que el propósito original de que los humanos habiten la Tierra eternamente se cumplirá.'
+          },
+          {
+            num: 5,
+            heading: '¿Qué hará Dios?',
+            question: '¿Qué hará Dios para acabar de forma definitiva con el sufrimiento?',
+            scriptureRef: 'Mateo 6:9, 10',
+            scriptureQuote: 'Mateo capítulo 6, versículos 9 y 10. La Biblia indica: "Padre nuestro que estás en los cielos, [...] que venga tu Reino".',
+            explanation: 'Dios utilizará un gobierno celestial, dirigido por Jesucristo, para eliminar la maldad de Satanás, erradicar las enfermedades y destruir la muerte, convirtiendo el planeta en un paraíso habitado por personas justas.'
+          }
+        ]
+      },
+      {
+        baseTitle: '¿Es posible alcanzar la paz mundial?',
+        subcategory: 'La Atalaya',
+        points: [
+          {
+            num: 1,
+            heading: 'Punto 1: Gobiernos',
+            question: '¿Tienen los líderes políticos la capacidad de traer paz mundial definitiva?',
+            scriptureRef: 'Jeremías 10:23',
+            scriptureQuote: 'Jeremías capítulo 10, versículo 23. La Biblia indica: "Al hombre que está andando ni siquiera le corresponde dirigir sus pasos".',
+            explanation: 'Los seres humanos no fueron creados con la capacidad de gobernarse a sí mismos. Además, tendencias internas como el egoísmo y el orgullo corrompen los gobiernos humanos, haciendo que la paz mundial solo sea posible mediante la intervención del Reino de Dios.'
+          },
+          {
+            num: 2,
+            heading: 'Punto 2: Religiones',
+            question: '¿Han ayudado las religiones del mundo a alcanzar la paz o han fomentado la guerra?',
+            scriptureRef: 'Apocalipsis 18:24',
+            scriptureQuote: 'Apocalipsis capítulo 18, versículo 24. La Biblia indica: "En ella se encontró la sangre [...] de todos los que han sido asesinados en la tierra".',
+            explanation: 'La historia demuestra que las instituciones religiosas han manchado sus manos de sangre animando a sus fieles a luchar en guerras. Las religiones que toleran o promueven la violencia no son parte de la solución, a diferencia de la adoración verdadera que impulsa la paz.'
+          },
+          {
+            num: 3,
+            heading: 'Punto 3: Tecnología',
+            question: '¿Puede la tecnología moderna eliminar el odio que causa las guerras?',
+            scriptureRef: 'Marcos 7:21, 22',
+            scriptureQuote: 'Marcos capítulo 7, versículos 21 y 22. La Biblia indica: "De adentro, del corazón de la gente, salen razonamientos perjudiciales".',
+            explanation: 'Las guerras surgen por la codicia, envidia u orgullo que residen en la mente y el corazón. La tecnología es solo una herramienta, incapaz de arrancar esas malas tendencias.'
+          },
+          {
+            num: 4,
+            heading: 'Punto 4: Economía',
+            question: '¿Erradicará una mejor economía mundial la violencia?',
+            scriptureRef: '1 Timoteo 6:10',
+            scriptureQuote: '1 Timoteo capítulo 6, versículo 10. La Biblia indica: "El amor al dinero es raíz de todo tipo de males".',
+            explanation: 'Los intereses financieros y la avaricia son los generadores principales de guerras por tierras o recursos. Ningún tratado comercial frenará los conflictos; la paz solo se logra asimilando y aplicando los principios de Jehová.'
+          }
+        ]
+      },
+      {
+        baseTitle: '¿Qué está pasando con el respeto?',
+        subcategory: '¡Despertad!',
+        points: [
+          {
+            num: 1,
+            heading: 'Punto 1: Respeto por los demás',
+            question: '¿Cómo debe reaccionar un cristiano ante el aumento global de la falta de educación y respeto?',
+            scriptureRef: 'Proverbios 15:1',
+            scriptureQuote: 'Proverbios capítulo 15, versículo 1. La Biblia indica: "Una respuesta amable aparta la furia, pero una palabra hiriente provoca la ira".',
+            explanation: 'Las palabras hirientes escalan los problemas, mientras que tratar a las personas con amabilidad y estar dispuesto a pasar por alto pequeñas ofensas apacigua los ánimos y frena los conflictos.'
+          },
+          {
+            num: 2,
+            heading: 'Punto 2: Respeto por la vida',
+            question: '¿Qué medidas cotidianas demuestran que respetamos nuestra propia vida y la del prójimo?',
+            scriptureRef: '2 Corintios 7:1',
+            scriptureQuote: '2 Corintios capítulo 7, versículo 1. La Biblia indica: "Limpiémonos de todo lo que contamina el cuerpo".',
+            explanation: 'Abandonar hábitos perjudiciales como fumar o beber en exceso, y mantener normas estrictas de seguridad al conducir o en el mantenimiento del hogar, evidencia una profunda valoración por el don divino de la vida.'
+          },
+          {
+            num: 3,
+            heading: 'Punto 3: Respeto por la familia',
+            question: '¿Qué elemento es indispensable para que los cónyuges y los hijos sientan seguridad en el hogar?',
+            scriptureRef: 'Romanos 12:10',
+            scriptureQuote: 'Romanos capítulo 12, versículo 10. La Biblia indica: "Tomen la iniciativa de honrarse unos a otros".',
+            explanation: 'El respeto no es algo que los familiares deban ganarse, sino una obligación mutua. Evitar expresiones críticas, radicales o hirientes detiene el ciclo de conflictos y asegura la estabilidad psicológica de todos.'
+          },
+          {
+            num: 4,
+            heading: 'Punto 4: Respeto por uno mismo',
+            question: '¿Qué pueden hacer quienes se sienten inferiores para desarrollar amor propio y resiliencia?',
+            scriptureRef: 'Hechos 20:35',
+            scriptureQuote: 'Hechos capítulo 20, versículo 35. La Biblia indica: "Hay más felicidad en dar que en recibir".',
+            explanation: 'Involucrarse en ayudar a los demás y elegir amistades leales y positivas genera verdadera felicidad. Este enfoque reconstruye la dignidad y evita que los pequeños fracasos se perciban como derrotas absolutas.'
+          }
+        ]
+      }
+    ];
+
+    function buildMagazinePointHtml(pt) {
+      const headingBlock = pt.heading ? `<p><strong>${pt.heading}</strong></p>` : '';
+      return `${headingBlock}<ul><li><strong>Pregunta de introducción:</strong> ${pt.question}</li><li><strong>Texto bíblico:</strong> ${pt.scriptureQuote}</li><li><strong>Explicación bíblica:</strong> ${pt.explanation}</li></ul>`;
+    }
+
+    let hasRunMagazineCorrectionSync = false;
+    async function syncCorrectedMagazinesIfNeeded() {
+      if (hasRunMagazineCorrectionSync || !Array.isArray(globalRecords) || globalRecords.length === 0) return;
+      hasRunMagazineCorrectionSync = true;
+      let anyUpdated = false;
+
+      for (const mag of CORRECTED_MAGAZINE_SERIES) {
+        const normBase = normalizeForSearch(mag.baseTitle);
+
+        // Encontrar todos los registros que pertenecen a esta serie
+        const seriesRecs = globalRecords.filter(r => {
+          const cleanT = (r.title || '').replace(/\s*(?:-\s*)?#\d+\s*$/i, '').trim();
+          return normalizeForSearch(cleanT) === normBase;
+        });
+
+        // Identificar la ficha padre (#1 / sin sufijo #N) y su portada personalizada si existe
+        let rootRec = seriesRecs.find(r => !/#\d+\s*$/i.test(r.title || '')) || seriesRecs[0] || null;
+        let seriesCustomCover = null;
+        for (const sr of seriesRecs) {
+          const m = parseRecordMetadata(sr);
+          if (m.coverImage && (m.coverImage.startsWith('data:image/webp') || m.coverImage.startsWith('data:image/jpeg') || m.coverImage.startsWith('data:image/png'))) {
+            seriesCustomCover = m.coverImage;
+            break;
+          }
+        }
+
+        for (const pt of mag.points) {
+          const expectedTitle = pt.num === 1 ? mag.baseTitle : `${mag.baseTitle} #${pt.num}`;
+          const expectedNotes = buildMagazinePointHtml(pt);
+
+          // Buscar si existe la ficha para este punto (#1, #2, #3...)
+          let targetRec = seriesRecs.find(r => {
+            const matchN = (r.title || '').match(/#(\d+)\s*$/);
+            const rNum = matchN ? parseInt(matchN[1], 10) : 1;
+            return rNum === pt.num;
+          });
+
+          if (targetRec) {
+            const meta = parseRecordMetadata(targetRec);
+            const alreadySynced = (targetRec.notes || '').includes(pt.scriptureQuote) && (targetRec.notes || '').includes(pt.explanation);
+            const needsParentFix = pt.num > 1 && rootRec && (meta.parentRecordId !== rootRec.id || meta.seriesNumber !== pt.num);
+            const needsCoverFix = Boolean(seriesCustomCover && meta.coverImage !== seriesCustomCover);
+
+            if (!alreadySynced || needsParentFix || needsCoverFix) {
+              const rawDate = formatDateForInput(new Date(targetRec.date));
+              const updatedMetaObj = {
+                items: meta.items,
+                subcategory: meta.subcategory || mag.subcategory,
+                packageName: meta.packageName || '',
+                calendarAssigned: Boolean(meta.calendarAssigned),
+                previousDateBeforePack: meta.previousDateBeforePack || null,
+                wentOut: Boolean(meta.wentOut),
+                hours: meta.hours || 0,
+                revisitaData: null,
+                parentRecordId: pt.num > 1 && rootRec ? rootRec.id : null,
+                parentRecordTitle: pt.num > 1 ? mag.baseTitle : '',
+                seriesNumber: pt.num > 1 ? pt.num : null
+              };
+              try {
+                await updatePredicacionAdaptive(targetRec.id, {
+                  title: expectedTitle,
+                  rawDate: rawDate,
+                  category: meta.categoryLabel || targetRec.category || 'Servicio',
+                  metaObj: updatedMetaObj,
+                  notes: expectedNotes,
+                  customCover: seriesCustomCover
+                });
+                anyUpdated = true;
+              } catch (e) {
+                console.warn('No se pudo actualizar ficha de serie:', expectedTitle, e);
+              }
+            }
+          } else if (rootRec && pt.num > 1) {
+            // Si la serie existe pero faltaba algún punto hijo (ej. #5 de ¿Quién es Dios?), lo creamos vinculado al padre
+            const rootMeta = parseRecordMetadata(rootRec);
+            const newMetaObj = {
+              items: [],
+              subcategory: rootMeta.subcategory || mag.subcategory,
+              packageName: '',
+              calendarAssigned: false,
+              wentOut: false,
+              hours: 0,
+              revisitaData: null,
+              parentRecordId: rootRec.id,
+              parentRecordTitle: mag.baseTitle,
+              seriesNumber: pt.num
+            };
+            try {
+              await createPredicacionAdaptive({
+                title: expectedTitle,
+                rawDate: formatDateForInput(new Date()),
+                category: rootMeta.categoryLabel || rootRec.category || 'Servicio',
+                metaObj: newMetaObj,
+                notes: expectedNotes,
+                customCover: seriesCustomCover
+              });
+              anyUpdated = true;
+            } catch (e) {
+              console.warn('No se pudo crear punto faltante de serie:', expectedTitle, e);
+            }
+          }
+        }
+      }
+
+      if (anyUpdated) {
+        globalRecords = await pb.collection('predicaciones').getFullList({
+          sort: '-date',
+          requestKey: null
+        });
+        showToast('Fichas de las 3 revistas actualizadas con la información correcta');
+      }
+    }
+
     async function loadDataAndRender() {
       recordsContainer.innerHTML = `<div class="text-center py-12 text-outline">Cargando registros...</div>`;
       try {
@@ -1603,6 +1847,7 @@
           sort: '-date',
           requestKey: null
         });
+        await syncCorrectedMagazinesIfNeeded();
         renderCalendar();
         renderRecords();
         checkWeekendNotifications();
