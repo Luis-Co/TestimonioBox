@@ -1024,22 +1024,31 @@
       let jsonStr = JSON.stringify(baseMeta);
       if (jsonStr.length <= 4900) return jsonStr;
 
-      // 1. Si tiene padre (ficha hijo), el hijo puede heredar la portada en tiempo de lectura desde su padre en memoria, ahorrando ~3,000 caracteres
-      if (baseMeta.parentRecordId && baseMeta.coverImage) {
-        const withoutDupCover = { ...baseMeta, coverImage: null };
-        jsonStr = JSON.stringify(withoutDupCover);
+      // Recortamos progresivamente el texto de las citas bíblicas para CONSERVAR siempre la imagen de portada y el vínculo con el padre
+      for (const maxTextLen of [220, 120, 60, 0]) {
+        const trimmedItems = Array.isArray(baseMeta.items)
+          ? baseMeta.items.map(it => {
+              if (typeof it !== 'object' || !it) return it;
+              if (maxTextLen === 0) return { ref: it.ref || '' };
+              return (it.text && it.text.length > maxTextLen)
+                ? { ...it, text: it.text.slice(0, maxTextLen) + '…' }
+                : it;
+            })
+          : [];
+        const compactMeta = { ...baseMeta, items: trimmedItems };
+        jsonStr = JSON.stringify(compactMeta);
         if (jsonStr.length <= 4900) return jsonStr;
       }
 
-      // 2. Si aún supera 4,900 caracteres, recortamos textos largos de citas bíblicas o quitamos la portada embebida
-      const trimmedItems = Array.isArray(baseMeta.items)
-        ? baseMeta.items.map(it => (typeof it === 'object' && it.text && it.text.length > 350) ? { ...it, text: it.text.slice(0, 350) + '…' } : it)
+      // Último recurso si hubiera demasiadas citas: conservar las primeras 5 referencias manteniendo la portada y el padre intactos
+      const minItems = Array.isArray(baseMeta.items)
+        ? baseMeta.items.slice(0, 5).map(it => (typeof it === 'object' && it ? { ref: it.ref || '' } : it))
         : [];
-      const compactMeta = { ...baseMeta, items: trimmedItems };
-      jsonStr = JSON.stringify(compactMeta);
+      const fallbackWithCover = { ...baseMeta, items: minItems };
+      jsonStr = JSON.stringify(fallbackWithCover);
       if (jsonStr.length <= 4900) return jsonStr;
 
-      return JSON.stringify({ ...compactMeta, coverImage: null });
+      return JSON.stringify({ ...fallbackWithCover, coverImage: null });
     }
 
     // Guardado 100% en la base de datos PocketBase del VPS
@@ -1047,14 +1056,15 @@
       const isoDate = new Date((rawDate || formatDateForInput(new Date())) + 'T12:00:00.000Z').toISOString();
       const userId = pb.authStore.model?.id || pb.authStore.record?.id || null;
 
-      // Guardamos el nombre completo de la categoría y la portada comprimida directamente en PocketBase (VPS)
+      // Guardamos el nombre completo de la categoría en scriptures.categoryLabel y la portada comprimida directamente en PocketBase (VPS)
       const safeScripturesJson = buildSafeScripturesJson(metaObj, customCover, category);
       const safeNotes = (notes || '<p>Asignación preparada.</p>').slice(0, 4900);
+      const pbCategory = LEGACY_CATEGORY_MAP[category] || category || 'Predicacion';
 
       let payload = {
         title: title || 'Asignación Ministerial',
         date: isoDate,
-        category: category,
+        category: pbCategory,
         scriptures: safeScripturesJson,
         notes: safeNotes
       };
@@ -1067,27 +1077,15 @@
         const errData = err1?.response?.data || {};
         console.warn('Intento 1 en PocketBase rechazado. Detalles por campo:', JSON.stringify(err1?.response || err1));
 
-        // Adaptar campos según la validación exacta devuelta por PocketBase en el VPS
-        const adapted = { ...payload };
+        const adapted = {
+          ...payload,
+          category: LEGACY_CATEGORY_MAP[category] || 'Predicacion',
+          scriptures: safeScripturesJson,
+          notes: (notes && notes.trim() ? notes : 'Asignación registrada.').slice(0, 4900)
+        };
 
-        // Si el campo category falló (ej. select en PB espera Discurso, Reunion, Predicacion, Revisita)
-        if (errData.category || LEGACY_CATEGORY_MAP[category]) {
-          adapted.category = LEGACY_CATEGORY_MAP[category] || 'Predicacion';
-        }
-
-        // Si scriptures falló por longitud máxima, forzar versión sin portada duplicada
-        if (errData.scriptures) {
-          adapted.scriptures = buildSafeScripturesJson(metaObj, null, category);
-        }
-
-        // Si el campo user falló (no existe o relación distinta), probar sin user
         if (errData.user) {
           delete adapted.user;
-        }
-
-        // Si notes falló por estar vacío o requerido
-        if (errData.notes || !adapted.notes) {
-          adapted.notes = (notes && notes.trim() ? notes : 'Asignación registrada.').slice(0, 4900);
         }
 
         try {
@@ -1095,12 +1093,11 @@
           return { record: created2, source: 'pocketbase' };
         } catch (err2) {
           console.warn('Intento 2 en PocketBase rechazado. Detalles:', JSON.stringify(err2?.response || err2));
-          // Intento 3 en PocketBase (VPS): sin user, categoría compatible y scriptures compacto
           const minimalPayload = {
             title: adapted.title,
             date: isoDate,
             category: LEGACY_CATEGORY_MAP[category] || 'Predicacion',
-            scriptures: buildSafeScripturesJson(metaObj, null, category),
+            scriptures: safeScripturesJson,
             notes: (adapted.notes || 'Asignación registrada.').slice(0, 4900)
           };
           const created3 = await pb.collection('predicaciones').create(minimalPayload, { requestKey: null });
@@ -1114,11 +1111,12 @@
       const isoDate = new Date((rawDate || formatDateForInput(new Date())) + 'T12:00:00.000Z').toISOString();
       const safeScripturesJson = buildSafeScripturesJson(metaObj, customCover, category);
       const safeNotes = (notes || '<p>Asignación preparada.</p>').slice(0, 4900);
+      const pbCategory = LEGACY_CATEGORY_MAP[category] || category || 'Predicacion';
 
       const payload = {
         title: title || 'Asignación Ministerial',
         date: isoDate,
-        category: category,
+        category: pbCategory,
         scriptures: safeScripturesJson,
         notes: safeNotes
       };
@@ -1127,11 +1125,10 @@
         const updated = await pb.collection('predicaciones').update(id, payload, { requestKey: null });
         return { record: updated, source: 'pocketbase' };
       } catch (err1) {
-        const errData = err1?.response?.data || {};
         const adapted = {
           ...payload,
           category: LEGACY_CATEGORY_MAP[category] || 'Predicacion',
-          scriptures: errData.scriptures ? buildSafeScripturesJson(metaObj, null, category) : safeScripturesJson,
+          scriptures: safeScripturesJson,
           notes: (notes && notes.trim() ? notes : 'Asignación registrada.').slice(0, 4900)
         };
         const updated2 = await pb.collection('predicaciones').update(id, adapted, { requestKey: null });
@@ -1173,15 +1170,58 @@
           ? parsed.calendarAssigned
           : (hasPackage || isRevisita);
 
-        // Si es ficha hija de una serie y no guardó copia duplicada de la imagen por límite de caracteres, la hereda en vivo del padre
+        // Si es ficha hija de una serie (por parentRecordId o por sufijo "#N"), recupera o hereda en vivo el padre y la portada de toda la serie
         let resolvedCover = parsed.coverImage;
-        if (!resolvedCover && parsed.parentRecordId && Array.isArray(globalRecords)) {
-          const parentRec = globalRecords.find(x => x.id === parsed.parentRecordId);
-          if (parentRec && parentRec.id !== record.id) {
-            try {
-              const pParsed = typeof parentRec.scriptures === 'object' ? parentRec.scriptures : JSON.parse(parentRec.scriptures || '{}');
-              if (pParsed && pParsed.coverImage) resolvedCover = pParsed.coverImage;
-            } catch (e) {}
+        let resolvedParentId = parsed.parentRecordId || null;
+        let resolvedParentTitle = parsed.parentRecordTitle || '';
+        let resolvedSeriesNumber = parsed.seriesNumber || null;
+
+        const titleSeriesMatch = (record.title || '').match(/^(.*?)\s*(?:-\s*)?#(\d+)\s*$/i);
+        if (!resolvedSeriesNumber && titleSeriesMatch) {
+          resolvedSeriesNumber = parseInt(titleSeriesMatch[2], 10) || null;
+        }
+
+        if (Array.isArray(globalRecords) && (resolvedParentId || resolvedParentTitle || titleSeriesMatch)) {
+          const baseSeriesTitle = (resolvedParentTitle || (titleSeriesMatch ? titleSeriesMatch[1] : record.title) || '')
+            .replace(/\s*(?:-\s*)?#\d+\s*$/i, '')
+            .trim();
+          const baseLower = baseSeriesTitle.toLowerCase();
+
+          // 1. Si perdió su parentRecordId pero tiene sufijo #N o parentRecordTitle, revincular automáticamente al registro padre raíz
+          if (!resolvedParentId && baseLower) {
+            const rootCandidate = globalRecords.find(c => {
+              if (c.id === record.id) return false;
+              const cTitleClean = (c.title || '').trim().toLowerCase();
+              return cTitleClean === baseLower;
+            });
+            if (rootCandidate) {
+              resolvedParentId = rootCandidate.id;
+              resolvedParentTitle = rootCandidate.title.trim();
+            }
+          } else if (resolvedParentId && !resolvedParentTitle) {
+            const parentRec = globalRecords.find(c => c.id === resolvedParentId);
+            if (parentRec) {
+              resolvedParentTitle = (parentRec.title || '').replace(/\s*(?:-\s*)?#\d+\s*$/i, '').trim();
+            }
+          }
+
+          // 2. Si no tiene portada personalizada propia, heredarla en vivo de la ficha padre o de cualquier ficha hermana de la misma serie
+          if (!resolvedCover) {
+            for (const candidate of globalRecords) {
+              if (candidate.id === record.id) continue;
+              try {
+                const cParsed = typeof candidate.scriptures === 'object' ? candidate.scriptures : JSON.parse(candidate.scriptures || '{}');
+                if (!cParsed || !cParsed.coverImage) continue;
+                const cBaseTitle = (cParsed.parentRecordTitle || candidate.title || '').replace(/\s*(?:-\s*)?#\d+\s*$/i, '').trim().toLowerCase();
+                const isSameSeries =
+                  (resolvedParentId && (candidate.id === resolvedParentId || cParsed.parentRecordId === resolvedParentId)) ||
+                  (baseLower && cBaseTitle === baseLower);
+                if (isSameSeries) {
+                  resolvedCover = cParsed.coverImage;
+                  break;
+                }
+              } catch (e) {}
+            }
           }
         }
 
@@ -1195,9 +1235,9 @@
           wentOut: Boolean(parsed.wentOut),
           hours: parseFloat(parsed.hours) || 0,
           revisitaData: parsed.revisitaData || null,
-          parentRecordId: parsed.parentRecordId || null,
-          parentRecordTitle: parsed.parentRecordTitle || '',
-          seriesNumber: parsed.seriesNumber || null,
+          parentRecordId: resolvedParentId,
+          parentRecordTitle: resolvedParentTitle,
+          seriesNumber: resolvedSeriesNumber,
           coverImage: resolvedCover || PRESET_COVERS[subcat] || PRESET_COVERS['La Atalaya']
         };
       }
@@ -1263,19 +1303,19 @@
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, w, h);
 
-          // Intentar primero en WebP (más ligero) y ajustar calidad para no exceder límites de texto en PocketBase
-          let dataUrl = canvas.toDataURL('image/webp', 0.65);
-          if (!dataUrl.startsWith('data:image/webp') || dataUrl.length > 2900) {
-            dataUrl = canvas.toDataURL('image/jpeg', 0.55);
+          // Intentar primero en WebP (más ligero, <= 2200 chars) para que quepa holgadamente junto con citas y metadatos de serie en PocketBase
+          let dataUrl = canvas.toDataURL('image/webp', 0.58);
+          if (!dataUrl.startsWith('data:image/webp') || dataUrl.length > 2200) {
+            dataUrl = canvas.toDataURL('image/jpeg', 0.50);
           }
-          if (dataUrl.length > 2900) {
+          if (dataUrl.length > 2200) {
             const smallCanvas = document.createElement('canvas');
-            smallCanvas.width = Math.round(w * 0.75);
-            smallCanvas.height = Math.round(h * 0.75);
+            smallCanvas.width = Math.round(w * 0.72);
+            smallCanvas.height = Math.round(h * 0.72);
             smallCanvas.getContext('2d').drawImage(img, 0, 0, smallCanvas.width, smallCanvas.height);
-            dataUrl = smallCanvas.toDataURL('image/webp', 0.55);
-            if (dataUrl.length > 2900) {
-              dataUrl = smallCanvas.toDataURL('image/jpeg', 0.48);
+            dataUrl = smallCanvas.toDataURL('image/webp', 0.50);
+            if (dataUrl.length > 2200) {
+              dataUrl = smallCanvas.toDataURL('image/jpeg', 0.44);
             }
           }
 
@@ -1871,9 +1911,8 @@
 
       const meta = parseRecordMetadata(record);
       const isCustomImg = meta.coverImage && (meta.coverImage.startsWith('data:image/webp') || meta.coverImage.startsWith('data:image/jpeg') || meta.coverImage.startsWith('data:image/png'));
-      const updatedPayload = JSON.stringify({
+      const metaObj = {
         items: meta.items,
-        categoryLabel: meta.categoryLabel || record.category,
         subcategory: meta.subcategory,
         packageName: meta.packageName,
         calendarAssigned: Boolean(meta.calendarAssigned),
@@ -1883,9 +1922,9 @@
         revisitaData: meta.revisitaData,
         parentRecordId: meta.parentRecordId || null,
         parentRecordTitle: meta.parentRecordTitle || '',
-        seriesNumber: meta.seriesNumber || null,
-        coverImage: isCustomImg ? meta.coverImage : null
-      });
+        seriesNumber: meta.seriesNumber || null
+      };
+      const updatedPayload = buildSafeScripturesJson(metaObj, isCustomImg ? meta.coverImage : null, meta.categoryLabel || record.category);
 
       try {
         await pb.collection('predicaciones').update(id, { scriptures: updatedPayload }, { requestKey: null });
@@ -2192,7 +2231,7 @@
         .trim();
     }
 
-    function computeSeriesContinuation(selectedRecord) {
+    function computeSeriesContinuation(selectedRecord, existingEditRecord = null) {
       const selectedMeta = parseRecordMetadata(selectedRecord);
       const rootId = selectedMeta.parentRecordId || selectedRecord.id;
       const rootRecord = globalRecords.find(r => r.id === rootId) || selectedRecord;
@@ -2203,25 +2242,43 @@
         .replace(/\s*(?:-\s*)?#\d+\s*$/i, '')
         .trim();
 
-      let maxNum = 1;
-      globalRecords.forEach(r => {
-        if (editingRecordId && r.id === editingRecordId) return;
-        const m = parseRecordMetadata(r);
-        const rBase = (m.parentRecordTitle || r.title || '').replace(/\s*(?:-\s*)?#\d+\s*$/i, '').trim();
-        if (r.id === rootId || m.parentRecordId === rootId || (rBase.toLowerCase() === baseTitle.toLowerCase() && baseTitle.length > 0)) {
-          if (m.seriesNumber && m.seriesNumber > maxNum) {
-            maxNum = m.seriesNumber;
-          }
-          const matchNum = (r.title || '').match(/#(\d+)\s*$/);
-          if (matchNum) {
-            const parsedN = parseInt(matchNum[1], 10);
-            if (parsedN > maxNum) maxNum = parsedN;
-          }
-        }
-      });
+      let targetNum = null;
+      let numberedTitle = '';
 
-      const nextNum = maxNum + 1;
-      const numberedTitle = `${baseTitle} #${nextNum}`;
+      // Si estamos editando una ficha que ya pertenece a esta misma serie, conservamos su número (#2, #3...)
+      if (existingEditRecord) {
+        const editMeta = parseRecordMetadata(existingEditRecord);
+        const editBase = (editMeta.parentRecordTitle || existingEditRecord.title || '').replace(/\s*(?:-\s*)?#\d+\s*$/i, '').trim();
+        const editMatchNum = (existingEditRecord.title || '').match(/#(\d+)\s*$/);
+        const isSameParent = editMeta.parentRecordId === rootId || (editBase.toLowerCase() === baseTitle.toLowerCase() && baseTitle.length > 0);
+        if (isSameParent && (editMeta.seriesNumber || editMatchNum)) {
+          targetNum = editMeta.seriesNumber || parseInt(editMatchNum[1], 10);
+          numberedTitle = `${baseTitle} #${targetNum}`;
+        }
+      }
+
+      if (!targetNum) {
+        let maxNum = 1;
+        globalRecords.forEach(r => {
+          if (editingRecordId && r.id === editingRecordId) return;
+          const m = parseRecordMetadata(r);
+          const rBase = (m.parentRecordTitle || r.title || '').replace(/\s*(?:-\s*)?#\d+\s*$/i, '').trim();
+          if (r.id === rootId || m.parentRecordId === rootId || (rBase.toLowerCase() === baseTitle.toLowerCase() && baseTitle.length > 0)) {
+            if (m.seriesNumber && m.seriesNumber > maxNum) {
+              maxNum = m.seriesNumber;
+            }
+            const matchNum = (r.title || '').match(/#(\d+)\s*$/);
+            if (matchNum) {
+              const parsedN = parseInt(matchNum[1], 10);
+              if (parsedN > maxNum) maxNum = parsedN;
+            }
+          }
+        });
+
+        targetNum = maxNum + 1;
+        numberedTitle = `${baseTitle} #${targetNum}`;
+      }
+
       const isCustomImg = rootMeta.coverImage && (
         rootMeta.coverImage.startsWith('data:image/webp') ||
         rootMeta.coverImage.startsWith('data:image/jpeg') ||
@@ -2231,7 +2288,7 @@
       return {
         parentRecordId: rootId,
         parentRecordTitle: baseTitle,
-        seriesNumber: nextNum,
+        seriesNumber: targetNum,
         numberedTitle: numberedTitle,
         category: rootMeta.categoryLabel || rootRecord.category || 'Servicio',
         subcategory: rootMeta.subcategory || 'La Atalaya',
@@ -2366,16 +2423,20 @@
         return;
       }
 
-      const info = computeSeriesContinuation(selectedRecord);
+      const existingEditRec = editingRecordId ? globalRecords.find(r => r.id === editingRecordId) : null;
+      const info = computeSeriesContinuation(selectedRecord, existingEditRec);
       activeSeriesParentInfo = info;
 
-      // Rellenar automáticamente los campos ocultos con los datos heredados del padre
+      // Rellenar automáticamente los campos con los datos heredados del padre
       fieldTitle.value = info.numberedTitle;
       fieldTitle.required = false;
       document.getElementById('fieldCategory').value = info.category;
       document.getElementById('fieldSubcategory').value = info.subcategory;
-      document.getElementById('fieldPackageName').value = info.packageName;
+      if (!editingRecordId) {
+        document.getElementById('fieldPackageName').value = '';
+      }
       customCoverDataUrl = info.customCoverData;
+      updateCoverPreview();
 
       // Mostrar el resumen visual de serie y ocultar Título, Categoría, Subcategoría e Imagen
       inheritedCoverImg.src = info.coverImage;
@@ -2496,18 +2557,7 @@
       parentSearchInput.value = '';
       parentFilterDate.value = '';
       populateParentRecordOptions(meta.parentRecordId || '');
-      fieldParentRecord.value = '';
-      applyParentSelectionUI();
-
-      // Si pertenecía a una serie, conservamos su vínculo pero mostramos todos los campos para que pueda editar título, portada o notas libremente
-      if (meta.parentRecordId) {
-        fieldParentRecord.value = meta.parentRecordId;
-        activeSeriesParentInfo = {
-          parentRecordId: meta.parentRecordId,
-          parentRecordTitle: meta.parentRecordTitle || '',
-          seriesNumber: meta.seriesNumber || null
-        };
-      }
+      fieldParentRecord.value = meta.parentRecordId || '';
 
       document.getElementById('fieldTitle').value = record.title || '';
       const dObj = new Date(record.date);
@@ -2529,6 +2579,13 @@
         meta.coverImage.startsWith('data:image/png')
       );
       customCoverDataUrl = isCustomImg ? meta.coverImage : null;
+
+      // Si pertenece a una serie (tiene ficha padre), muestra el recuadro de vínculo con el padre y su portada heredada
+      applyParentSelectionUI();
+      if (meta.parentRecordId && record.title) {
+        document.getElementById('fieldTitle').value = record.title;
+        inheritedGeneratedTitle.textContent = record.title;
+      }
       updateCoverPreview();
 
       richEditor.innerHTML = record.notes || '';
@@ -2902,23 +2959,23 @@
       const cleanNotes = (editorHtml === '<br>') ? '' : editorHtml;
       document.getElementById('fieldNotes').value = cleanNotes;
 
-      const isCreatingWithParent = !editingRecordId && activeSeriesParentInfo && activeSeriesParentInfo.numberedTitle;
+      const hasSeriesParent = Boolean(fieldParentRecord.value && activeSeriesParentInfo && activeSeriesParentInfo.parentRecordId);
 
-      const finalTitle = isCreatingWithParent
-        ? activeSeriesParentInfo.numberedTitle
+      const finalTitle = hasSeriesParent
+        ? (document.getElementById('fieldTitle').value.trim() || activeSeriesParentInfo.numberedTitle)
         : document.getElementById('fieldTitle').value.trim();
-      const category = isCreatingWithParent
+      const category = hasSeriesParent
         ? activeSeriesParentInfo.category
         : document.getElementById('fieldCategory').value;
-      const subcategory = isCreatingWithParent
+      const subcategory = hasSeriesParent
         ? activeSeriesParentInfo.subcategory
         : document.getElementById('fieldSubcategory').value;
       // Al crear una nueva ficha de serie no hereda el paquete del padre automáticamente para que no se asigne sola al calendario
-      const packageName = isCreatingWithParent
+      const packageName = (!editingRecordId && hasSeriesParent)
         ? ''
         : document.getElementById('fieldPackageName').value.trim();
-      const finalCover = isCreatingWithParent
-        ? activeSeriesParentInfo.customCoverData
+      const finalCover = hasSeriesParent
+        ? (activeSeriesParentInfo.customCoverData || customCoverDataUrl || null)
         : (customCoverDataUrl || null);
 
       const hoursVal = parseFloat(document.getElementById('fieldHours').value) || 0;
@@ -2933,9 +2990,9 @@
         wentOut: wentOutVal,
         hours: hoursVal,
         revisitaData: null,
-        parentRecordId: activeSeriesParentInfo ? activeSeriesParentInfo.parentRecordId : null,
-        parentRecordTitle: activeSeriesParentInfo ? activeSeriesParentInfo.parentRecordTitle : '',
-        seriesNumber: activeSeriesParentInfo ? activeSeriesParentInfo.seriesNumber : null
+        parentRecordId: hasSeriesParent ? activeSeriesParentInfo.parentRecordId : null,
+        parentRecordTitle: hasSeriesParent ? activeSeriesParentInfo.parentRecordTitle : '',
+        seriesNumber: hasSeriesParent ? activeSeriesParentInfo.seriesNumber : null
       };
 
       const submitBtn = document.getElementById('btnSubmitRecord');
@@ -2962,7 +3019,7 @@
             notes: cleanNotes,
             customCover: finalCover
           });
-          showToast(isCreatingWithParent ? `Ficha "${finalTitle}" guardada en la serie` : 'Ficha guardada correctamente');
+          showToast(hasSeriesParent ? `Ficha "${finalTitle}" guardada en la serie` : 'Ficha guardada correctamente');
         }
 
         closeModal();
