@@ -99,10 +99,6 @@
           <div class="font-label-sm text-[0.6875rem] text-outline px-2 mb-1 uppercase tracking-wider sidebar-text">Navegación Pastoral</div>
           <nav class="flex flex-col gap-1">
             <a id="navCronogramaBtn" title="Cronograma & Predicaciones" class="flex items-center gap-2 px-2 py-2 rounded-lg bg-surface-container-high text-primary font-medium cursor-pointer transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">event_available</span><span class="sidebar-text">Cronograma & Predicaciones</span></a>
-            <a id="navUnassignedBtn" title="Fichas Sin Fecha Asociada" class="flex items-center justify-between gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer" href="#">
-              <span class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">library_books</span><span class="sidebar-text">Fichas Sin Fecha</span></span>
-              <span id="navUnassignedBadge" class="text-[10px] font-mono bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold">0</span>
-            </a>
             <a id="navDashboardBtn" title="Dashboard del Ministerio" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer" href="#"><span class="material-symbols-outlined text-[20px]">monitoring</span><span class="sidebar-text">Dashboard</span></a>
             <a id="navRevisitasBtn" title="Registrar Revisita" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[20px]">contacts_product</span><span class="sidebar-text">Revisitas</span></a>
             <a id="navPackBtn" title="Paquetes de Fichas" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[20px]">inventory_2</span><span class="sidebar-text">Paquetes de Fichas</span></a>
@@ -2949,7 +2945,6 @@
     const informesSection = document.getElementById('informesSection');
     const dashboardSection = document.getElementById('dashboardSection');
     const navCronogramaBtn = document.getElementById('navCronogramaBtn');
-    const navUnassignedBtn = document.getElementById('navUnassignedBtn');
     const navDashboardBtn = document.getElementById('navDashboardBtn');
     const navInformesBtn = document.getElementById('navInformesBtn');
     const navRevisitasBtn = document.getElementById('navRevisitasBtn');
@@ -2959,8 +2954,6 @@
     function switchSection(section) {
       const activeClass = 'flex items-center gap-2 px-2 py-2 rounded-lg bg-surface-container-high text-primary font-medium cursor-pointer transition-colors';
       const inactiveClass = 'flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer';
-      const unassignedActiveClass = 'flex items-center justify-between gap-2 px-2 py-2 rounded-lg bg-surface-container-high text-primary font-medium cursor-pointer transition-colors';
-      const unassignedInactiveClass = 'flex items-center justify-between gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer';
 
       cronogramaSection.classList.add('hidden');
       informesSection.classList.add('hidden');
@@ -2973,7 +2966,6 @@
       navCronogramaBtn.className = inactiveClass;
       navInformesBtn.className = inactiveClass;
       if (navDashboardBtn) navDashboardBtn.className = inactiveClass;
-      if (navUnassignedBtn) navUnassignedBtn.className = unassignedInactiveClass;
 
       if (section === 'informes') {
         informesSection.classList.remove('hidden');
@@ -2985,14 +2977,6 @@
         dashboardSection.classList.add('flex');
         if (navDashboardBtn) navDashboardBtn.className = activeClass;
         renderDashboard();
-      } else if (section === 'unassigned') {
-        cronogramaSection.classList.remove('hidden');
-        if (navUnassignedBtn) navUnassignedBtn.className = unassignedActiveClass;
-        selectedDateFilter = null;
-        recordsViewMode = 'unassigned';
-        updateRecordsViewTabsUI();
-        renderCalendar();
-        renderRecords();
       } else {
         cronogramaSection.classList.remove('hidden');
         navCronogramaBtn.className = activeClass;
@@ -3008,13 +2992,6 @@
       renderCalendar();
       renderRecords();
     });
-
-    if (navUnassignedBtn) {
-      navUnassignedBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        switchSection('unassigned');
-      });
-    }
 
     if (navDashboardBtn) {
       navDashboardBtn.addEventListener('click', (e) => {
