@@ -469,19 +469,25 @@
           </div>
 
           <!-- Resumen automático cuando se elige una Ficha Padre (oculta título, categoría, subcategoría e imagen) -->
-          <div id="seriesInheritedSummary" class="hidden mt-1 p-3.5 rounded-xl bg-surface-container-high border border-primary/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <div class="flex items-center gap-3.5">
-              <img id="inheritedCoverImg" src="" alt="Portada heredada" class="w-12 h-16 object-cover rounded-lg border border-outline/25 shadow flex-shrink-0">
-              <div class="flex flex-col gap-0.5">
-                <span class="text-[10px] font-label-sm uppercase text-primary tracking-wider">Continuación automática de serie (hereda categoría, fuente y portada)</span>
-                <p id="inheritedGeneratedTitle" class="font-headline-sm text-lg text-on-surface font-bold leading-snug"></p>
-                <div id="inheritedBadges" class="flex flex-wrap items-center gap-1.5 text-[11px] text-tertiary mt-0.5"></div>
+          <div id="seriesInheritedSummary" class="hidden mt-1 p-3.5 rounded-xl bg-surface-container-high border border-primary/30 flex flex-col gap-3">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div class="flex items-center gap-3.5">
+                <img id="inheritedCoverImg" src="" alt="Portada heredada" class="w-12 h-16 object-cover rounded-lg border border-outline/25 shadow flex-shrink-0">
+                <div class="flex flex-col gap-0.5">
+                  <span class="text-[10px] font-label-sm uppercase text-primary tracking-wider">Continuación automática de serie (hereda categoría, fuente y portada)</span>
+                  <p id="inheritedGeneratedTitle" class="font-headline-sm text-lg text-on-surface font-bold leading-snug"></p>
+                  <div id="inheritedBadges" class="flex flex-wrap items-center gap-1.5 text-[11px] text-tertiary mt-0.5"></div>
+                </div>
               </div>
+              <button type="button" id="btnClearParentSelection" class="text-xs text-outline hover:text-error bg-surface-container px-2.5 py-1.5 rounded-lg border border-outline/15 transition-colors flex items-center gap-1 self-end sm:self-center whitespace-nowrap">
+                <span class="material-symbols-outlined text-[15px]">link_off</span>
+                <span>Desvincular padre</span>
+              </button>
             </div>
-            <button type="button" id="btnClearParentSelection" class="text-xs text-outline hover:text-error bg-surface-container px-2.5 py-1.5 rounded-lg border border-outline/15 transition-colors flex items-center gap-1 self-end sm:self-center whitespace-nowrap">
-              <span class="material-symbols-outlined text-[15px]">link_off</span>
-              <span>Desvincular padre</span>
-            </button>
+            <div class="pt-2.5 border-t border-outline/15">
+              <label for="fieldSeriesSubtitle" class="block text-[11px] font-label-sm text-primary uppercase mb-1">Subtítulo de la Ficha Hija / Tema del Punto (Ej. ¿Cuál es el nombre de Dios?)</label>
+              <input type="text" id="fieldSeriesSubtitle" placeholder="Escribe el subtítulo o pregunta del punto de esta ficha hija..." class="w-full bg-surface-container border border-outline/25 rounded-lg px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary">
+            </div>
           </div>
         </div>
 
@@ -1160,6 +1166,7 @@
           parentRecordId: null,
           parentRecordTitle: '',
           seriesNumber: null,
+          seriesSubtitle: '',
           coverImage: record.coverImage || PRESET_COVERS[subcat] || PRESET_COVERS['Estudio Personal / Biblia']
         };
       } else if (parsed && typeof parsed === 'object') {
@@ -1175,10 +1182,19 @@
         let resolvedParentId = parsed.parentRecordId || null;
         let resolvedParentTitle = parsed.parentRecordTitle || '';
         let resolvedSeriesNumber = parsed.seriesNumber || null;
+        let resolvedSeriesSubtitle = parsed.seriesSubtitle || '';
 
         const titleSeriesMatch = (record.title || '').match(/^(.*?)\s*(?:-\s*)?#(\d+)\s*$/i);
         if (!resolvedSeriesNumber && titleSeriesMatch) {
           resolvedSeriesNumber = parseInt(titleSeriesMatch[2], 10) || null;
+        }
+
+        // Si no tiene subtítulo guardado pero sus notas empiezan con <p><strong>...</strong></p>, lo extraemos como subtítulo por defecto
+        if (!resolvedSeriesSubtitle && (resolvedParentId || resolvedSeriesNumber) && record.notes) {
+          const strongMatch = record.notes.match(/^\s*<p><strong>([^<]+)<\/strong><\/p>/i);
+          if (strongMatch) {
+            resolvedSeriesSubtitle = strongMatch[1].trim();
+          }
         }
 
         if (Array.isArray(globalRecords) && (resolvedParentId || resolvedParentTitle || titleSeriesMatch)) {
@@ -1238,6 +1254,7 @@
           parentRecordId: resolvedParentId,
           parentRecordTitle: resolvedParentTitle,
           seriesNumber: resolvedSeriesNumber,
+          seriesSubtitle: resolvedSeriesSubtitle,
           coverImage: resolvedCover || PRESET_COVERS[subcat] || PRESET_COVERS['La Atalaya']
         };
       }
@@ -1254,6 +1271,7 @@
         parentRecordId: null,
         parentRecordTitle: '',
         seriesNumber: null,
+        seriesSubtitle: '',
         coverImage: PRESET_COVERS['La Atalaya']
       };
     }
@@ -1756,6 +1774,7 @@
         for (const pt of mag.points) {
           const expectedTitle = pt.num === 1 ? mag.baseTitle : `${mag.baseTitle} #${pt.num}`;
           const expectedNotes = buildMagazinePointHtml(pt);
+          const expectedSubtitle = pt.heading || (pt.num === 1 ? mag.baseTitle : '');
 
           // Buscar si existe la ficha para este punto (#1, #2, #3...)
           let targetRec = seriesRecs.find(r => {
@@ -1769,8 +1788,9 @@
             const alreadySynced = (targetRec.notes || '').includes(pt.scriptureQuote) && (targetRec.notes || '').includes(pt.explanation);
             const needsParentFix = pt.num > 1 && rootRec && (meta.parentRecordId !== rootRec.id || meta.seriesNumber !== pt.num);
             const needsCoverFix = Boolean(seriesCustomCover && meta.coverImage !== seriesCustomCover);
+            const needsSubtitleFix = Boolean(pt.num > 1 && expectedSubtitle && !meta.seriesSubtitle);
 
-            if (!alreadySynced || needsParentFix || needsCoverFix) {
+            if (!alreadySynced || needsParentFix || needsCoverFix || needsSubtitleFix) {
               const rawDate = formatDateForInput(new Date(targetRec.date));
               const updatedMetaObj = {
                 items: meta.items,
@@ -1783,7 +1803,8 @@
                 revisitaData: null,
                 parentRecordId: pt.num > 1 && rootRec ? rootRec.id : null,
                 parentRecordTitle: pt.num > 1 ? mag.baseTitle : '',
-                seriesNumber: pt.num > 1 ? pt.num : null
+                seriesNumber: pt.num > 1 ? pt.num : null,
+                seriesSubtitle: pt.num > 1 ? (meta.seriesSubtitle || expectedSubtitle) : (meta.seriesSubtitle || '')
               };
               try {
                 await updatePredicacionAdaptive(targetRec.id, {
@@ -1812,7 +1833,8 @@
               revisitaData: null,
               parentRecordId: rootRec.id,
               parentRecordTitle: mag.baseTitle,
-              seriesNumber: pt.num
+              seriesNumber: pt.num,
+              seriesSubtitle: expectedSubtitle
             };
             try {
               await createPredicacionAdaptive({
@@ -2009,6 +2031,7 @@
                   ${meta.wentOut ? `<span class="font-label-sm text-[0.6875rem] bg-[#1b3a24] text-[#86efac] border border-[#86efac]/30 px-2 py-0.5 rounded flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">check_circle</span>Salí (${meta.hours} h)</span>` : ''}
                 </div>
                 <h3 class="font-headline-md text-2xl text-on-surface mt-0.5">${record.title}</h3>
+                ${meta.seriesSubtitle ? `<p class="font-headline-sm text-lg text-primary font-semibold mt-0.5 leading-snug">${meta.seriesSubtitle}</p>` : ''}
                 ${meta.parentRecordTitle ? `<span class="text-xs text-tertiary flex items-center gap-1 mt-0.5"><span class="material-symbols-outlined text-[14px]">subdirectory_arrow_right</span> Parte de la serie: <strong>${meta.parentRecordTitle}</strong></span>` : ''}
               </div>
             </div>
@@ -2119,7 +2142,8 @@
         revisitaData: meta.revisitaData,
         parentRecordId: meta.parentRecordId,
         parentRecordTitle: meta.parentRecordTitle,
-        seriesNumber: meta.seriesNumber
+        seriesNumber: meta.seriesNumber,
+        seriesSubtitle: meta.seriesSubtitle || ''
       };
 
       try {
@@ -2167,7 +2191,8 @@
         revisitaData: meta.revisitaData,
         parentRecordId: meta.parentRecordId || null,
         parentRecordTitle: meta.parentRecordTitle || '',
-        seriesNumber: meta.seriesNumber || null
+        seriesNumber: meta.seriesNumber || null,
+        seriesSubtitle: meta.seriesSubtitle || ''
       };
       const updatedPayload = buildSafeScripturesJson(metaObj, isCustomImg ? meta.coverImage : null, meta.categoryLabel || record.category);
 
@@ -2258,6 +2283,7 @@
 
       let msg = `📖 *TESTIMONIOBOX - MINISTERIO DE JEHOVÁ*\n`;
       msg += `*Tema:* ${record.title}\n`;
+      if (meta.seriesSubtitle) msg += `*Subtítulo:* ${meta.seriesSubtitle}\n`;
       msg += `*Fecha:* ${dateStr}\n`;
       msg += `*Categoría:* ${record.category} (${meta.subcategory})\n`;
       if (meta.packageName) msg += `*Paquete:* ${meta.packageName}\n`;
@@ -2656,6 +2682,7 @@
       const selectedId = fieldParentRecord.value;
       const selectedRecord = globalRecords.find(r => r.id === selectedId);
       const fieldTitle = document.getElementById('fieldTitle');
+      const fieldSeriesSubtitle = document.getElementById('fieldSeriesSubtitle');
 
       if (!selectedRecord) {
         activeSeriesParentInfo = null;
@@ -2665,6 +2692,7 @@
         standaloneSubcatRow.classList.remove('hidden');
         dateFieldCol.className = 'md:col-span-3';
         fieldTitle.required = true;
+        if (fieldSeriesSubtitle) fieldSeriesSubtitle.value = '';
         return;
       }
 
@@ -2757,6 +2785,8 @@
       dateInput.value = '';
       parentSearchInput.value = '';
       parentFilterDate.value = '';
+      const subInput = document.getElementById('fieldSeriesSubtitle');
+      if (subInput) subInput.value = '';
       populateParentRecordOptions(preselectParentId);
       fieldParentRecord.value = preselectParentId || '';
       applyParentSelectionUI();
@@ -2830,6 +2860,10 @@
       if (meta.parentRecordId && record.title) {
         document.getElementById('fieldTitle').value = record.title;
         inheritedGeneratedTitle.textContent = record.title;
+      }
+      const subInput = document.getElementById('fieldSeriesSubtitle');
+      if (subInput) {
+        subInput.value = meta.seriesSubtitle || '';
       }
       updateCoverPreview();
 
@@ -2914,7 +2948,7 @@
         const meta = parseRecordMetadata(r);
         if (meta.revisitaData) return false;
         if (!q) return true;
-        const searchable = normalizeForSearch(`${r.title} ${meta.subcategory} ${meta.categoryLabel || r.category} ${meta.packageName || ''}`);
+        const searchable = normalizeForSearch(`${r.title} ${meta.seriesSubtitle || ''} ${meta.subcategory} ${meta.categoryLabel || r.category} ${meta.packageName || ''}`);
         return searchable.includes(q);
       });
 
@@ -2938,7 +2972,7 @@
             <div class="flex items-center gap-2.5 min-w-0 flex-1">
               <img src="${meta.coverImage}" class="w-7 h-9 object-cover rounded border border-outline/20 flex-shrink-0">
               <div class="flex flex-col min-w-0 flex-1">
-                <span class="text-xs font-medium text-on-surface truncate">${r.title}</span>
+                <span class="text-xs font-medium text-on-surface truncate">${r.title}${meta.seriesSubtitle ? ` <span class="text-primary font-normal">— ${meta.seriesSubtitle}</span>` : ''}</span>
                 <div class="flex flex-wrap items-center gap-1.5 text-[10px] text-outline">
                   <span class="text-tertiary">${meta.subcategory}</span>
                   <span>&bull;</span>
@@ -2991,7 +3025,8 @@
         revisitaData: meta.revisitaData,
         parentRecordId: meta.parentRecordId,
         parentRecordTitle: meta.parentRecordTitle,
-        seriesNumber: meta.seriesNumber
+        seriesNumber: meta.seriesNumber,
+        seriesSubtitle: meta.seriesSubtitle || ''
       };
 
       try {
@@ -3037,7 +3072,8 @@
         revisitaData: meta.revisitaData,
         parentRecordId: meta.parentRecordId,
         parentRecordTitle: meta.parentRecordTitle,
-        seriesNumber: meta.seriesNumber
+        seriesNumber: meta.seriesNumber,
+        seriesSubtitle: meta.seriesSubtitle || ''
       };
 
       try {
@@ -3226,6 +3262,9 @@
       const hoursVal = parseFloat(document.getElementById('fieldHours').value) || 0;
       const wentOutVal = document.getElementById('fieldWentOut').checked || hoursVal > 0;
       const isCalendarAssigned = Boolean(explicitDate || packageName);
+      const seriesSubtitleVal = hasSeriesParent
+        ? (document.getElementById('fieldSeriesSubtitle') ? document.getElementById('fieldSeriesSubtitle').value.trim() : '')
+        : '';
 
       const metaObj = {
         items: currentScriptures,
@@ -3237,7 +3276,8 @@
         revisitaData: null,
         parentRecordId: hasSeriesParent ? activeSeriesParentInfo.parentRecordId : null,
         parentRecordTitle: hasSeriesParent ? activeSeriesParentInfo.parentRecordTitle : '',
-        seriesNumber: hasSeriesParent ? activeSeriesParentInfo.seriesNumber : null
+        seriesNumber: hasSeriesParent ? activeSeriesParentInfo.seriesNumber : null,
+        seriesSubtitle: seriesSubtitleVal
       };
 
       const submitBtn = document.getElementById('btnSubmitRecord');
