@@ -202,6 +202,7 @@
                   <button type="button" data-view="month" class="rec-view-tab px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-primary text-[#432c00] transition-colors flex items-center gap-1.5 cursor-pointer">
                     <span class="material-symbols-outlined text-[16px]">calendar_month</span>
                     <span>Del Mes Actual</span>
+                    <span id="tabMonthCount" class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-black/20 font-bold">0</span>
                   </button>
                   <button type="button" data-view="unassigned" class="rec-view-tab px-3.5 py-1.5 rounded-lg text-xs font-medium text-on-surface-variant hover:text-on-surface bg-surface-container hover:bg-surface-container-high transition-colors flex items-center gap-1.5 cursor-pointer">
                     <span class="material-symbols-outlined text-[16px]">library_books</span>
@@ -1013,24 +1014,49 @@
       'Revisita': 'Revisita'
     };
 
+    // Construye y recorta de forma segura el JSON de metadatos para no superar nunca el límite de 5,000 caracteres de PocketBase
+    function buildSafeScripturesJson(metaObj, customCover, category) {
+      const baseMeta = {
+        ...metaObj,
+        categoryLabel: category,
+        coverImage: customCover || null
+      };
+      let jsonStr = JSON.stringify(baseMeta);
+      if (jsonStr.length <= 4900) return jsonStr;
+
+      // 1. Si tiene padre (ficha hijo), el hijo puede heredar la portada en tiempo de lectura desde su padre en memoria, ahorrando ~3,000 caracteres
+      if (baseMeta.parentRecordId && baseMeta.coverImage) {
+        const withoutDupCover = { ...baseMeta, coverImage: null };
+        jsonStr = JSON.stringify(withoutDupCover);
+        if (jsonStr.length <= 4900) return jsonStr;
+      }
+
+      // 2. Si aún supera 4,900 caracteres, recortamos textos largos de citas bíblicas o quitamos la portada embebida
+      const trimmedItems = Array.isArray(baseMeta.items)
+        ? baseMeta.items.map(it => (typeof it === 'object' && it.text && it.text.length > 350) ? { ...it, text: it.text.slice(0, 350) + '…' } : it)
+        : [];
+      const compactMeta = { ...baseMeta, items: trimmedItems };
+      jsonStr = JSON.stringify(compactMeta);
+      if (jsonStr.length <= 4900) return jsonStr;
+
+      return JSON.stringify({ ...compactMeta, coverImage: null });
+    }
+
     // Guardado 100% en la base de datos PocketBase del VPS
     async function createPredicacionAdaptive({ title, rawDate, category, metaObj, notes, customCover }) {
       const isoDate = new Date((rawDate || formatDateForInput(new Date())) + 'T12:00:00.000Z').toISOString();
       const userId = pb.authStore.model?.id || pb.authStore.record?.id || null;
 
       // Guardamos el nombre completo de la categoría y la portada comprimida directamente en PocketBase (VPS)
-      const fullMeta = {
-        ...metaObj,
-        categoryLabel: category,
-        coverImage: customCover || null
-      };
+      const safeScripturesJson = buildSafeScripturesJson(metaObj, customCover, category);
+      const safeNotes = (notes || '<p>Asignación preparada.</p>').slice(0, 4900);
 
       let payload = {
         title: title || 'Asignación Ministerial',
         date: isoDate,
         category: category,
-        scriptures: JSON.stringify(fullMeta),
-        notes: notes || '<p>Asignación preparada.</p>'
+        scriptures: safeScripturesJson,
+        notes: safeNotes
       };
       if (userId) payload.user = userId;
 
@@ -1049,6 +1075,11 @@
           adapted.category = LEGACY_CATEGORY_MAP[category] || 'Predicacion';
         }
 
+        // Si scriptures falló por longitud máxima, forzar versión sin portada duplicada
+        if (errData.scriptures) {
+          adapted.scriptures = buildSafeScripturesJson(metaObj, null, category);
+        }
+
         // Si el campo user falló (no existe o relación distinta), probar sin user
         if (errData.user) {
           delete adapted.user;
@@ -1056,7 +1087,7 @@
 
         // Si notes falló por estar vacío o requerido
         if (errData.notes || !adapted.notes) {
-          adapted.notes = notes && notes.trim() ? notes : 'Asignación registrada.';
+          adapted.notes = (notes && notes.trim() ? notes : 'Asignación registrada.').slice(0, 4900);
         }
 
         try {
@@ -1064,13 +1095,13 @@
           return { record: created2, source: 'pocketbase' };
         } catch (err2) {
           console.warn('Intento 2 en PocketBase rechazado. Detalles:', JSON.stringify(err2?.response || err2));
-          // Intento 3 en PocketBase (VPS): sin user y con categoría compatible
+          // Intento 3 en PocketBase (VPS): sin user, categoría compatible y scriptures compacto
           const minimalPayload = {
             title: adapted.title,
             date: isoDate,
             category: LEGACY_CATEGORY_MAP[category] || 'Predicacion',
-            scriptures: adapted.scriptures,
-            notes: adapted.notes || 'Asignación registrada.'
+            scriptures: buildSafeScripturesJson(metaObj, null, category),
+            notes: (adapted.notes || 'Asignación registrada.').slice(0, 4900)
           };
           const created3 = await pb.collection('predicaciones').create(minimalPayload, { requestKey: null });
           return { record: created3, source: 'pocketbase' };
@@ -1081,29 +1112,27 @@
     // Actualización 100% en la base de datos PocketBase del VPS
     async function updatePredicacionAdaptive(id, { title, rawDate, category, metaObj, notes, customCover }) {
       const isoDate = new Date((rawDate || formatDateForInput(new Date())) + 'T12:00:00.000Z').toISOString();
-
-      const fullMeta = {
-        ...metaObj,
-        categoryLabel: category,
-        coverImage: customCover || null
-      };
+      const safeScripturesJson = buildSafeScripturesJson(metaObj, customCover, category);
+      const safeNotes = (notes || '<p>Asignación preparada.</p>').slice(0, 4900);
 
       const payload = {
         title: title || 'Asignación Ministerial',
         date: isoDate,
         category: category,
-        scriptures: JSON.stringify(fullMeta),
-        notes: notes || '<p>Asignación preparada.</p>'
+        scriptures: safeScripturesJson,
+        notes: safeNotes
       };
 
       try {
         const updated = await pb.collection('predicaciones').update(id, payload, { requestKey: null });
         return { record: updated, source: 'pocketbase' };
       } catch (err1) {
+        const errData = err1?.response?.data || {};
         const adapted = {
           ...payload,
           category: LEGACY_CATEGORY_MAP[category] || 'Predicacion',
-          notes: notes && notes.trim() ? notes : 'Asignación registrada.'
+          scriptures: errData.scriptures ? buildSafeScripturesJson(metaObj, null, category) : safeScripturesJson,
+          notes: (notes && notes.trim() ? notes : 'Asignación registrada.').slice(0, 4900)
         };
         const updated2 = await pb.collection('predicaciones').update(id, adapted, { requestKey: null });
         return { record: updated2, source: 'pocketbase' };
@@ -1143,6 +1172,19 @@
         const calendarAssigned = typeof parsed.calendarAssigned === 'boolean'
           ? parsed.calendarAssigned
           : (hasPackage || isRevisita);
+
+        // Si es ficha hija de una serie y no guardó copia duplicada de la imagen por límite de caracteres, la hereda en vivo del padre
+        let resolvedCover = parsed.coverImage;
+        if (!resolvedCover && parsed.parentRecordId && Array.isArray(globalRecords)) {
+          const parentRec = globalRecords.find(x => x.id === parsed.parentRecordId);
+          if (parentRec && parentRec.id !== record.id) {
+            try {
+              const pParsed = typeof parentRec.scriptures === 'object' ? parentRec.scriptures : JSON.parse(parentRec.scriptures || '{}');
+              if (pParsed && pParsed.coverImage) resolvedCover = pParsed.coverImage;
+            } catch (e) {}
+          }
+        }
+
         return {
           items: Array.isArray(parsed.items) ? parsed.items : [],
           categoryLabel: parsed.categoryLabel || record.category || 'Asignación',
@@ -1156,7 +1198,7 @@
           parentRecordId: parsed.parentRecordId || null,
           parentRecordTitle: parsed.parentRecordTitle || '',
           seriesNumber: parsed.seriesNumber || null,
-          coverImage: parsed.coverImage || PRESET_COVERS[subcat] || PRESET_COVERS['La Atalaya']
+          coverImage: resolvedCover || PRESET_COVERS[subcat] || PRESET_COVERS['La Atalaya']
         };
       }
 
@@ -1533,17 +1575,23 @@
     }
 
     function updateRecordsViewTabsUI() {
+      const monthAssignedCount = globalRecords.filter(r => {
+        const d = new Date(r.date);
+        const meta = parseRecordMetadata(r);
+        return meta.calendarAssigned && !isNaN(d) && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+      }).length;
+
       const unassignedCount = globalRecords.filter(r => {
         const meta = parseRecordMetadata(r);
         return !meta.revisitaData && !meta.calendarAssigned;
       }).length;
 
+      const tabMonthCount = document.getElementById('tabMonthCount');
       const tabUnassignedCount = document.getElementById('tabUnassignedCount');
-      const navUnassignedBadge = document.getElementById('navUnassignedBadge');
       const tabAllCount = document.getElementById('tabAllCount');
 
+      if (tabMonthCount) tabMonthCount.textContent = monthAssignedCount;
       if (tabUnassignedCount) tabUnassignedCount.textContent = unassignedCount;
-      if (navUnassignedBadge) navUnassignedBadge.textContent = unassignedCount;
       if (tabAllCount) tabAllCount.textContent = globalRecords.length;
 
       document.querySelectorAll('.rec-view-tab').forEach(btn => {
@@ -1585,9 +1633,8 @@
           // Mostrar absolutamente todas las fichas y registros sin límite de mes
           return true;
         }
-        // En la vista del mes actual, mostrar las asignadas o creadas en este mes
-        if (d.getMonth() !== currentMonth || d.getFullYear() !== currentYear) return false;
-        return true;
+        // En la vista "Del Mes Actual", mostrar ÚNICAMENTE las fichas asociadas al calendario en ese mes
+        return meta.calendarAssigned && !isNaN(d) && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
       });
 
       if (filteredRecords.length === 0) {
@@ -1595,12 +1642,12 @@
           ? `No hay fichas asignadas para el día ${selectedDateFilter}. Puedes ir a "Fichas Sin Fecha Asociada" para asociar una.`
           : (recordsViewMode === 'unassigned'
               ? 'Todas tus fichas tienen ya una fecha asociada en el calendario.'
-              : 'No hay fichas para esta selección.');
+              : 'No hay fichas asociadas a fechas de este mes en el calendario. Revisa "Fichas Sin Fecha Asociada" para asignarlas.');
         recordsContainer.innerHTML = `
           <div class="text-center py-12 bg-surface-container-low rounded-xl border border-outline/10 px-4">
             <p class="text-outline mb-4">${emptyMsg}</p>
             <div class="flex flex-wrap justify-center gap-3">
-              ${selectedDateFilter ? `<button onclick="document.querySelector('[data-view=\\'unassigned\\']').click()" class="bg-surface-container-high hover:bg-surface-container-highest text-secondary px-4 py-2 rounded-lg text-xs font-medium border border-secondary/30 transition-colors cursor-pointer">Ver Fichas Sin Fecha Asociada</button>` : ''}
+              ${recordsViewMode !== 'unassigned' ? `<button onclick="document.querySelector('[data-view=\\'unassigned\\']').click()" class="bg-surface-container-high hover:bg-surface-container-highest text-secondary px-4 py-2 rounded-lg text-xs font-medium border border-secondary/30 transition-colors cursor-pointer">Ver Fichas Sin Fecha Asociada</button>` : ''}
               <button onclick="openModal()" class="text-primary hover:text-primary-container font-medium text-sm transition-colors cursor-pointer">+ Crear Nueva Ficha</button>
             </div>
           </div>`;
