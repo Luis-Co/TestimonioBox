@@ -92,13 +92,62 @@
     #appTopHeader { background-color: var(--c-header-bg); }
     .scripture-box-surface { background-color: var(--c-scripture-bg); }
     html:not(.dark) [class*="color-scheme:dark"] { color-scheme: light !important; }
-    html:not(.dark) .cal-tooltip { background-color: #ffffff !important; border-color: rgba(179, 116, 14, 0.35) !important; box-shadow: 0 10px 25px rgba(0,0,0,0.14) !important; }
+    html:not(.dark) .cal-tooltip { background-color: #ffffff !important; border-color: rgba(var(--c-primary), 0.35) !important; box-shadow: 0 10px 25px rgba(0,0,0,0.14) !important; }
     html:not(.dark) .bg-primary { color: #ffffff !important; }
     html:not(.dark) .bg-primary span, html:not(.dark) .bg-primary .material-symbols-outlined { color: #ffffff; }
     html:not(.dark) .bg-\[\#1b3a24\] { background-color: #dcfce7 !important; color: #166534 !important; border-color: #86efac !important; }
     html:not(.dark) .bg-\[\#141b21\] { background-color: #f6f1e6 !important; }
     html:not(.dark) .bg-\[\#191c21\] { background-color: #ffffff !important; }
     html:not(.dark) #appSidebar { border-right: 1px solid rgba(118, 109, 96, 0.16); }
+
+    /* Tramas / Texturas de fondo configurables */
+    body {
+      --pattern-opacity: 0.12;
+      --pattern-color: rgba(251, 194, 98, var(--pattern-opacity));
+    }
+    main.pattern-surface {
+      background-color: rgb(var(--c-background));
+      background-attachment: fixed;
+    }
+    body[data-pattern="dots"] main.pattern-surface {
+      background-image: radial-gradient(var(--pattern-color) 1.3px, transparent 1.3px);
+      background-size: 20px 20px;
+    }
+    body[data-pattern="grid"] main.pattern-surface {
+      background-image:
+        linear-gradient(to right, var(--pattern-color) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--pattern-color) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    body[data-pattern="diagonal"] main.pattern-surface {
+      background-image: repeating-linear-gradient(
+        -45deg,
+        var(--pattern-color) 0px,
+        var(--pattern-color) 1px,
+        transparent 1px,
+        transparent 14px
+      );
+    }
+    body[data-pattern="cross"] main.pattern-surface {
+      background-image:
+        radial-gradient(circle at center, var(--pattern-color) 1.5px, transparent 1.5px),
+        linear-gradient(to right, var(--pattern-color) 0.5px, transparent 0.5px),
+        linear-gradient(to bottom, var(--pattern-color) 0.5px, transparent 0.5px);
+      background-size: 24px 24px;
+    }
+    body[data-pattern="paper"] main.pattern-surface {
+      background-image:
+        radial-gradient(var(--pattern-color) 0.8px, transparent 0.8px),
+        radial-gradient(var(--pattern-color) 0.8px, transparent 0.8px);
+      background-size: 16px 16px;
+      background-position: 0 0, 8px 8px;
+    }
+    body[data-pattern="waves"] main.pattern-surface {
+      background-image:
+        radial-gradient(circle at 100% 50%, transparent 20%, var(--pattern-color) 21%, var(--pattern-color) 23%, transparent 24%, transparent),
+        radial-gradient(circle at 0% 50%, transparent 20%, var(--pattern-color) 21%, var(--pattern-color) 23%, transparent 24%, transparent);
+      background-size: 32px 32px;
+    }
 
     /* Tooltip del calendario */
     .cal-tooltip { opacity: 0; visibility: hidden; transform: translate(-50%, 4px); transition: all 0.18s ease; }
@@ -205,8 +254,17 @@
             <a id="navRevisitasBtn" title="Registrar Revisita" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[20px]">contacts_product</span><span class="sidebar-text">Revisitas</span></a>
             <a id="navPackBtn" title="Paquetes de Fichas" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[20px]">inventory_2</span><span class="sidebar-text">Paquetes de Fichas</span></a>
             <a id="navInformesBtn" title="Informes Mensuales" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[20px]">assessment</span><span class="sidebar-text">Informes</span></a>
+            <a id="navAparienciaBtn" title="Apariencia, Colores y Tramas" class="flex items-center gap-2 px-2 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer" href="#"><span class="material-symbols-outlined text-[20px]">palette</span><span class="sidebar-text">Apariencia & Temas</span></a>
           </nav>
         </div>
+      </div>
+
+      <!-- Pie del Sidebar con cambio rápido de Modo Claro / Oscuro -->
+      <div class="p-3 border-t border-outline/10">
+        <button type="button" id="btnSidebarThemeToggle" class="w-full flex items-center justify-center sm:justify-start gap-2.5 px-3 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface border border-outline/15 transition-colors cursor-pointer" title="Cambiar entre Modo Claro y Modo Oscuro">
+          <span id="sidebarThemeIcon" class="material-symbols-outlined text-[20px] text-primary">light_mode</span>
+          <span id="sidebarThemeLabel" class="sidebar-text text-xs font-medium">Cambiar a Modo Claro</span>
+        </button>
       </div>
     </aside>
 
@@ -222,10 +280,15 @@
           </div>
         </div>
         <div class="flex items-center gap-2 sm:gap-3">
-          <!-- Selector de Tema Claro / Oscuro -->
-          <button type="button" id="btnToggleTheme" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container border border-outline/15 transition-colors cursor-pointer" title="Cambiar entre Modo Claro y Modo Oscuro">
-            <span id="themeToggleIcon" class="material-symbols-outlined text-[20px]">light_mode</span>
-            <span id="themeToggleLabel" class="hidden sm:inline text-xs font-medium">Modo Claro</span>
+          <!-- Selector Rápido de Modo Claro / Oscuro -->
+          <button type="button" id="btnToggleTheme" class="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-on-surface hover:text-primary border border-primary/30 transition-colors cursor-pointer shadow-sm" title="Cambiar entre Modo Claro y Modo Oscuro">
+            <span id="themeToggleIcon" class="material-symbols-outlined text-[20px] text-primary">light_mode</span>
+            <span id="themeToggleLabel" class="text-xs font-semibold">Modo Claro</span>
+          </button>
+
+          <!-- Acceso rápido a Personalizar Colores y Tramas -->
+          <button type="button" id="btnHeaderApariencia" class="p-2 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-primary border border-outline/15 transition-colors cursor-pointer" title="Personalizar Colores y Tramas">
+            <span class="material-symbols-outlined text-[20px]">palette</span>
           </button>
 
           <!-- Campanita de Notificaciones -->
@@ -252,7 +315,7 @@
         </div>
       </header>
 
-      <main class="relative w-full pt-24 bg-background px-6 min-h-screen">
+      <main class="pattern-surface relative w-full pt-24 bg-background px-6 min-h-screen">
         <!-- VISTA CRONOGRAMA & PREDICACIONES -->
         <div id="cronogramaSection" class="flex flex-col w-full pb-16">
           <section class="w-full mb-6 flex flex-wrap justify-between items-end gap-4">
@@ -520,6 +583,114 @@
                 <span class="text-[11px] text-outline uppercase font-label-sm">Visitas y Temas</span>
               </div>
               <div id="dashTopPersonasList" class="flex flex-col gap-3"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VISTA APARIENCIA, COLORES Y TRAMAS -->
+        <div id="aparienciaSection" class="hidden flex-col w-full pb-16">
+          <section class="w-full mb-6 flex flex-wrap justify-between items-end gap-4">
+            <div class="flex flex-col">
+              <h1 class="font-headline-lg text-[2.5rem] text-on-surface tracking-tight leading-none mb-2">Apariencia, Colores & Tramas</h1>
+              <p class="text-on-surface-variant">Personaliza el modo claro u oscuro, elige tus propios colores para cada modo y activa tramas de fondo.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2.5">
+              <button type="button" id="btnResetThemeAll" class="flex items-center gap-1.5 bg-surface-container-high hover:bg-error-container/40 text-on-surface-variant hover:text-error border border-outline/20 px-4 py-2 rounded-lg text-xs font-semibold transition-colors cursor-pointer">
+                <span class="material-symbols-outlined text-[18px]">restart_alt</span>
+                <span>Restablecer Colores Originales</span>
+              </button>
+            </div>
+          </section>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Columna izquierda: Modo + Paletas Predefinidas + Tramas -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+              <!-- Selector de Modo Claro / Oscuro -->
+              <div class="bg-surface-container-low rounded-xl border border-outline/15 p-5 shadow-sm flex flex-col gap-3">
+                <h3 class="font-headline-sm text-lg text-primary flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[20px]">contrast</span>
+                  <span>Modo de Visualización</span>
+                </h3>
+                <div class="grid grid-cols-2 gap-3">
+                  <button type="button" id="btnChooseDarkMode" class="flex items-center justify-center gap-2 p-3.5 rounded-xl border-2 border-primary bg-surface-container-high text-on-surface font-semibold text-sm transition-all cursor-pointer">
+                    <span class="material-symbols-outlined text-[22px] text-primary">dark_mode</span>
+                    <span>Modo Oscuro</span>
+                  </button>
+                  <button type="button" id="btnChooseLightMode" class="flex items-center justify-center gap-2 p-3.5 rounded-xl border-2 border-outline/20 bg-surface-container text-on-surface-variant hover:text-on-surface font-semibold text-sm transition-all cursor-pointer">
+                    <span class="material-symbols-outlined text-[22px] text-secondary">light_mode</span>
+                    <span>Modo Claro</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Paletas Predefinidas -->
+              <div class="bg-surface-container-low rounded-xl border border-outline/15 p-5 shadow-sm flex flex-col gap-3">
+                <div class="flex items-center justify-between">
+                  <h3 class="font-headline-sm text-lg text-primary flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[20px]">style</span>
+                    <span>Paletas Predefinidas</span>
+                  </h3>
+                  <span class="text-[11px] font-label-sm text-outline uppercase">1 clic</span>
+                </div>
+                <div id="themePresetsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
+              </div>
+
+              <!-- Tramas y Texturas de Fondo -->
+              <div class="bg-surface-container-low rounded-xl border border-outline/15 p-5 shadow-sm flex flex-col gap-4">
+                <div class="flex items-center justify-between">
+                  <h3 class="font-headline-sm text-lg text-primary flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[20px]">texture</span>
+                    <span>Trama / Textura de Fondo</span>
+                  </h3>
+                  <span id="patternOpacityValue" class="text-xs font-mono text-primary font-bold">12%</span>
+                </div>
+                <div id="patternOptionsGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
+                <div class="flex flex-col gap-1.5 pt-2 border-t border-outline/10">
+                  <div class="flex justify-between text-xs text-outline">
+                    <span>Intensidad de la trama</span>
+                    <span>Sutil &rarr; Marcada</span>
+                  </div>
+                  <input type="range" id="patternOpacitySlider" min="3" max="45" value="12" class="w-full accent-primary cursor-pointer">
+                </div>
+              </div>
+            </div>
+
+            <!-- Columna derecha: Editor detallado de colores para Modo Oscuro y Modo Claro -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+              <div class="bg-surface-container-low rounded-xl border border-outline/15 p-6 shadow-sm flex flex-col gap-5">
+                <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-outline/10">
+                  <div class="flex flex-col">
+                    <h3 class="font-headline-sm text-xl text-primary flex items-center gap-2">
+                      <span class="material-symbols-outlined text-[22px]">colorize</span>
+                      <span>Personalizar Colores</span>
+                    </h3>
+                    <span class="text-xs text-outline">Configura los colores de forma independiente para el Modo Oscuro y el Modo Claro.</span>
+                  </div>
+                  <div class="flex items-center gap-1 bg-surface-container p-1 rounded-xl border border-outline/15">
+                    <button type="button" id="tabEditDarkColors" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-[#432c00] transition-colors cursor-pointer">Modo Oscuro</button>
+                    <button type="button" id="tabEditLightColors" class="px-3 py-1.5 rounded-lg text-xs font-medium text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer">Modo Claro</button>
+                  </div>
+                </div>
+
+                <div id="colorPickersGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+
+                <!-- Vista Previa en Vivo -->
+                <div class="mt-2 p-4 rounded-xl bg-surface-container border border-outline/15 flex flex-col gap-3">
+                  <span class="text-[11px] font-label-sm uppercase text-outline tracking-wider">Vista Previa en Vivo</span>
+                  <div class="bg-surface-container-low p-4 rounded-xl border border-outline/15 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex flex-col gap-1">
+                      <div class="flex items-center gap-1.5">
+                        <span class="text-[10px] font-mono bg-surface-container-highest text-primary px-2 py-0.5 rounded">DOM, 22 NOV</span>
+                        <span class="text-[10px] bg-primary/15 text-secondary border border-primary/25 px-2 py-0.5 rounded">La Atalaya</span>
+                        <span class="text-[10px] bg-surface-container text-tertiary px-2 py-0.5 rounded">Servicio</span>
+                      </div>
+                      <p class="font-headline-sm text-lg text-on-surface font-semibold">¿Quién es Dios?</p>
+                      <p class="text-xs text-on-surface-variant">Ejemplo de cómo se ven tus tarjetas con los colores y trama elegidos.</p>
+                    </div>
+                    <button type="button" class="px-4 py-2 rounded-lg bg-primary text-[#432c00] text-xs font-semibold shadow-sm pointer-events-none">Botón Principal</button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1037,6 +1208,54 @@
     </div>
   </div>
 
+  <!-- MODAL SELECTOR DE MÚLTIPLES FECHAS AL MISMO TIEMPO PARA UNA FICHA -->
+  <div id="multiDateModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+    <div class="bg-surface-container-low w-full max-w-lg rounded-2xl shadow-2xl p-6 border border-primary/25 flex flex-col gap-4">
+      <div class="flex justify-between items-center pb-3 border-b border-outline/10">
+        <div class="flex flex-col">
+          <h2 class="text-xl font-headline-sm text-primary flex items-center gap-2">
+            <span class="material-symbols-outlined text-[24px]">date_range</span>
+            <span>Asignar a Múltiples Fechas</span>
+          </h2>
+          <p id="multiDateFichaTitle" class="text-xs text-on-surface-variant truncate max-w-sm mt-0.5"></p>
+        </div>
+        <button type="button" id="btnCloseMultiDateModal" class="text-outline hover:text-on-surface p-1 rounded-lg hover:bg-surface-container-high cursor-pointer"><span class="material-symbols-outlined">close</span></button>
+      </div>
+
+      <p class="text-xs text-outline">Haz clic sobre todos los días del calendario en los que quieras usar esta ficha (puedes cambiar de mes y marcar tantos días como desees al mismo tiempo).</p>
+
+      <!-- Mini calendario interactivo multi-selección -->
+      <div class="bg-surface-container rounded-xl p-4 border border-outline/15">
+        <div class="flex items-center justify-between mb-3">
+          <button type="button" id="btnMultiDatePrevMonth" class="p-1.5 rounded-lg hover:bg-surface-container-high text-on-surface-variant cursor-pointer"><span class="material-symbols-outlined text-[20px]">chevron_left</span></button>
+          <span id="multiDateMonthLabel" class="font-headline-sm text-base text-primary capitalize font-semibold">Mes Año</span>
+          <button type="button" id="btnMultiDateNextMonth" class="p-1.5 rounded-lg hover:bg-surface-container-high text-on-surface-variant cursor-pointer"><span class="material-symbols-outlined text-[20px]">chevron_right</span></button>
+        </div>
+        <div class="grid grid-cols-7 gap-1 text-center font-label-sm text-[0.65rem] text-outline uppercase mb-2">
+          <div>Do</div><div>Lu</div><div>Ma</div><div>Mi</div><div>Ju</div><div>Vi</div><div>Sa</div>
+        </div>
+        <div id="multiDateCalendarGrid" class="grid grid-cols-7 gap-1.5 text-sm"></div>
+      </div>
+
+      <!-- Lista de fechas seleccionadas -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-label-sm uppercase text-outline">Fechas seleccionadas (<span id="multiDateSelectedCount" class="text-primary font-bold">0</span>)</span>
+          <button type="button" id="btnClearAllMultiDates" class="text-[11px] text-error hover:underline cursor-pointer">Limpiar todas</button>
+        </div>
+        <div id="multiDateSelectedPills" class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto custom-scroll p-2 bg-surface-container/60 rounded-lg border border-outline/10 min-h-[42px]"></div>
+      </div>
+
+      <div class="flex justify-end gap-2.5 pt-2 border-t border-outline/10">
+        <button type="button" id="btnCancelMultiDateModal" class="px-4 py-2 rounded-lg text-sm text-on-surface-variant hover:bg-surface-container-high transition-colors cursor-pointer">Cancelar</button>
+        <button type="button" id="btnSaveMultiDates" class="px-5 py-2 bg-primary hover:bg-primary-container text-[#432c00] font-semibold rounded-lg text-sm shadow-md transition-colors flex items-center gap-1.5 cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]">check_circle</span>
+          <span>Guardar Fechas</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/pocketbase@0.21.1/dist/pocketbase.umd.js"></script>
@@ -1080,23 +1299,380 @@
       'Revisita Pastoral': makePresetCoverSvg('REVISITA', 'SEGUIMIENTO PASTORAL', '#17252a', '#0c1518', '#67e8f9', '🏠')
     };
 
-    // ================= MODO CLARO / OSCURO =================
+    // ================= MODO CLARO / OSCURO + PERSONALIZACIÓN DE COLORES Y TRAMAS =================
+    const APPEARANCE_STORAGE_KEY = 'testimoniobox_appearance_v1';
+
+    const DEFAULT_THEME_CONFIG = {
+      mode: 'dark',
+      pattern: 'none',
+      patternOpacity: 12,
+      dark: {
+        primary: '#fbc262',
+        secondary: '#ecc076',
+        tertiary: '#bbcfd9',
+        background: '#101418',
+        surfaceLow: '#191c21',
+        sidebar: '#0b0e13',
+        onSurface: '#e1e2e9'
+      },
+      light: {
+        primary: '#b3740e',
+        secondary: '#8a5a12',
+        tertiary: '#2d607a',
+        background: '#f5f3ee',
+        surfaceLow: '#ffffff',
+        sidebar: '#eeeae2',
+        onSurface: '#1c1f24'
+      }
+    };
+
+    const THEME_PRESETS = [
+      {
+        id: 'pastoral',
+        name: 'Dorado Pastoral',
+        dark: { primary: '#fbc262', secondary: '#ecc076', tertiary: '#bbcfd9', background: '#101418', surfaceLow: '#191c21', sidebar: '#0b0e13', onSurface: '#e1e2e9' },
+        light: { primary: '#b3740e', secondary: '#8a5a12', tertiary: '#2d607a', background: '#f5f3ee', surfaceLow: '#ffffff', sidebar: '#eeeae2', onSurface: '#1c1f24' }
+      },
+      {
+        id: 'teocratico',
+        name: 'Azul Teocrático',
+        dark: { primary: '#60a5fa', secondary: '#93c5fd', tertiary: '#c4b5fd', background: '#0c1322', surfaceLow: '#141e33', sidebar: '#080e1a', onSurface: '#e5edf8' },
+        light: { primary: '#1d4ed8', secondary: '#2563eb', tertiary: '#4f46e5', background: '#f1f5f9', surfaceLow: '#ffffff', sidebar: '#e2e8f0', onSurface: '#0f172a' }
+      },
+      {
+        id: 'olivo',
+        name: 'Verde Olivo',
+        dark: { primary: '#6ee7b7', secondary: '#a7f3d0', tertiary: '#fde68a', background: '#0d1714', surfaceLow: '#14221e', sidebar: '#08100d', onSurface: '#e4f0ec' },
+        light: { primary: '#047857', secondary: '#059669', tertiary: '#b45309', background: '#f2f7f4', surfaceLow: '#ffffff', sidebar: '#e3eee8', onSurface: '#13241d' }
+      },
+      {
+        id: 'burdeos',
+        name: 'Burdeos & Pergamino',
+        dark: { primary: '#f472b6', secondary: '#fbcfe8', tertiary: '#fcd34d', background: '#171016', surfaceLow: '#231822', sidebar: '#100a10', onSurface: '#f2e8ef' },
+        light: { primary: '#9d174d', secondary: '#be185d', tertiary: '#92400e', background: '#faf5f7', surfaceLow: '#ffffff', sidebar: '#f2e6eb', onSurface: '#27131d' }
+      },
+      {
+        id: 'indigo',
+        name: 'Índigo Moderno',
+        dark: { primary: '#a78bfa', secondary: '#c4b5fd', tertiary: '#67e8f9', background: '#11101d', surfaceLow: '#1a192b', sidebar: '#0b0a14', onSurface: '#ebe9f7' },
+        light: { primary: '#6d28d9', secondary: '#7c3aed', tertiary: '#0e7490', background: '#f5f3ff', surfaceLow: '#ffffff', sidebar: '#ede9fe', onSurface: '#1e1b4b' }
+      },
+      {
+        id: 'terracota',
+        name: 'Terracota Cálido',
+        dark: { primary: '#fb923c', secondary: '#fdba74', tertiary: '#fca5a5', background: '#18120e', surfaceLow: '#241b15', sidebar: '#110c09', onSurface: '#f3eae4' },
+        light: { primary: '#c2410c', secondary: '#ea580c', tertiary: '#9a3412', background: '#fdf7f2', surfaceLow: '#ffffff', sidebar: '#f5e8de', onSurface: '#2c1810' }
+      }
+    ];
+
+    const THEME_PATTERNS = [
+      { id: 'none', name: 'Liso (Sin trama)', icon: 'check_box_outline_blank' },
+      { id: 'dots', name: 'Puntos', icon: 'grain' },
+      { id: 'grid', name: 'Cuadrícula', icon: 'grid_4x4' },
+      { id: 'diagonal', name: 'Diagonales', icon: 'line_style' },
+      { id: 'cross', name: 'Geométrica', icon: 'apps' },
+      { id: 'paper', name: 'Pergamino', icon: 'article' },
+      { id: 'waves', name: 'Ondas', icon: 'waves' }
+    ];
+
+    const COLOR_FIELDS_DEF = [
+      { key: 'primary', label: 'Color Principal (Botones y Acentos)' },
+      { key: 'secondary', label: 'Color Secundario (Etiquetas y Enlaces)' },
+      { key: 'tertiary', label: 'Color Terciario (Detalles y Categorías)' },
+      { key: 'background', label: 'Fondo Principal del Sitio' },
+      { key: 'surfaceLow', label: 'Fondo de Tarjetas y Paneles' },
+      { key: 'sidebar', label: 'Fondo del Menú Lateral' },
+      { key: 'onSurface', label: 'Color del Texto Principal' }
+    ];
+
+    function loadAppearanceConfig() {
+      try {
+        const raw = localStorage.getItem(APPEARANCE_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          return {
+            mode: parsed.mode === 'light' ? 'light' : 'dark',
+            pattern: parsed.pattern || 'none',
+            patternOpacity: typeof parsed.patternOpacity === 'number' ? parsed.patternOpacity : 12,
+            dark: { ...DEFAULT_THEME_CONFIG.dark, ...(parsed.dark || {}) },
+            light: { ...DEFAULT_THEME_CONFIG.light, ...(parsed.light || {}) }
+          };
+        }
+      } catch (e) {}
+      const legacyTheme = localStorage.getItem('testimoniobox_theme');
+      return {
+        ...JSON.parse(JSON.stringify(DEFAULT_THEME_CONFIG)),
+        mode: legacyTheme === 'light' ? 'light' : 'dark'
+      };
+    }
+
+    let appearanceConfig = loadAppearanceConfig();
+    let editingColorModeTab = appearanceConfig.mode;
+
+    function hexToRgb(hex) {
+      const clean = String(hex || '#000000').replace('#', '').trim();
+      const full = clean.length === 3 ? clean.split('').map(c => c + c).join('') : clean.padEnd(6, '0').slice(0, 6);
+      const num = parseInt(full, 16);
+      return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+    }
+
+    function mixRgb(rgbA, rgbB, weightB) {
+      const wA = 1 - weightB;
+      return [
+        Math.round(rgbA[0] * wA + rgbB[0] * weightB),
+        Math.round(rgbA[1] * wA + rgbB[1] * weightB),
+        Math.round(rgbA[2] * wA + rgbB[2] * weightB)
+      ];
+    }
+
+    function saveAppearanceConfig() {
+      localStorage.setItem(APPEARANCE_STORAGE_KEY, JSON.stringify(appearanceConfig));
+      localStorage.setItem('testimoniobox_theme', appearanceConfig.mode);
+    }
+
+    function applyAppearanceConfig() {
+      const isDark = appearanceConfig.mode === 'dark';
+      document.documentElement.classList.toggle('dark', isDark);
+
+      const pal = isDark ? appearanceConfig.dark : appearanceConfig.light;
+      const rootStyle = document.documentElement.style;
+
+      const primaryRgb = hexToRgb(pal.primary);
+      const secondaryRgb = hexToRgb(pal.secondary);
+      const tertiaryRgb = hexToRgb(pal.tertiary);
+      const bgRgb = hexToRgb(pal.background);
+      const surfLowRgb = hexToRgb(pal.surfaceLow);
+      const sidebarRgb = hexToRgb(pal.sidebar);
+      const onSurfaceRgb = hexToRgb(pal.onSurface);
+
+      const contrastTarget = isDark ? [255, 255, 255] : [0, 0, 0];
+      const primaryContainerRgb = mixRgb(primaryRgb, isDark ? [0, 0, 0] : [0, 0, 0], 0.14);
+      const surfRgb = mixRgb(surfLowRgb, contrastTarget, isDark ? 0.04 : 0.045);
+      const surfHighRgb = mixRgb(surfLowRgb, contrastTarget, isDark ? 0.09 : 0.085);
+      const surfHighestRgb = mixRgb(surfLowRgb, contrastTarget, isDark ? 0.15 : 0.135);
+      const surfBrightRgb = mixRgb(surfLowRgb, contrastTarget, isDark ? 0.18 : 0.17);
+      const onSurfVarRgb = mixRgb(onSurfaceRgb, bgRgb, 0.25);
+      const outlineRgb = mixRgb(onSurfaceRgb, bgRgb, 0.48);
+
+      rootStyle.setProperty('--c-primary', primaryRgb.join(' '));
+      rootStyle.setProperty('--c-primary-container', primaryContainerRgb.join(' '));
+      rootStyle.setProperty('--c-secondary', secondaryRgb.join(' '));
+      rootStyle.setProperty('--c-tertiary', tertiaryRgb.join(' '));
+      rootStyle.setProperty('--c-background', bgRgb.join(' '));
+      rootStyle.setProperty('--c-surface-container-low', surfLowRgb.join(' '));
+      rootStyle.setProperty('--c-surface-container', surfRgb.join(' '));
+      rootStyle.setProperty('--c-surface-container-high', surfHighRgb.join(' '));
+      rootStyle.setProperty('--c-surface-container-highest', surfHighestRgb.join(' '));
+      rootStyle.setProperty('--c-surface-bright', surfBrightRgb.join(' '));
+      rootStyle.setProperty('--c-sidebar', sidebarRgb.join(' '));
+      rootStyle.setProperty('--c-on-surface', onSurfaceRgb.join(' '));
+      rootStyle.setProperty('--c-on-surface-variant', onSurfVarRgb.join(' '));
+      rootStyle.setProperty('--c-outline', outlineRgb.join(' '));
+      rootStyle.setProperty('--c-header-bg', `rgba(${bgRgb[0]}, ${bgRgb[1]}, ${bgRgb[2]}, 0.88)`);
+
+      document.body.setAttribute('data-pattern', appearanceConfig.pattern || 'none');
+      const alpha = Math.max(0.02, Math.min(0.5, (appearanceConfig.patternOpacity || 12) / 100));
+      document.body.style.setProperty('--pattern-opacity', String(alpha));
+      document.body.style.setProperty('--pattern-color', `rgba(${primaryRgb[0]}, ${primaryRgb[1]}, ${primaryRgb[2]}, ${alpha})`);
+
+      updateThemeToggleUI();
+    }
+
     function updateThemeToggleUI() {
-      const isDark = document.documentElement.classList.contains('dark');
+      const isDark = appearanceConfig.mode === 'dark';
       const icon = document.getElementById('themeToggleIcon');
       const label = document.getElementById('themeToggleLabel');
+      const sIcon = document.getElementById('sidebarThemeIcon');
+      const sLabel = document.getElementById('sidebarThemeLabel');
       if (icon) icon.textContent = isDark ? 'light_mode' : 'dark_mode';
       if (label) label.textContent = isDark ? 'Modo Claro' : 'Modo Oscuro';
+      if (sIcon) sIcon.textContent = isDark ? 'light_mode' : 'dark_mode';
+      if (sLabel) sLabel.textContent = isDark ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro';
+
+      const btnDark = document.getElementById('btnChooseDarkMode');
+      const btnLight = document.getElementById('btnChooseLightMode');
+      if (btnDark && btnLight) {
+        btnDark.className = isDark
+          ? 'flex items-center justify-center gap-2 p-3.5 rounded-xl border-2 border-primary bg-surface-container-high text-on-surface font-semibold text-sm transition-all cursor-pointer'
+          : 'flex items-center justify-center gap-2 p-3.5 rounded-xl border-2 border-outline/20 bg-surface-container text-on-surface-variant hover:text-on-surface font-semibold text-sm transition-all cursor-pointer';
+        btnLight.className = !isDark
+          ? 'flex items-center justify-center gap-2 p-3.5 rounded-xl border-2 border-primary bg-surface-container-high text-on-surface font-semibold text-sm transition-all cursor-pointer'
+          : 'flex items-center justify-center gap-2 p-3.5 rounded-xl border-2 border-outline/20 bg-surface-container text-on-surface-variant hover:text-on-surface font-semibold text-sm transition-all cursor-pointer';
+      }
     }
+
+    function toggleLightDarkMode() {
+      appearanceConfig.mode = appearanceConfig.mode === 'dark' ? 'light' : 'dark';
+      editingColorModeTab = appearanceConfig.mode;
+      saveAppearanceConfig();
+      applyAppearanceConfig();
+      if (typeof renderAppearanceSection === 'function') renderAppearanceSection();
+    }
+
+    function renderAppearanceSection() {
+      const presetsGrid = document.getElementById('themePresetsGrid');
+      const patternGrid = document.getElementById('patternOptionsGrid');
+      const colorGrid = document.getElementById('colorPickersGrid');
+      const opacitySlider = document.getElementById('patternOpacitySlider');
+      const opacityValue = document.getElementById('patternOpacityValue');
+      const tabDark = document.getElementById('tabEditDarkColors');
+      const tabLight = document.getElementById('tabEditLightColors');
+
+      if (tabDark && tabLight) {
+        tabDark.className = editingColorModeTab === 'dark'
+          ? 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-[#432c00] transition-colors cursor-pointer'
+          : 'px-3 py-1.5 rounded-lg text-xs font-medium text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer';
+        tabLight.className = editingColorModeTab === 'light'
+          ? 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-[#432c00] transition-colors cursor-pointer'
+          : 'px-3 py-1.5 rounded-lg text-xs font-medium text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer';
+      }
+
+      if (presetsGrid) {
+        presetsGrid.innerHTML = THEME_PRESETS.map(p => {
+          const sample = appearanceConfig.mode === 'dark' ? p.dark : p.light;
+          return `
+            <button type="button" onclick="applyThemePreset('${p.id}')" class="flex items-center justify-between gap-2 p-3 rounded-xl bg-surface-container hover:bg-surface-container-high border border-outline/15 hover:border-primary/40 transition-all text-left cursor-pointer">
+              <span class="text-xs font-semibold text-on-surface truncate">${p.name}</span>
+              <div class="flex items-center gap-1 flex-shrink-0">
+                <span class="w-4 h-4 rounded-full border border-white/20" style="background:${sample.background}"></span>
+                <span class="w-4 h-4 rounded-full border border-white/20" style="background:${sample.primary}"></span>
+                <span class="w-4 h-4 rounded-full border border-white/20" style="background:${sample.tertiary}"></span>
+              </div>
+            </button>
+          `;
+        }).join('');
+      }
+
+      if (patternGrid) {
+        patternGrid.innerHTML = THEME_PATTERNS.map(pt => {
+          const isActive = appearanceConfig.pattern === pt.id;
+          return `
+            <button type="button" onclick="selectThemePattern('${pt.id}')" class="flex flex-col items-center justify-center gap-1 p-2.5 rounded-xl border transition-all cursor-pointer ${isActive ? 'bg-primary/15 border-primary text-primary font-semibold' : 'bg-surface-container border-outline/15 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'}">
+              <span class="material-symbols-outlined text-[20px]">${pt.icon}</span>
+              <span class="text-[11px] leading-tight text-center">${pt.name}</span>
+            </button>
+          `;
+        }).join('');
+      }
+
+      if (opacitySlider) opacitySlider.value = appearanceConfig.patternOpacity || 12;
+      if (opacityValue) opacityValue.textContent = `${appearanceConfig.patternOpacity || 12}%`;
+
+      if (colorGrid) {
+        const pal = appearanceConfig[editingColorModeTab];
+        colorGrid.innerHTML = COLOR_FIELDS_DEF.map(f => `
+          <label class="flex items-center justify-between gap-3 bg-surface-container px-3.5 py-2.5 rounded-xl border border-outline/15 hover:border-primary/40 transition-colors cursor-pointer">
+            <div class="flex flex-col min-w-0">
+              <span class="text-xs font-medium text-on-surface truncate">${f.label}</span>
+              <span class="text-[11px] font-mono text-outline uppercase" id="hex-label-${f.key}">${pal[f.key]}</span>
+            </div>
+            <input type="color" value="${pal[f.key]}" oninput="updateCustomColor('${f.key}', this.value)" class="w-9 h-9 rounded-lg border border-outline/30 bg-transparent cursor-pointer flex-shrink-0">
+          </label>
+        `).join('');
+      }
+    }
+
+    window.applyThemePreset = (presetId) => {
+      const preset = THEME_PRESETS.find(p => p.id === presetId);
+      if (!preset) return;
+      appearanceConfig.dark = { ...preset.dark };
+      appearanceConfig.light = { ...preset.light };
+      saveAppearanceConfig();
+      applyAppearanceConfig();
+      renderAppearanceSection();
+      showToast(`Paleta "${preset.name}" aplicada`);
+    };
+
+    window.selectThemePattern = (patternId) => {
+      appearanceConfig.pattern = patternId;
+      saveAppearanceConfig();
+      applyAppearanceConfig();
+      renderAppearanceSection();
+    };
+
+    window.updateCustomColor = (key, hexVal) => {
+      appearanceConfig[editingColorModeTab][key] = hexVal;
+      const lbl = document.getElementById(`hex-label-${key}`);
+      if (lbl) lbl.textContent = hexVal;
+      // Si el usuario está editando un modo distinto al activo, cambiamos la vista previa a ese modo para verlo en vivo
+      if (appearanceConfig.mode !== editingColorModeTab) {
+        appearanceConfig.mode = editingColorModeTab;
+      }
+      saveAppearanceConfig();
+      applyAppearanceConfig();
+    };
+
     const btnToggleTheme = document.getElementById('btnToggleTheme');
-    if (btnToggleTheme) {
-      btnToggleTheme.addEventListener('click', () => {
-        const isDark = document.documentElement.classList.toggle('dark');
-        localStorage.setItem('testimoniobox_theme', isDark ? 'dark' : 'light');
-        updateThemeToggleUI();
+    if (btnToggleTheme) btnToggleTheme.addEventListener('click', toggleLightDarkMode);
+    const btnSidebarThemeToggle = document.getElementById('btnSidebarThemeToggle');
+    if (btnSidebarThemeToggle) btnSidebarThemeToggle.addEventListener('click', toggleLightDarkMode);
+
+    const btnChooseDarkMode = document.getElementById('btnChooseDarkMode');
+    if (btnChooseDarkMode) {
+      btnChooseDarkMode.addEventListener('click', () => {
+        appearanceConfig.mode = 'dark';
+        editingColorModeTab = 'dark';
+        saveAppearanceConfig();
+        applyAppearanceConfig();
+        renderAppearanceSection();
       });
     }
-    updateThemeToggleUI();
+    const btnChooseLightMode = document.getElementById('btnChooseLightMode');
+    if (btnChooseLightMode) {
+      btnChooseLightMode.addEventListener('click', () => {
+        appearanceConfig.mode = 'light';
+        editingColorModeTab = 'light';
+        saveAppearanceConfig();
+        applyAppearanceConfig();
+        renderAppearanceSection();
+      });
+    }
+    const tabEditDarkColors = document.getElementById('tabEditDarkColors');
+    if (tabEditDarkColors) {
+      tabEditDarkColors.addEventListener('click', () => {
+        editingColorModeTab = 'dark';
+        appearanceConfig.mode = 'dark';
+        saveAppearanceConfig();
+        applyAppearanceConfig();
+        renderAppearanceSection();
+      });
+    }
+    const tabEditLightColors = document.getElementById('tabEditLightColors');
+    if (tabEditLightColors) {
+      tabEditLightColors.addEventListener('click', () => {
+        editingColorModeTab = 'light';
+        appearanceConfig.mode = 'light';
+        saveAppearanceConfig();
+        applyAppearanceConfig();
+        renderAppearanceSection();
+      });
+    }
+    const patternOpacitySlider = document.getElementById('patternOpacitySlider');
+    if (patternOpacitySlider) {
+      patternOpacitySlider.addEventListener('input', (e) => {
+        appearanceConfig.patternOpacity = parseInt(e.target.value, 10) || 12;
+        if (appearanceConfig.pattern === 'none') {
+          appearanceConfig.pattern = 'dots';
+        }
+        saveAppearanceConfig();
+        applyAppearanceConfig();
+        const ov = document.getElementById('patternOpacityValue');
+        if (ov) ov.textContent = `${appearanceConfig.patternOpacity}%`;
+      });
+    }
+    const btnResetThemeAll = document.getElementById('btnResetThemeAll');
+    if (btnResetThemeAll) {
+      btnResetThemeAll.addEventListener('click', () => {
+        appearanceConfig = JSON.parse(JSON.stringify(DEFAULT_THEME_CONFIG));
+        editingColorModeTab = appearanceConfig.mode;
+        saveAppearanceConfig();
+        applyAppearanceConfig();
+        renderAppearanceSection();
+        showToast('Colores y tramas restablecidos a los valores originales');
+      });
+    }
+
+    applyAppearanceConfig();
 
     function normalizeAssignedDatesList(datesArr) {
       if (!Array.isArray(datesArr)) return [];
@@ -2257,16 +2833,19 @@
 
               ${!meta.revisitaData ? `
               <div class="flex flex-wrap items-center gap-1.5 bg-surface-container px-2.5 py-1 rounded-lg border border-outline/15">
-                <span class="material-symbols-outlined text-[15px] text-primary">calendar_add_on</span>
-                <span class="text-[11px] font-label-sm uppercase text-outline">Asociar a otro día:</span>
+                <button type="button" onclick="openMultiDateModal('${record.id}')" class="flex items-center gap-1 text-[11px] bg-primary text-[#432c00] hover:bg-primary-container font-semibold px-2.5 py-1 rounded transition-colors cursor-pointer" title="Abrir calendario para marcar varios días al mismo tiempo">
+                  <span class="material-symbols-outlined text-[14px]">date_range</span>
+                  <span>Elegir varios días (${meta.assignedDates.length})</span>
+                </button>
+                <span class="text-outline/40 text-xs">|</span>
                 <input type="date" id="inp-assign-date-${record.id}" value="" class="bg-surface-container-high border border-outline/20 rounded px-2 py-0.5 text-xs text-on-surface focus:outline-none focus:border-primary [color-scheme:dark]">
                 <button type="button" onclick="quickAssignCardDate('${record.id}')" class="text-[11px] bg-primary/20 hover:bg-primary text-primary hover:text-[#432c00] font-semibold px-2 py-0.5 rounded border border-primary/30 transition-colors cursor-pointer">
-                  + Asociar día
+                  + Agregar día
                 </button>
                 ${meta.assignedDates.length > 0 ? `
                 <button type="button" onclick="quickUnassignCardDate('${record.id}', '${selectedDateFilter && meta.assignedDates.includes(selectedDateFilter) ? selectedDateFilter : '__ALL__'}')" class="flex items-center gap-1 text-[11px] bg-error-container/25 hover:bg-error text-error hover:text-[#410002] font-medium px-2 py-0.5 rounded border border-error/30 transition-colors cursor-pointer" title="${selectedDateFilter && meta.assignedDates.includes(selectedDateFilter) ? 'Desasignar solo de este día' : 'Desasignar de todos los días'}">
                   <span class="material-symbols-outlined text-[13px]">event_busy</span>
-                  <span>${selectedDateFilter && meta.assignedDates.includes(selectedDateFilter) ? 'Desasignar de este día' : (meta.assignedDates.length > 1 ? 'Quitar todos los días' : 'Desasignar de este día')}</span>
+                  <span>${selectedDateFilter && meta.assignedDates.includes(selectedDateFilter) ? 'Desasignar de este día' : (meta.assignedDates.length > 1 ? 'Quitar todos' : 'Desasignar')}</span>
                 </button>` : ''}
               </div>` : ''}
             </div>
@@ -2343,6 +2922,177 @@
     window.quickUnassignCardDate = async (id, specificDate = '__ALL__') => {
       await removeFichaFromPackage(id, specificDate);
     };
+
+    // ================= MODAL INTERACTIVO DE MÚLTIPLES FECHAS AL MISMO TIEMPO =================
+    let multiDateRecordId = null;
+    let multiDateDraftSet = new Set();
+    let multiDateViewMonth = currentMonth;
+    let multiDateViewYear = currentYear;
+
+    const multiDateModal = document.getElementById('multiDateModal');
+    const multiDateCalendarGrid = document.getElementById('multiDateCalendarGrid');
+    const multiDateMonthLabel = document.getElementById('multiDateMonthLabel');
+    const multiDateSelectedPills = document.getElementById('multiDateSelectedPills');
+    const multiDateSelectedCount = document.getElementById('multiDateSelectedCount');
+
+    function renderMultiDateModalUI() {
+      const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      if (multiDateMonthLabel) multiDateMonthLabel.textContent = `${monthNames[multiDateViewMonth]} ${multiDateViewYear}`;
+
+      const firstDay = new Date(multiDateViewYear, multiDateViewMonth, 1).getDay();
+      const daysInMonth = new Date(multiDateViewYear, multiDateViewMonth + 1, 0).getDate();
+
+      multiDateCalendarGrid.innerHTML = '';
+      for (let i = 0; i < firstDay; i++) {
+        multiDateCalendarGrid.appendChild(document.createElement('div'));
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const ymd = `${multiDateViewYear}-${String(multiDateViewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const isSelected = multiDateDraftSet.has(ymd);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = day;
+        btn.className = isSelected
+          ? 'py-2 rounded-lg bg-primary text-[#432c00] font-bold shadow-sm transition-all cursor-pointer'
+          : 'py-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-all cursor-pointer';
+        btn.addEventListener('click', () => {
+          if (multiDateDraftSet.has(ymd)) {
+            multiDateDraftSet.delete(ymd);
+          } else {
+            multiDateDraftSet.add(ymd);
+          }
+          renderMultiDateModalUI();
+        });
+        multiDateCalendarGrid.appendChild(btn);
+      }
+
+      const sorted = Array.from(multiDateDraftSet).sort();
+      if (multiDateSelectedCount) multiDateSelectedCount.textContent = sorted.length;
+      if (multiDateSelectedPills) {
+        if (sorted.length === 0) {
+          multiDateSelectedPills.innerHTML = `<span class="text-xs text-outline italic px-1">Sin fechas seleccionadas (la ficha quedará en "Fichas Sin Fecha Asociada")</span>`;
+        } else {
+          multiDateSelectedPills.innerHTML = sorted.map(ymd => `
+            <span class="inline-flex items-center gap-1 text-[11px] font-mono bg-primary/20 text-primary border border-primary/35 px-2 py-0.5 rounded-md">
+              <span>${formatShortDateEs(ymd)}</span>
+              <button type="button" onclick="removeMultiDateDraft('${ymd}')" class="hover:text-error flex items-center cursor-pointer"><span class="material-symbols-outlined text-[13px]">close</span></button>
+            </span>
+          `).join('');
+        }
+      }
+    }
+
+    window.removeMultiDateDraft = (ymd) => {
+      multiDateDraftSet.delete(ymd);
+      renderMultiDateModalUI();
+    };
+
+    window.openMultiDateModal = (recordId) => {
+      const record = globalRecords.find(r => r.id === recordId);
+      if (!record) return;
+      const meta = parseRecordMetadata(record);
+      multiDateRecordId = recordId;
+      multiDateDraftSet = new Set(meta.assignedDates || []);
+      multiDateViewMonth = currentMonth;
+      multiDateViewYear = currentYear;
+      const titleEl = document.getElementById('multiDateFichaTitle');
+      if (titleEl) titleEl.textContent = `${record.title}${meta.seriesSubtitle ? ` — ${meta.seriesSubtitle}` : ''}`;
+      renderMultiDateModalUI();
+      if (multiDateModal) multiDateModal.classList.remove('hidden');
+    };
+
+    function closeMultiDateModal() {
+      if (multiDateModal) multiDateModal.classList.add('hidden');
+      multiDateRecordId = null;
+    }
+
+    const btnCloseMultiDateModal = document.getElementById('btnCloseMultiDateModal');
+    if (btnCloseMultiDateModal) btnCloseMultiDateModal.addEventListener('click', closeMultiDateModal);
+    const btnCancelMultiDateModal = document.getElementById('btnCancelMultiDateModal');
+    if (btnCancelMultiDateModal) btnCancelMultiDateModal.addEventListener('click', closeMultiDateModal);
+    const btnMultiDatePrevMonth = document.getElementById('btnMultiDatePrevMonth');
+    if (btnMultiDatePrevMonth) {
+      btnMultiDatePrevMonth.addEventListener('click', () => {
+        multiDateViewMonth--;
+        if (multiDateViewMonth < 0) { multiDateViewMonth = 11; multiDateViewYear--; }
+        renderMultiDateModalUI();
+      });
+    }
+    const btnMultiDateNextMonth = document.getElementById('btnMultiDateNextMonth');
+    if (btnMultiDateNextMonth) {
+      btnMultiDateNextMonth.addEventListener('click', () => {
+        multiDateViewMonth++;
+        if (multiDateViewMonth > 11) { multiDateViewMonth = 0; multiDateViewYear++; }
+        renderMultiDateModalUI();
+      });
+    }
+    const btnClearAllMultiDates = document.getElementById('btnClearAllMultiDates');
+    if (btnClearAllMultiDates) {
+      btnClearAllMultiDates.addEventListener('click', () => {
+        multiDateDraftSet.clear();
+        renderMultiDateModalUI();
+      });
+    }
+    const btnSaveMultiDates = document.getElementById('btnSaveMultiDates');
+    if (btnSaveMultiDates) {
+      btnSaveMultiDates.addEventListener('click', async () => {
+        if (!multiDateRecordId) return;
+        const record = globalRecords.find(r => r.id === multiDateRecordId);
+        if (!record) return;
+        const meta = parseRecordMetadata(record);
+        const sortedDates = Array.from(multiDateDraftSet).sort();
+        const isAssigned = sortedDates.length > 0;
+        const createdDateStr = record.created ? formatDateForInput(new Date(record.created)) : formatDateForInput(new Date());
+        const nextRawDate = isAssigned ? sortedDates[sortedDates.length - 1] : (meta.previousDateBeforePack || createdDateStr);
+
+        const isCustomImg = meta.coverImage && (
+          meta.coverImage.startsWith('data:image/webp') ||
+          meta.coverImage.startsWith('data:image/jpeg') ||
+          meta.coverImage.startsWith('data:image/png')
+        );
+
+        const metaObj = {
+          items: meta.items,
+          subcategory: meta.subcategory,
+          packageName: isAssigned ? meta.packageName : '',
+          calendarAssigned: isAssigned,
+          assignedDates: sortedDates,
+          previousDateBeforePack: isAssigned ? (meta.previousDateBeforePack || createdDateStr) : null,
+          wentOut: meta.wentOut,
+          hours: meta.hours,
+          revisitaData: meta.revisitaData,
+          parentRecordId: meta.parentRecordId,
+          parentRecordTitle: meta.parentRecordTitle,
+          seriesNumber: meta.seriesNumber,
+          seriesSubtitle: meta.seriesSubtitle || ''
+        };
+
+        btnSaveMultiDates.disabled = true;
+        try {
+          await updatePredicacionAdaptive(multiDateRecordId, {
+            title: record.title,
+            rawDate: nextRawDate,
+            category: meta.categoryLabel || record.category,
+            metaObj: metaObj,
+            notes: record.notes || '',
+            customCover: isCustomImg ? meta.coverImage : null
+          });
+          showToast(
+            isAssigned
+              ? `Ficha "${record.title}" asignada a ${sortedDates.length} ${sortedDates.length === 1 ? 'día' : 'días'}`
+              : `Fechas quitadas de "${record.title}"`
+          );
+          closeMultiDateModal();
+          await loadDataAndRender();
+        } catch (err) {
+          console.error(err);
+          showToast('Error al guardar las fechas en PocketBase', 'error');
+        } finally {
+          btnSaveMultiDates.disabled = false;
+        }
+      });
+    }
 
     // Actualiza rápidamente desde la tarjeta en PocketBase (VPS) si salió y cuántas horas hizo
     window.updateRecordHours = async (id) => {
@@ -3578,10 +4328,13 @@
     const cronogramaSection = document.getElementById('cronogramaSection');
     const informesSection = document.getElementById('informesSection');
     const dashboardSection = document.getElementById('dashboardSection');
+    const aparienciaSection = document.getElementById('aparienciaSection');
     const navCronogramaBtn = document.getElementById('navCronogramaBtn');
     const navDashboardBtn = document.getElementById('navDashboardBtn');
     const navInformesBtn = document.getElementById('navInformesBtn');
     const navRevisitasBtn = document.getElementById('navRevisitasBtn');
+    const navAparienciaBtn = document.getElementById('navAparienciaBtn');
+    const btnHeaderApariencia = document.getElementById('btnHeaderApariencia');
 
     let currentDashPeriod = 'year';
 
@@ -3596,10 +4349,15 @@
         dashboardSection.classList.add('hidden');
         dashboardSection.classList.remove('flex');
       }
+      if (aparienciaSection) {
+        aparienciaSection.classList.add('hidden');
+        aparienciaSection.classList.remove('flex');
+      }
 
       navCronogramaBtn.className = inactiveClass;
       navInformesBtn.className = inactiveClass;
       if (navDashboardBtn) navDashboardBtn.className = inactiveClass;
+      if (navAparienciaBtn) navAparienciaBtn.className = inactiveClass;
 
       if (section === 'informes') {
         informesSection.classList.remove('hidden');
@@ -3611,10 +4369,27 @@
         dashboardSection.classList.add('flex');
         if (navDashboardBtn) navDashboardBtn.className = activeClass;
         renderDashboard();
+      } else if (section === 'apariencia' && aparienciaSection) {
+        aparienciaSection.classList.remove('hidden');
+        aparienciaSection.classList.add('flex');
+        if (navAparienciaBtn) navAparienciaBtn.className = activeClass;
+        renderAppearanceSection();
       } else {
         cronogramaSection.classList.remove('hidden');
         navCronogramaBtn.className = activeClass;
       }
+    }
+
+    if (navAparienciaBtn) {
+      navAparienciaBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchSection('apariencia');
+      });
+    }
+    if (btnHeaderApariencia) {
+      btnHeaderApariencia.addEventListener('click', () => {
+        switchSection('apariencia');
+      });
     }
 
     navCronogramaBtn.addEventListener('click', (e) => {
