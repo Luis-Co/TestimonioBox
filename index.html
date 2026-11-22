@@ -14,6 +14,50 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
   
   <style>
+    :root {
+      --c-background: 245 243 238;
+      --c-surface-container-low: 255 255 255;
+      --c-surface-container: 243 240 234;
+      --c-surface-container-high: 235 230 221;
+      --c-surface-container-highest: 223 217 206;
+      --c-surface-bright: 214 206 194;
+      --c-on-surface: 28 31 36;
+      --c-on-surface-variant: 78 74 67;
+      --c-outline: 118 109 96;
+      --c-primary: 179 116 14;
+      --c-primary-container: 152 96 8;
+      --c-secondary: 138 90 18;
+      --c-tertiary: 45 96 122;
+      --c-error: 186 26 26;
+      --c-error-container: 255 218 214;
+      --c-sidebar: 238 234 226;
+      --c-header-bg: rgba(245, 243, 238, 0.9);
+      --c-scripture-bg: #f6f1e6;
+      color-scheme: light;
+    }
+
+    html.dark {
+      --c-background: 16 20 24;
+      --c-surface-container-low: 25 28 33;
+      --c-surface-container: 29 32 37;
+      --c-surface-container-high: 39 42 47;
+      --c-surface-container-highest: 50 53 58;
+      --c-surface-bright: 54 57 63;
+      --c-on-surface: 225 226 233;
+      --c-on-surface-variant: 211 196 177;
+      --c-outline: 156 143 125;
+      --c-primary: 251 194 98;
+      --c-primary-container: 221 167 74;
+      --c-secondary: 236 192 118;
+      --c-tertiary: 187 207 217;
+      --c-error: 255 180 171;
+      --c-error-container: 147 0 10;
+      --c-sidebar: 11 14 19;
+      --c-header-bg: rgba(16, 20, 24, 0.85);
+      --c-scripture-bg: #141b21;
+      color-scheme: dark;
+    }
+
     @layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}
     ::-webkit-scrollbar{display:none;}
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -23,23 +67,38 @@
     .toast-exit { animation: fadeOut 0.3s ease-out forwards; }
     .bell-ring { animation: bellPulse 1.4s ease-in-out infinite; transform-origin: top center; }
     
-    .calendar-day.selected { background-color: #fbc262; color: #281900; font-weight: 600; }
-    .calendar-day.has-record::after { content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background-color: #dda74a; }
-    .calendar-day.selected.has-record::after { background-color: #281900; }
+    .calendar-day.selected { background-color: rgb(var(--c-primary)); color: #ffffff; font-weight: 600; }
+    html.dark .calendar-day.selected { color: #281900; }
+    .calendar-day.has-record::after { content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background-color: rgb(var(--c-primary-container)); }
+    .calendar-day.selected.has-record::after { background-color: #ffffff; }
+    html.dark .calendar-day.selected.has-record::after { background-color: #281900; }
 
     /* Estilos para contenido con formato enriquecido */
-    .rich-content h2 { font-family: 'Newsreader', serif; font-size: 1.5rem; font-weight: 600; color: #fbc262; margin: 0.75rem 0 0.35rem; line-height: 1.3; }
-    .rich-content h3 { font-family: 'Newsreader', serif; font-size: 1.2rem; font-weight: 600; color: #ecc076; margin: 0.6rem 0 0.25rem; line-height: 1.3; }
+    .rich-content h2 { font-family: 'Newsreader', serif; font-size: 1.5rem; font-weight: 600; color: rgb(var(--c-primary)); margin: 0.75rem 0 0.35rem; line-height: 1.3; }
+    .rich-content h3 { font-family: 'Newsreader', serif; font-size: 1.2rem; font-weight: 600; color: rgb(var(--c-secondary)); margin: 0.6rem 0 0.25rem; line-height: 1.3; }
     .rich-content p { margin-bottom: 0.5rem; }
     .rich-content ul { list-style-type: disc; padding-left: 1.5rem; margin: 0.5rem 0; }
     .rich-content ol { list-style-type: decimal; padding-left: 1.5rem; margin: 0.5rem 0; }
     .rich-content li { margin-bottom: 0.2rem; }
-    .rich-content blockquote { border-left: 3px solid #ecc076; padding: 0.5rem 1rem; margin: 0.6rem 0; background-color: rgba(20, 27, 33, 0.7); border-radius: 0 0.5rem 0.5rem 0; font-style: italic; color: #d3c4b1; }
+    .rich-content blockquote { border-left: 3px solid rgb(var(--c-secondary)); padding: 0.5rem 1rem; margin: 0.6rem 0; background-color: var(--c-scripture-bg); border-radius: 0 0.5rem 0.5rem 0; font-style: italic; color: rgb(var(--c-on-surface-variant)); }
     .rich-content hr { border: 0; border-top: 1px solid rgba(156, 143, 125, 0.25); margin: 0.75rem 0; }
-    #richEditor:empty:before { content: attr(data-placeholder); color: #9c8f7d; opacity: 0.6; pointer-events: none; }
+    #richEditor:empty:before { content: attr(data-placeholder); color: rgb(var(--c-outline)); opacity: 0.6; pointer-events: none; }
     .custom-scroll::-webkit-scrollbar { display: block; width: 6px; }
     .custom-scroll::-webkit-scrollbar-track { background: transparent; }
-    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(156, 143, 125, 0.3); border-radius: 9999px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(156, 143, 125, 0.35); border-radius: 9999px; }
+
+    /* Adaptaciones para Modo Claro */
+    #appSidebar { background-color: rgb(var(--c-sidebar)); }
+    #appTopHeader { background-color: var(--c-header-bg); }
+    .scripture-box-surface { background-color: var(--c-scripture-bg); }
+    html:not(.dark) [class*="color-scheme:dark"] { color-scheme: light !important; }
+    html:not(.dark) .cal-tooltip { background-color: #ffffff !important; border-color: rgba(179, 116, 14, 0.35) !important; box-shadow: 0 10px 25px rgba(0,0,0,0.14) !important; }
+    html:not(.dark) .bg-primary { color: #ffffff !important; }
+    html:not(.dark) .bg-primary span, html:not(.dark) .bg-primary .material-symbols-outlined { color: #ffffff; }
+    html:not(.dark) .bg-\[\#1b3a24\] { background-color: #dcfce7 !important; color: #166534 !important; border-color: #86efac !important; }
+    html:not(.dark) .bg-\[\#141b21\] { background-color: #f6f1e6 !important; }
+    html:not(.dark) .bg-\[\#191c21\] { background-color: #ffffff !important; }
+    html:not(.dark) #appSidebar { border-right: 1px solid rgba(118, 109, 96, 0.16); }
 
     /* Tooltip del calendario */
     .cal-tooltip { opacity: 0; visibility: hidden; transform: translate(-50%, 4px); transition: all 0.18s ease; }
@@ -57,9 +116,52 @@
     #appView.sidebar-collapsed #navUnassignedBadge { position: absolute; top: 3px; right: 6px; padding: 0 4px; font-size: 9px; line-height: 14px; }
   </style>
   
+  <script>
+    // Aplicar tema guardado antes del render inicial para evitar parpadeos
+    (function() {
+      const savedTheme = localStorage.getItem('testimoniobox_theme');
+      if (savedTheme === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script id="tailwind-config">
-    tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "primary-container": "#dda74a", "surface-bright": "#36393f", "on-surface": "#e1e2e9", "background": "#101418", "surface-container": "#1d2025", "surface-container-low": "#191c21", "surface-container-highest": "#32353a", "surface-container-high": "#272a2f", "outline": "#9c8f7d", "primary": "#fbc262", "on-surface-variant": "#d3c4b1", "secondary": "#ecc076", "tertiary": "#bbcfd9", "error": "#ffb4ab", "error-container": "#93000a" }, "fontFamily": { "headline-lg": ["Newsreader"], "headline-sm": ["Newsreader"], "label-sm": ["JetBrains Mono"], "body-md": ["Inter"], "scripture-quote": ["Newsreader"], "body-sm": ["Inter"], "headline-md": ["Newsreader"] } } } };
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary-container": "rgb(var(--c-primary-container) / <alpha-value>)",
+            "surface-bright": "rgb(var(--c-surface-bright) / <alpha-value>)",
+            "on-surface": "rgb(var(--c-on-surface) / <alpha-value>)",
+            "background": "rgb(var(--c-background) / <alpha-value>)",
+            "surface-container": "rgb(var(--c-surface-container) / <alpha-value>)",
+            "surface-container-low": "rgb(var(--c-surface-container-low) / <alpha-value>)",
+            "surface-container-highest": "rgb(var(--c-surface-container-highest) / <alpha-value>)",
+            "surface-container-high": "rgb(var(--c-surface-container-high) / <alpha-value>)",
+            "outline": "rgb(var(--c-outline) / <alpha-value>)",
+            "primary": "rgb(var(--c-primary) / <alpha-value>)",
+            "on-surface-variant": "rgb(var(--c-on-surface-variant) / <alpha-value>)",
+            "secondary": "rgb(var(--c-secondary) / <alpha-value>)",
+            "tertiary": "rgb(var(--c-tertiary) / <alpha-value>)",
+            "error": "rgb(var(--c-error) / <alpha-value>)",
+            "error-container": "rgb(var(--c-error-container) / <alpha-value>)"
+          },
+          "fontFamily": {
+            "headline-lg": ["Newsreader"],
+            "headline-sm": ["Newsreader"],
+            "label-sm": ["JetBrains Mono"],
+            "body-md": ["Inter"],
+            "scripture-quote": ["Newsreader"],
+            "body-sm": ["Inter"],
+            "headline-md": ["Newsreader"]
+          }
+        }
+      }
+    };
   </script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -119,7 +221,13 @@
             </div>
           </div>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 sm:gap-3">
+          <!-- Selector de Tema Claro / Oscuro -->
+          <button type="button" id="btnToggleTheme" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container border border-outline/15 transition-colors cursor-pointer" title="Cambiar entre Modo Claro y Modo Oscuro">
+            <span id="themeToggleIcon" class="material-symbols-outlined text-[20px]">light_mode</span>
+            <span id="themeToggleLabel" class="hidden sm:inline text-xs font-medium">Modo Claro</span>
+          </button>
+
           <!-- Campanita de Notificaciones -->
           <div class="relative" id="notificationWrapper">
             <button id="btnNotifications" class="relative p-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" title="Notificaciones de Ministerio">
@@ -499,10 +607,14 @@
           </div>
           <div id="dateFieldCol" class="md:col-span-3">
             <div class="flex items-center justify-between mb-1">
-              <label class="block text-xs font-label-sm text-outline uppercase" title="Si lo dejas vacío, se guarda con la fecha de creación pero no ocupa un día específico del calendario hasta que la asignes">Asignar a Día (Opcional)</label>
-              <button type="button" id="btnClearFieldDate" class="text-[10px] text-tertiary hover:text-primary">Sin fecha</button>
+              <label class="block text-xs font-label-sm text-outline uppercase" title="Puedes asociar la ficha a uno o varios días del calendario. Si lo dejas vacío, se guarda sin fecha de calendario hasta que la asignes">Asignar a Días (Opcional)</label>
+              <button type="button" id="btnClearFieldDate" class="text-[10px] text-tertiary hover:text-primary cursor-pointer">Sin fechas</button>
             </div>
-            <input type="date" id="fieldDate" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2.5 text-on-surface focus:outline-none focus:border-primary [color-scheme:dark]">
+            <div class="flex items-center gap-1.5">
+              <input type="date" id="fieldDate" class="flex-1 min-w-0 bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2.5 text-on-surface focus:outline-none focus:border-primary [color-scheme:dark]">
+              <button type="button" id="btnAddModalDate" class="px-2.5 py-2.5 bg-primary/20 hover:bg-primary text-primary hover:text-[#432c00] rounded-lg border border-primary/30 text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer" title="Agregar este día a la ficha">+ Día</button>
+            </div>
+            <div id="modalAssignedDatesList" class="flex flex-wrap gap-1.5 mt-2"></div>
           </div>
           <div id="categoryFieldCol" class="md:col-span-3">
             <label class="block text-xs font-label-sm text-outline mb-1 uppercase">Categoría</label>
@@ -522,6 +634,8 @@
             <select id="fieldSubcategory" class="w-full bg-surface-container-high border border-outline/20 rounded-lg px-3 py-2.5 text-on-surface focus:outline-none focus:border-primary">
               <option value="La Atalaya">🗼 Revista La Atalaya</option>
               <option value="¡Despertad!">🌅 Revista ¡Despertad!</option>
+              <option value="Folleto">📗 Folleto</option>
+              <option value="Tratado">📄 Tratado</option>
               <option value="Investigación con IA">✨ Investigación en conjunto con IA</option>
               <option value="Guía de Actividades">📘 Guía de Actividades</option>
               <option value="Estudio Personal / Biblia">📖 Estudio Personal / Biblia</option>
@@ -958,11 +1072,49 @@
     const PRESET_COVERS = {
       'La Atalaya': makePresetCoverSvg('LA ATALAYA', 'ANUNCIANDO EL REINO', '#1b2838', '#0f1722', '#fbc262', '🗼'),
       '¡Despertad!': makePresetCoverSvg('¡DESPERTAD!', 'REVISTA DE ESTUDIO', '#2d1f14', '#17110b', '#ecc076', '🌅'),
+      'Folleto': makePresetCoverSvg('FOLLETO', 'PUBLICACIÓN BÍBLICA', '#192b24', '#0e1915', '#34d399', '📗'),
+      'Tratado': makePresetCoverSvg('TRATADO', 'MENSAJE BÍBLICO', '#2b1c24', '#170e13', '#f472b6', '📄'),
       'Investigación con IA': makePresetCoverSvg('ESTUDIO + IA', 'INVESTIGACIÓN ASISTIDA', '#16242b', '#0d151a', '#7dd3fc', '✨'),
       'Guía de Actividades': makePresetCoverSvg('VIDA Y MINISTERIO', 'GUÍA DE ACTIVIDADES', '#231c2e', '#120e17', '#d8b4fe', '📘'),
       'Estudio Personal / Biblia': makePresetCoverSvg('SANTA BIBLIA', 'ESTUDIO PERSONAL', '#1c261e', '#0e1410', '#86efac', '📖'),
       'Revisita Pastoral': makePresetCoverSvg('REVISITA', 'SEGUIMIENTO PASTORAL', '#17252a', '#0c1518', '#67e8f9', '🏠')
     };
+
+    // ================= MODO CLARO / OSCURO =================
+    function updateThemeToggleUI() {
+      const isDark = document.documentElement.classList.contains('dark');
+      const icon = document.getElementById('themeToggleIcon');
+      const label = document.getElementById('themeToggleLabel');
+      if (icon) icon.textContent = isDark ? 'light_mode' : 'dark_mode';
+      if (label) label.textContent = isDark ? 'Modo Claro' : 'Modo Oscuro';
+    }
+    const btnToggleTheme = document.getElementById('btnToggleTheme');
+    if (btnToggleTheme) {
+      btnToggleTheme.addEventListener('click', () => {
+        const isDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('testimoniobox_theme', isDark ? 'dark' : 'light');
+        updateThemeToggleUI();
+      });
+    }
+    updateThemeToggleUI();
+
+    function normalizeAssignedDatesList(datesArr) {
+      if (!Array.isArray(datesArr)) return [];
+      const set = new Set();
+      datesArr.forEach(item => {
+        if (typeof item === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(item.trim())) {
+          set.add(item.trim());
+        }
+      });
+      return Array.from(set).sort();
+    }
+
+    function formatShortDateEs(ymd) {
+      if (!ymd || !/^\d{4}-\d{2}-\d{2}$/.test(ymd)) return ymd || '';
+      const d = new Date(ymd + 'T12:00:00');
+      if (isNaN(d)) return ymd;
+      return d.toLocaleDateString('es-ES', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+    }
 
     const loginView = document.getElementById('loginView');
     const appView = document.getElementById('appView');
@@ -1154,12 +1306,15 @@
 
       if (Array.isArray(parsed)) {
         const subcat = record.subcategory || 'Estudio Personal / Biblia';
+        const dObjLegacy = new Date(record.date);
+        const legacyDates = !isNaN(dObjLegacy) ? [formatDateForInput(dObjLegacy)] : [];
         return {
           items: parsed,
           categoryLabel: record.category || 'Asignación',
           subcategory: subcat,
           packageName: record.packageName || '',
-          calendarAssigned: true,
+          calendarAssigned: legacyDates.length > 0,
+          assignedDates: legacyDates,
           wentOut: Boolean(record.wentOut),
           hours: parseFloat(record.hours) || 0,
           revisitaData: null,
@@ -1173,9 +1328,18 @@
         const subcat = parsed.subcategory || record.subcategory || (record.category === 'Revisita' ? 'Revisita Pastoral' : 'La Atalaya');
         const hasPackage = Boolean(parsed.packageName || record.packageName);
         const isRevisita = Boolean(parsed.revisitaData || record.category === 'Revisita');
-        const calendarAssigned = typeof parsed.calendarAssigned === 'boolean'
+        const legacyCalendarAssigned = typeof parsed.calendarAssigned === 'boolean'
           ? parsed.calendarAssigned
           : (hasPackage || isRevisita);
+
+        let assignedDates = [];
+        if (Array.isArray(parsed.assignedDates)) {
+          assignedDates = normalizeAssignedDatesList(parsed.assignedDates);
+        } else if (legacyCalendarAssigned) {
+          const dObjRec = new Date(record.date);
+          if (!isNaN(dObjRec)) assignedDates = [formatDateForInput(dObjRec)];
+        }
+        const calendarAssigned = assignedDates.length > 0;
 
         // Si es ficha hija de una serie (por parentRecordId o por sufijo "#N"), recupera o hereda en vivo el padre y la portada de toda la serie
         let resolvedCover = parsed.coverImage;
@@ -1247,6 +1411,7 @@
           subcategory: subcat,
           packageName: parsed.packageName || record.packageName || '',
           calendarAssigned: calendarAssigned,
+          assignedDates: assignedDates,
           previousDateBeforePack: parsed.previousDateBeforePack || null,
           wentOut: Boolean(parsed.wentOut),
           hours: parseFloat(parsed.hours) || 0,
@@ -1265,6 +1430,7 @@
         subcategory: 'La Atalaya',
         packageName: '',
         calendarAssigned: false,
+        assignedDates: [],
         wentOut: false,
         hours: 0,
         revisitaData: null,
@@ -1408,11 +1574,11 @@
       const { saturday, sunday, satStr, sunStr } = getUpcomingWeekendDates();
       const satRecords = globalRecords.filter(r => {
         const meta = parseRecordMetadata(r);
-        return meta.calendarAssigned && formatDateForInput(new Date(r.date)) === satStr;
+        return meta.assignedDates.includes(satStr);
       });
       const sunRecords = globalRecords.filter(r => {
         const meta = parseRecordMetadata(r);
-        return meta.calendarAssigned && formatDateForInput(new Date(r.date)) === sunStr;
+        return meta.assignedDates.includes(sunStr);
       });
       const totalWeekend = satRecords.length + sunRecords.length;
 
@@ -1522,17 +1688,17 @@
       const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
       calendarMonthYear.textContent = `${monthNames[currentMonth]} ${currentYear}`;
       
-      // Agrupa títulos de notas asignadas por fecha YYYY-MM-DD para el calendario
+      // Agrupa títulos de notas asignadas por fecha YYYY-MM-DD para el calendario (soporta múltiples días por ficha)
       const recordsByDate = {};
       globalRecords.forEach(r => {
         const meta = parseRecordMetadata(r);
-        if (!meta.calendarAssigned) return; // Solo marcar en calendario si fue asignada a una fecha
-        const d = new Date(r.date);
-        if (!isNaN(d)) {
-          const key = formatDateForInput(d);
+        if (!meta.assignedDates || meta.assignedDates.length === 0) return;
+        meta.assignedDates.forEach(key => {
           if (!recordsByDate[key]) recordsByDate[key] = [];
-          recordsByDate[key].push(r);
-        }
+          if (!recordsByDate[key].some(existing => existing.id === r.id)) {
+            recordsByDate[key].push(r);
+          }
+        });
       });
 
       for (let i = 0; i < firstDay; i++) {
@@ -1796,7 +1962,8 @@
                 items: meta.items,
                 subcategory: meta.subcategory || mag.subcategory,
                 packageName: meta.packageName || '',
-                calendarAssigned: Boolean(meta.calendarAssigned),
+                calendarAssigned: meta.assignedDates.length > 0,
+                assignedDates: meta.assignedDates,
                 previousDateBeforePack: meta.previousDateBeforePack || null,
                 wentOut: Boolean(meta.wentOut),
                 hours: meta.hours || 0,
@@ -1881,16 +2048,23 @@
       }
     }
 
+    function recordHasDateInMonth(meta, monthIdx, yearNum) {
+      if (!meta.assignedDates || meta.assignedDates.length === 0) return false;
+      return meta.assignedDates.some(dStr => {
+        const parts = dStr.split('-').map(Number);
+        return parts.length === 3 && parts[0] === yearNum && (parts[1] - 1) === monthIdx;
+      });
+    }
+
     function updateRecordsViewTabsUI() {
       const monthAssignedCount = globalRecords.filter(r => {
-        const d = new Date(r.date);
         const meta = parseRecordMetadata(r);
-        return meta.calendarAssigned && !isNaN(d) && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+        return recordHasDateInMonth(meta, currentMonth, currentYear);
       }).length;
 
       const unassignedCount = globalRecords.filter(r => {
         const meta = parseRecordMetadata(r);
-        return !meta.revisitaData && !meta.calendarAssigned;
+        return !meta.revisitaData && meta.assignedDates.length === 0;
       }).length;
 
       const tabMonthCount = document.getElementById('tabMonthCount');
@@ -1926,22 +2100,21 @@
       updateRecordsViewTabsUI();
       
       let filteredRecords = globalRecords.filter(r => {
-        const d = new Date(r.date);
         const meta = parseRecordMetadata(r);
         if (selectedDateFilter) {
-          // Al filtrar por un día del calendario, mostrar únicamente las fichas asignadas a esa fecha
-          return meta.calendarAssigned && formatDateForInput(d) === selectedDateFilter;
+          // Al filtrar por un día del calendario, mostrar las fichas que tengan ese día entre sus fechas asignadas
+          return meta.assignedDates.includes(selectedDateFilter);
         }
         if (recordsViewMode === 'unassigned') {
           // Mostrar todas las fichas creadas sin fecha de calendario asociada (de cualquier mes)
-          return !meta.revisitaData && !meta.calendarAssigned;
+          return !meta.revisitaData && meta.assignedDates.length === 0;
         }
         if (recordsViewMode === 'all') {
           // Mostrar absolutamente todas las fichas y registros sin límite de mes
           return true;
         }
-        // En la vista "Del Mes Actual", mostrar ÚNICAMENTE las fichas asociadas al calendario en ese mes
-        return meta.calendarAssigned && !isNaN(d) && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+        // En la vista "Del Mes Actual", mostrar ÚNICAMENTE las fichas asociadas al menos a un día de ese mes
+        return recordHasDateInMonth(meta, currentMonth, currentYear);
       });
 
       if (filteredRecords.length === 0) {
@@ -2016,12 +2189,13 @@
               <img src="${meta.coverImage}" alt="${meta.subcategory}" class="w-16 h-22 sm:w-20 sm:h-28 object-cover rounded-lg border border-outline/20 shadow-md flex-shrink-0 bg-surface-container-high">
               <div class="flex flex-col gap-1 flex-1">
                 <div class="flex flex-wrap items-center gap-1.5 mb-1">
-                  ${meta.calendarAssigned
-                    ? `<span class="font-label-sm text-[0.6875rem] bg-surface-container-highest text-primary px-2 py-0.5 rounded font-mono flex items-center gap-1.5" title="Asignada a esta fecha en el calendario">
+                  ${meta.assignedDates.length > 0
+                    ? meta.assignedDates.map(dStr => `
+                      <span class="font-label-sm text-[0.6875rem] bg-surface-container-highest text-primary px-2 py-0.5 rounded font-mono flex items-center gap-1.5" title="Asignada a esta fecha en el calendario">
                         <span class="material-symbols-outlined text-[12px]">event_available</span>
-                        <span>${dateString}</span>
-                        ${!meta.revisitaData ? `<button type="button" onclick="quickUnassignCardDate('${record.id}')" class="ml-0.5 text-outline hover:text-error flex items-center cursor-pointer no-export" title="Desasignar de este día (no borra la ficha)"><span class="material-symbols-outlined text-[13px]">close</span></button>` : ''}
-                      </span>`
+                        <span>${formatShortDateEs(dStr)}</span>
+                        ${!meta.revisitaData ? `<button type="button" onclick="quickUnassignCardDate('${record.id}', '${dStr}')" class="ml-0.5 text-outline hover:text-error flex items-center cursor-pointer no-export" title="Quitar este día (no borra la ficha)"><span class="material-symbols-outlined text-[13px]">close</span></button>` : ''}
+                      </span>`).join('')
                     : `<span class="font-label-sm text-[0.6875rem] bg-surface-container text-outline px-2 py-0.5 rounded font-mono" title="Fecha de creación (sin día de calendario asignado)">CREADA: ${dateString}</span>`
                   }
                   <span class="font-label-sm text-[0.6875rem] bg-surface-container text-tertiary px-2 py-0.5 rounded">${meta.categoryLabel || record.category}</span>
@@ -2084,15 +2258,15 @@
               ${!meta.revisitaData ? `
               <div class="flex flex-wrap items-center gap-1.5 bg-surface-container px-2.5 py-1 rounded-lg border border-outline/15">
                 <span class="material-symbols-outlined text-[15px] text-primary">calendar_add_on</span>
-                <span class="text-[11px] font-label-sm uppercase text-outline">${meta.calendarAssigned ? 'Cambiar fecha:' : 'Asociar a fecha:'}</span>
-                <input type="date" id="inp-assign-date-${record.id}" value="${meta.calendarAssigned && !isNaN(dateObj) ? formatDateForInput(dateObj) : ''}" class="bg-surface-container-high border border-outline/20 rounded px-2 py-0.5 text-xs text-on-surface focus:outline-none focus:border-primary [color-scheme:dark]">
+                <span class="text-[11px] font-label-sm uppercase text-outline">Asociar a otro día:</span>
+                <input type="date" id="inp-assign-date-${record.id}" value="" class="bg-surface-container-high border border-outline/20 rounded px-2 py-0.5 text-xs text-on-surface focus:outline-none focus:border-primary [color-scheme:dark]">
                 <button type="button" onclick="quickAssignCardDate('${record.id}')" class="text-[11px] bg-primary/20 hover:bg-primary text-primary hover:text-[#432c00] font-semibold px-2 py-0.5 rounded border border-primary/30 transition-colors cursor-pointer">
-                  ${meta.calendarAssigned ? 'Mover' : 'Asociar'}
+                  + Asociar día
                 </button>
-                ${meta.calendarAssigned ? `
-                <button type="button" onclick="quickUnassignCardDate('${record.id}')" class="flex items-center gap-1 text-[11px] bg-error-container/25 hover:bg-error text-error hover:text-[#410002] font-medium px-2 py-0.5 rounded border border-error/30 transition-colors cursor-pointer" title="Desasignar de este día sin borrar la ficha">
+                ${meta.assignedDates.length > 0 ? `
+                <button type="button" onclick="quickUnassignCardDate('${record.id}', '${selectedDateFilter && meta.assignedDates.includes(selectedDateFilter) ? selectedDateFilter : '__ALL__'}')" class="flex items-center gap-1 text-[11px] bg-error-container/25 hover:bg-error text-error hover:text-[#410002] font-medium px-2 py-0.5 rounded border border-error/30 transition-colors cursor-pointer" title="${selectedDateFilter && meta.assignedDates.includes(selectedDateFilter) ? 'Desasignar solo de este día' : 'Desasignar de todos los días'}">
                   <span class="material-symbols-outlined text-[13px]">event_busy</span>
-                  <span>Desasignar de este día</span>
+                  <span>${selectedDateFilter && meta.assignedDates.includes(selectedDateFilter) ? 'Desasignar de este día' : (meta.assignedDates.length > 1 ? 'Quitar todos los días' : 'Desasignar de este día')}</span>
                 </button>` : ''}
               </div>` : ''}
             </div>
@@ -2110,7 +2284,7 @@
       });
     }
 
-    // Asocia o cambia rápidamente la fecha de calendario de una ficha directamente desde la tarjeta
+    // Agrega una nueva fecha de calendario a una ficha (una ficha puede asociarse a tantos días como se desee)
     window.quickAssignCardDate = async (id) => {
       const record = globalRecords.find(r => r.id === id);
       if (!record) return;
@@ -2125,6 +2299,7 @@
       const meta = parseRecordMetadata(record);
       const currentRecordDate = formatDateForInput(new Date(record.date));
       const prevDate = meta.previousDateBeforePack || currentRecordDate;
+      const nextAssignedDates = normalizeAssignedDatesList([...meta.assignedDates, targetDate]);
       const isCustomImg = meta.coverImage && (
         meta.coverImage.startsWith('data:image/webp') ||
         meta.coverImage.startsWith('data:image/jpeg') ||
@@ -2136,6 +2311,7 @@
         subcategory: meta.subcategory,
         packageName: meta.packageName,
         calendarAssigned: true,
+        assignedDates: nextAssignedDates,
         previousDateBeforePack: prevDate,
         wentOut: meta.wentOut,
         hours: meta.hours,
@@ -2149,14 +2325,14 @@
       try {
         await updatePredicacionAdaptive(id, {
           title: record.title,
-          rawDate: targetDate,
+          rawDate: nextAssignedDates[nextAssignedDates.length - 1] || targetDate,
           category: meta.categoryLabel || record.category,
           metaObj: metaObj,
           notes: record.notes || '',
           customCover: isCustomImg ? meta.coverImage : null
         });
         const formatted = new Date(targetDate + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
-        showToast(`Ficha "${record.title}" asociada al ${formatted}`);
+        showToast(`Ficha "${record.title}" asociada al ${formatted} (${nextAssignedDates.length} ${nextAssignedDates.length === 1 ? 'día' : 'días'})`);
         await loadDataAndRender();
       } catch (err) {
         console.error(err);
@@ -2164,8 +2340,8 @@
       }
     };
 
-    window.quickUnassignCardDate = async (id) => {
-      await removeFichaFromPackage(id);
+    window.quickUnassignCardDate = async (id, specificDate = '__ALL__') => {
+      await removeFichaFromPackage(id, specificDate);
     };
 
     // Actualiza rápidamente desde la tarjeta en PocketBase (VPS) si salió y cuántas horas hizo
@@ -2184,7 +2360,8 @@
         items: meta.items,
         subcategory: meta.subcategory,
         packageName: meta.packageName,
-        calendarAssigned: Boolean(meta.calendarAssigned),
+        calendarAssigned: meta.assignedDates.length > 0,
+        assignedDates: meta.assignedDates,
         previousDateBeforePack: meta.previousDateBeforePack || null,
         wentOut: wentOutVal,
         hours: hoursVal,
@@ -2215,9 +2392,10 @@
       const record = globalRecords.find(r => r.id === id);
       if (!cardEl || !record) return;
       showToast('Generando imagen de la ficha...');
+      const isDark = document.documentElement.classList.contains('dark');
       try {
         const canvas = await html2canvas(cardEl, {
-          backgroundColor: '#191c21',
+          backgroundColor: isDark ? '#191c21' : '#ffffff',
           scale: 2,
           useCORS: true,
           ignoreElements: (el) => el.classList && el.classList.contains('no-export')
@@ -2240,20 +2418,21 @@
       const record = globalRecords.find(r => r.id === id);
       if (!cardEl || !record) return;
       showToast('Generando archivo PDF...');
+      const isDark = document.documentElement.classList.contains('dark');
       try {
         const safeTitle = (record.title || 'ficha').replace(/[^a-z0-9áéíóúñ_-]/gi, '_');
         const clone = cardEl.cloneNode(true);
         const actionBtns = clone.querySelector('.no-export');
         if (actionBtns) actionBtns.remove();
-        clone.style.backgroundColor = '#191c21';
-        clone.style.color = '#e1e2e9';
+        clone.style.backgroundColor = isDark ? '#191c21' : '#ffffff';
+        clone.style.color = isDark ? '#e1e2e9' : '#1c1f24';
         clone.style.padding = '24px';
 
         await html2pdf().set({
           margin: 10,
           filename: `TestimonioBox_${safeTitle}.pdf`,
           image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#191c21' },
+          html2canvas: { scale: 2, useCORS: true, backgroundColor: isDark ? '#191c21' : '#ffffff' },
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         }).from(clone).save();
         showToast('PDF descargado correctamente');
@@ -2269,7 +2448,10 @@
       if (!record) return;
       const meta = parseRecordMetadata(record);
       const dateObj = new Date(record.date);
-      const dateStr = isNaN(dateObj) ? '' : dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      const fallbackDateStr = isNaN(dateObj) ? '' : dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      const dateStr = meta.assignedDates.length > 0
+        ? meta.assignedDates.map(d => new Date(d + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })).join(' | ')
+        : fallbackDateStr;
 
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = record.notes || '';
@@ -2768,10 +2950,52 @@
       updateCoverPreview();
     });
 
+    let modalAssignedDates = [];
+    const modalAssignedDatesList = document.getElementById('modalAssignedDatesList');
+    const btnAddModalDate = document.getElementById('btnAddModalDate');
+
+    function renderModalAssignedDates() {
+      if (!modalAssignedDatesList) return;
+      if (modalAssignedDates.length === 0) {
+        modalAssignedDatesList.innerHTML = '';
+        return;
+      }
+      modalAssignedDatesList.innerHTML = modalAssignedDates.map(dStr => `
+        <span class="inline-flex items-center gap-1 text-[11px] font-mono bg-primary/15 text-primary border border-primary/30 px-2 py-0.5 rounded-md">
+          <span>${formatShortDateEs(dStr)}</span>
+          <button type="button" onclick="removeModalAssignedDate('${dStr}')" class="text-outline hover:text-error flex items-center cursor-pointer" title="Quitar este día">
+            <span class="material-symbols-outlined text-[13px]">close</span>
+          </button>
+        </span>
+      `).join('');
+    }
+
+    window.removeModalAssignedDate = (dStr) => {
+      modalAssignedDates = modalAssignedDates.filter(d => d !== dStr);
+      renderModalAssignedDates();
+    };
+
+    if (btnAddModalDate) {
+      btnAddModalDate.addEventListener('click', () => {
+        const dateInput = document.getElementById('fieldDate');
+        const val = dateInput ? dateInput.value.trim() : '';
+        if (!val) {
+          showToast('Selecciona una fecha primero para agregarla', 'error');
+          if (dateInput) dateInput.focus();
+          return;
+        }
+        modalAssignedDates = normalizeAssignedDatesList([...modalAssignedDates, val]);
+        dateInput.value = '';
+        renderModalAssignedDates();
+      });
+    }
+
     const btnClearFieldDate = document.getElementById('btnClearFieldDate');
     if (btnClearFieldDate) {
       btnClearFieldDate.addEventListener('click', () => {
         document.getElementById('fieldDate').value = '';
+        modalAssignedDates = [];
+        renderModalAssignedDates();
       });
     }
 
@@ -2783,6 +3007,8 @@
       // Por defecto no se asigna a ningún día del calendario a menos que se elija o se asigne explícitamente
       const dateInput = document.getElementById('fieldDate');
       dateInput.value = '';
+      modalAssignedDates = [];
+      renderModalAssignedDates();
       parentSearchInput.value = '';
       parentFilterDate.value = '';
       const subInput = document.getElementById('fieldSeriesSubtitle');
@@ -2835,10 +3061,9 @@
       fieldParentRecord.value = meta.parentRecordId || '';
 
       document.getElementById('fieldTitle').value = record.title || '';
-      const dObj = new Date(record.date);
-      document.getElementById('fieldDate').value = meta.calendarAssigned
-        ? (isNaN(dObj) ? '' : formatDateForInput(dObj))
-        : '';
+      document.getElementById('fieldDate').value = '';
+      modalAssignedDates = normalizeAssignedDatesList(meta.assignedDates);
+      renderModalAssignedDates();
       document.getElementById('fieldCategory').value = meta.categoryLabel || record.category || 'Discurso Público';
       document.getElementById('fieldSubcategory').value = meta.subcategory || 'La Atalaya';
       document.getElementById('fieldPackageName').value = meta.packageName || '';
@@ -2885,7 +3110,9 @@
       document.getElementById('weekendModal').classList.add('hidden');
       selectedDateFilter = dateStr;
       openModal('');
-      document.getElementById('fieldDate').value = dateStr;
+      modalAssignedDates = normalizeAssignedDatesList([dateStr]);
+      renderModalAssignedDates();
+      document.getElementById('fieldDate').value = '';
       if (packageName) {
         document.getElementById('fieldPackageName').value = packageName;
       }
@@ -2899,6 +3126,8 @@
         recordForm.reset();
         richEditor.innerHTML = '';
         currentScriptures = [];
+        modalAssignedDates = [];
+        renderModalAssignedDates();
         customCoverDataUrl = null;
         activeSeriesParentInfo = null;
         editingRecordId = null;
@@ -2963,9 +3192,8 @@
 
       packSearchResultsList.innerHTML = candidateFichas.slice(0, 30).map(r => {
         const meta = parseRecordMetadata(r);
-        const rDateStr = formatDateForInput(new Date(r.date));
         const dFormatted = new Date(r.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
-        const isAlreadyInPack = (currentPackName && meta.packageName === currentPackName) || (meta.calendarAssigned && rDateStr === selectedDateVal);
+        const isAlreadyInPack = Boolean(selectedDateVal && meta.assignedDates.includes(selectedDateVal));
 
         return `
           <div class="flex items-center justify-between gap-2 py-2 px-2.5 hover:bg-surface-container-high rounded-lg transition-colors">
@@ -2976,7 +3204,7 @@
                 <div class="flex flex-wrap items-center gap-1.5 text-[10px] text-outline">
                   <span class="text-tertiary">${meta.subcategory}</span>
                   <span>&bull;</span>
-                  <span class="font-mono">${meta.calendarAssigned ? `Asignada: ${dFormatted}` : `Creada: ${dFormatted}`}</span>
+                  <span class="font-mono">${meta.assignedDates.length > 0 ? `${meta.assignedDates.length} ${meta.assignedDates.length === 1 ? 'día asignado' : 'días asignados'}` : `Creada: ${dFormatted}`}</span>
                   ${meta.packageName ? `<span class="text-primary truncate max-w-[140px]">• ${meta.packageName}</span>` : ''}
                 </div>
               </div>
@@ -2984,7 +3212,7 @@
             ${isAlreadyInPack
               ? `<div class="flex items-center gap-1 flex-shrink-0">
                   <span class="text-[10px] font-mono bg-[#1b3a24] text-[#86efac] border border-[#86efac]/30 px-2 py-1 rounded flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">check</span>Asignada</span>
-                  <button type="button" onclick="removeFichaFromPackage('${r.id}')" class="text-[11px] bg-error-container/30 hover:bg-error text-error hover:text-[#410002] px-2 py-1 rounded border border-error/30 transition-colors cursor-pointer" title="Quitar del paquete">Quitar</button>
+                  <button type="button" onclick="removeFichaFromPackage('${r.id}', '${selectedDateVal}')" class="text-[11px] bg-error-container/30 hover:bg-error text-error hover:text-[#410002] px-2 py-1 rounded border border-error/30 transition-colors cursor-pointer" title="Quitar de este día">Quitar</button>
                 </div>`
               : `<button type="button" onclick="assignFichaToPackage('${r.id}')" class="text-xs bg-primary/20 hover:bg-primary text-primary hover:text-[#432c00] font-semibold px-2.5 py-1 rounded-lg border border-primary/30 transition-colors flex items-center gap-1 flex-shrink-0 cursor-pointer">
                   <span class="material-symbols-outlined text-[14px]">add_circle</span>
@@ -3007,6 +3235,7 @@
       const currentRecordDate = formatDateForInput(new Date(record.date));
       // Guardamos la fecha original de creación antes de asignarla al paquete
       const prevDate = meta.previousDateBeforePack || currentRecordDate;
+      const nextAssignedDates = normalizeAssignedDatesList([...meta.assignedDates, targetDate]);
 
       const isCustomImg = meta.coverImage && (
         meta.coverImage.startsWith('data:image/webp') ||
@@ -3019,6 +3248,7 @@
         subcategory: meta.subcategory,
         packageName: packName,
         calendarAssigned: true,
+        assignedDates: nextAssignedDates,
         previousDateBeforePack: prevDate,
         wentOut: meta.wentOut,
         hours: meta.hours,
@@ -3032,7 +3262,7 @@
       try {
         await updatePredicacionAdaptive(recordId, {
           title: record.title,
-          rawDate: targetDate,
+          rawDate: nextAssignedDates[nextAssignedDates.length - 1] || targetDate,
           category: meta.categoryLabel || record.category,
           metaObj: metaObj,
           notes: record.notes || '',
@@ -3047,7 +3277,7 @@
       }
     };
 
-    window.removeFichaFromPackage = async (recordId) => {
+    window.removeFichaFromPackage = async (recordId, specificDate = '__ALL__') => {
       const record = globalRecords.find(r => r.id === recordId);
       if (!record) return;
       const meta = parseRecordMetadata(record);
@@ -3057,16 +3287,24 @@
         meta.coverImage.startsWith('data:image/png')
       );
 
-      // Al quitarla del paquete/día, restauramos su fecha de creación original y marcamos calendarAssigned = false
+      let remainingDates = [];
+      if (specificDate && specificDate !== '__ALL__') {
+        remainingDates = meta.assignedDates.filter(d => d !== specificDate);
+      }
+
+      const stillAssigned = remainingDates.length > 0;
       const createdDateStr = record.created ? formatDateForInput(new Date(record.created)) : formatDateForInput(new Date());
-      const restoredDate = meta.previousDateBeforePack || createdDateStr;
+      const nextRawDate = stillAssigned
+        ? remainingDates[remainingDates.length - 1]
+        : (meta.previousDateBeforePack || createdDateStr);
 
       const metaObj = {
         items: meta.items,
         subcategory: meta.subcategory,
-        packageName: '',
-        calendarAssigned: false,
-        previousDateBeforePack: null,
+        packageName: stillAssigned ? meta.packageName : '',
+        calendarAssigned: stillAssigned,
+        assignedDates: remainingDates,
+        previousDateBeforePack: stillAssigned ? meta.previousDateBeforePack : null,
         wentOut: meta.wentOut,
         hours: meta.hours,
         revisitaData: meta.revisitaData,
@@ -3079,13 +3317,17 @@
       try {
         await updatePredicacionAdaptive(recordId, {
           title: record.title,
-          rawDate: restoredDate,
+          rawDate: nextRawDate,
           category: meta.categoryLabel || record.category,
           metaObj: metaObj,
           notes: record.notes || '',
           customCover: isCustomImg ? meta.coverImage : null
         });
-        showToast(`Ficha "${record.title}" quitada del paquete y del calendario`);
+        showToast(
+          stillAssigned
+            ? `Día quitado de "${record.title}" (sigue en ${remainingDates.length} ${remainingDates.length === 1 ? 'día' : 'días'})`
+            : `Ficha "${record.title}" desasignada del calendario`
+        );
         await loadDataAndRender();
         refreshWeekendModalView();
       } catch (err) {
@@ -3104,13 +3346,10 @@
         weekendPackTitle.value = getDefaultPackageTitleForDate(satVal);
       }
 
-      const currentPackName = weekendPackTitle.value.trim();
-
       const list = globalRecords.filter(r => {
         const meta = parseRecordMetadata(r);
         if (meta.revisitaData) return false;
-        const dStr = formatDateForInput(new Date(r.date));
-        return (currentPackName && meta.packageName === currentPackName) || (meta.calendarAssigned && dStr === satVal);
+        return meta.assignedDates.includes(satVal);
       });
 
       if (packAssignedCount) {
@@ -3120,20 +3359,19 @@
       if (list.length === 0) {
         weekendExistingList.innerHTML = `<p class="text-xs text-outline text-center py-4">No hay fichas asignadas todavía para este día (${satLabel}) o paquete.</p>`;
       } else {
+        const dayBadge = isNaN(satD) ? '' : satD.toLocaleDateString('es-ES', { weekday: 'short', day: '2-digit', month: 'short' }).toUpperCase();
         weekendExistingList.innerHTML = list.map(r => {
           const meta = parseRecordMetadata(r);
-          const dObj = new Date(r.date);
-          const dayBadge = isNaN(dObj) ? '' : dObj.toLocaleDateString('es-ES', { weekday: 'short', day: '2-digit', month: 'short' }).toUpperCase();
           return `
             <div class="flex items-center justify-between gap-2 bg-surface-container-high px-3 py-2 rounded-lg border border-outline/10">
               <div class="flex items-center gap-2.5 min-w-0 flex-1">
                 <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-primary/20 text-primary font-bold flex-shrink-0">${dayBadge}</span>
-                <span class="text-sm text-on-surface font-medium truncate">${r.title}</span>
+                <span class="text-sm text-on-surface font-medium truncate">${r.title}${meta.seriesSubtitle ? ` — ${meta.seriesSubtitle}` : ''}</span>
                 <span class="text-xs text-tertiary flex-shrink-0">(${meta.subcategory})</span>
                 ${meta.packageName ? `<span class="text-[10px] bg-surface-container px-2 py-0.5 rounded text-secondary truncate max-w-[140px]">${meta.packageName}</span>` : ''}
               </div>
               <div class="flex items-center gap-1 flex-shrink-0">
-                <button type="button" onclick="removeFichaFromPackage('${r.id}')" class="flex items-center gap-1 text-[11px] text-outline hover:text-error bg-surface-container hover:bg-error-container/30 px-2 py-1 rounded border border-outline/15 transition-colors cursor-pointer" title="Quitar de este paquete / día">
+                <button type="button" onclick="removeFichaFromPackage('${r.id}', '${satVal}')" class="flex items-center gap-1 text-[11px] text-outline hover:text-error bg-surface-container hover:bg-error-container/30 px-2 py-1 rounded border border-outline/15 transition-colors cursor-pointer" title="Quitar de este día">
                   <span class="material-symbols-outlined text-[14px]">link_off</span>
                   <span>Quitar</span>
                 </button>
@@ -3235,7 +3473,13 @@
       }
 
       const explicitDate = document.getElementById('fieldDate').value.trim();
-      const rawDate = explicitDate || formatDateForInput(new Date());
+      const finalAssignedDates = normalizeAssignedDatesList([
+        ...modalAssignedDates,
+        ...(explicitDate ? [explicitDate] : [])
+      ]);
+      const rawDate = finalAssignedDates.length > 0
+        ? finalAssignedDates[finalAssignedDates.length - 1]
+        : formatDateForInput(new Date());
       const editorHtml = richEditor.innerHTML.trim();
       const cleanNotes = (editorHtml === '<br>') ? '' : editorHtml;
       document.getElementById('fieldNotes').value = cleanNotes;
@@ -3261,7 +3505,7 @@
 
       const hoursVal = parseFloat(document.getElementById('fieldHours').value) || 0;
       const wentOutVal = document.getElementById('fieldWentOut').checked || hoursVal > 0;
-      const isCalendarAssigned = Boolean(explicitDate || packageName);
+      const isCalendarAssigned = finalAssignedDates.length > 0;
       const seriesSubtitleVal = hasSeriesParent
         ? (document.getElementById('fieldSeriesSubtitle') ? document.getElementById('fieldSeriesSubtitle').value.trim() : '')
         : '';
@@ -3271,6 +3515,7 @@
         subcategory: subcategory,
         packageName: packageName,
         calendarAssigned: isCalendarAssigned,
+        assignedDates: finalAssignedDates,
         wentOut: wentOutVal,
         hours: hoursVal,
         revisitaData: null,
